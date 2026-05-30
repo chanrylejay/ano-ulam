@@ -1,15 +1,17 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { sql } from '@/lib/db';
-import { callDeepSeekAPI } from '@/lib/deepseek';
+export const dynamic = "force-dynamic";
+
+import { NextRequest, NextResponse } from "next/server";
+import { sql } from "@/lib/db";
+import { callDeepSeekAPI } from "@/lib/deepseek";
 
 export async function POST(request: NextRequest) {
   try {
-    const cronSecret = request.headers.get('x-cron-secret');
+    const cronSecret = request.headers.get("x-cron-secret");
     if (cronSecret !== process.env.CRON_SECRET) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const today = new Date().toISOString().split('T')[0];
+    const today = new Date().toISOString().split("T")[0];
 
     // Check if suggestions already exist for today
     const existing = await sql`
@@ -19,7 +21,7 @@ export async function POST(request: NextRequest) {
     `;
 
     if (existing.length > 0) {
-      return NextResponse.json({ message: 'Suggestions already exist for today' });
+      return NextResponse.json({ message: "Suggestions already exist for today" });
     }
 
     // Get today's prices with commodity details
@@ -36,24 +38,31 @@ export async function POST(request: NextRequest) {
     `;
 
     if (prices.length === 0) {
-      return NextResponse.json({ error: 'No price data available for today' }, { status: 400 });
+      return NextResponse.json({ error: "No price data available for today" }, { status: 400 });
     }
 
     // Group by category and find cheapest
     const categorizedPrices: Record<string, typeof prices> = {};
-    prices.forEach(p => {
-      const cat = p.category || 'other';
+    prices.forEach((p) => {
+      const cat = p.category || "other";
       if (!categorizedPrices[cat]) categorizedPrices[cat] = [];
       categorizedPrices[cat].push(p);
     });
 
     // Get top 3 cheapest per category
-    const cheapestIngredients: Array<{ name: string; category: string; price: number; specification?: string }> = [];
+    const cheapestIngredients: Array<{
+      name: string;
+      category: string;
+      price: number;
+      specification?: string;
+    }> = [];
     Object.entries(categorizedPrices).forEach(([category, items]) => {
-      const sorted = [...items].sort((a, b) => (a.price_prevailing || 0) - (b.price_prevailing || 0));
-      sorted.slice(0, 3).forEach(item => {
+      const sorted = [...items].sort(
+        (a, b) => (a.price_prevailing || 0) - (b.price_prevailing || 0),
+      );
+      sorted.slice(0, 3).forEach((item) => {
         cheapestIngredients.push({
-          name: item.name || 'Unknown',
+          name: item.name || "Unknown",
           category: item.category || category,
           price: item.price_prevailing || 0,
           specification: item.specification || undefined,
@@ -63,8 +72,8 @@ export async function POST(request: NextRequest) {
 
     // Prepare price list for DeepSeek
     const priceList = prices
-      .map(p => `${p.name} (${p.category}): ₱${p.price_prevailing}/kg`)
-      .join('\n');
+      .map((p) => `${p.name} (${p.category}): ₱${p.price_prevailing}/kg`)
+      .join("\n");
 
     const prompt = `Based on these current market prices in the Philippines, suggest 5 budget-friendly Filipino meals. For each meal, provide:
 - name (Filipino dish name in Tagalog)
@@ -102,10 +111,10 @@ Return as a JSON object with a "meals" array.`;
       ingredientsCount: cheapestIngredients.length,
     });
   } catch (error) {
-    console.error('Error generating suggestions:', error);
+    console.error("Error generating suggestions:", error);
     return NextResponse.json(
-      { error: 'Failed to generate suggestions', details: String(error) },
-      { status: 500 }
+      { error: "Failed to generate suggestions", details: String(error) },
+      { status: 500 },
     );
   }
 }

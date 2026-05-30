@@ -1,10 +1,12 @@
-import { NextRequest, NextResponse } from 'next/server';
-import * as cheerio from 'cheerio';
-import { sql } from '@/lib/db';
-import { callDeepSeekAPI } from '@/lib/deepseek';
+export const dynamic = "force-dynamic";
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
+import { NextRequest, NextResponse } from "next/server";
+import * as cheerio from "cheerio";
+import { sql } from "@/lib/db";
+import { callDeepSeekAPI } from "@/lib/deepseek";
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 async function fetchPDFText(url: string): Promise<string> {
   const response = await fetch(url);
@@ -15,14 +17,14 @@ async function fetchPDFText(url: string): Promise<string> {
   const arrayBuffer = await response.arrayBuffer();
   const buffer = Buffer.from(arrayBuffer);
 
-  const pdfParse = await import('pdf-parse');
+  const pdfParse = await import("pdf-parse");
   const data = await pdfParse.default(buffer);
   return data.text;
 }
 
 async function findLatestPDFUrl(): Promise<string | null> {
   try {
-    const response = await fetch('https://www.da.gov.ph/price-monitoring/');
+    const response = await fetch("https://www.da.gov.ph/price-monitoring/");
     if (!response.ok) {
       throw new Error(`Failed to fetch DA page: ${response.status}`);
     }
@@ -32,28 +34,28 @@ async function findLatestPDFUrl(): Promise<string | null> {
 
     const pdfLinks: string[] = [];
     $('a[href*="Daily-Price-Index"][href$=".pdf"]').each((_, element) => {
-      const href = $(element).attr('href');
+      const href = $(element).attr("href");
       if (href) {
-        const fullUrl = href.startsWith('http') ? href : `https://www.da.gov.ph${href}`;
+        const fullUrl = href.startsWith("http") ? href : `https://www.da.gov.ph${href}`;
         pdfLinks.push(fullUrl);
       }
     });
 
     return pdfLinks.length > 0 ? pdfLinks[0] : null;
   } catch (error) {
-    console.error('Error finding PDF URL:', error);
+    console.error("Error finding PDF URL:", error);
     return null;
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const cronSecret = request.headers.get('x-cron-secret');
+    const cronSecret = request.headers.get("x-cron-secret");
     if (cronSecret !== process.env.CRON_SECRET) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const today = new Date().toISOString().split('T')[0];
+    const today = new Date().toISOString().split("T")[0];
 
     // Check if we already have data for today
     const existingPrices = await sql`
@@ -61,13 +63,13 @@ export async function POST(request: NextRequest) {
     `;
 
     if (existingPrices.length > 0) {
-      return NextResponse.json({ message: 'Prices already ingested for today' });
+      return NextResponse.json({ message: "Prices already ingested for today" });
     }
 
     // Find latest PDF URL
     const pdfUrl = await findLatestPDFUrl();
     if (!pdfUrl) {
-      return NextResponse.json({ error: 'Could not find Daily Price Index PDF' }, { status: 404 });
+      return NextResponse.json({ error: "Could not find Daily Price Index PDF" }, { status: 404 });
     }
 
     // Fetch and extract PDF text
@@ -75,10 +77,10 @@ export async function POST(request: NextRequest) {
     try {
       pdfText = await fetchPDFText(pdfUrl);
     } catch (pdfError) {
-      console.error('PDF extraction error:', pdfError);
+      console.error("PDF extraction error:", pdfError);
       return NextResponse.json(
-        { error: 'Failed to extract PDF content', details: String(pdfError) },
-        { status: 500 }
+        { error: "Failed to extract PDF content", details: String(pdfError) },
+        { status: 500 },
       );
     }
 
@@ -98,7 +100,7 @@ ${pdfText.substring(0, 8000)}`;
     const parsed = JSON.parse(responseText);
 
     if (!parsed.commodities || !Array.isArray(parsed.commodities)) {
-      throw new Error('Invalid response format from AI');
+      throw new Error("Invalid response format from AI");
     }
 
     let insertedCount = 0;
@@ -110,8 +112,8 @@ ${pdfText.substring(0, 8000)}`;
         continue;
       }
 
-      const specification = item.specification || '';
-      const category = item.category || 'other';
+      const specification = item.specification || "";
+      const category = item.category || "other";
 
       // Check if commodity exists
       let commodityResult = await sql`
@@ -142,8 +144,8 @@ ${pdfText.substring(0, 8000)}`;
         `;
         insertedCount++;
       } catch (insertError: any) {
-        if (insertError.code !== '23505') {
-          console.error('Error inserting price:', insertError);
+        if (insertError.code !== "23505") {
+          console.error("Error inserting price:", insertError);
         }
         skippedCount++;
       }
@@ -152,17 +154,17 @@ ${pdfText.substring(0, 8000)}`;
     // Trigger meal suggestion generation
     const baseUrl = process.env.VERCEL_URL
       ? `https://${process.env.VERCEL_URL}`
-      : 'http://localhost:3000';
+      : "http://localhost:3000";
 
     try {
       await fetch(`${baseUrl}/api/cron/suggest`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'x-cron-secret': process.env.CRON_SECRET || '',
+          "x-cron-secret": process.env.CRON_SECRET || "",
         },
       });
     } catch (suggestError) {
-      console.error('Error triggering suggestions:', suggestError);
+      console.error("Error triggering suggestions:", suggestError);
     }
 
     return NextResponse.json({
@@ -173,10 +175,10 @@ ${pdfText.substring(0, 8000)}`;
       pricesSkipped: skippedCount,
     });
   } catch (error) {
-    console.error('Error in cron ingest:', error);
+    console.error("Error in cron ingest:", error);
     return NextResponse.json(
-      { error: 'Failed to ingest prices', details: String(error) },
-      { status: 500 }
+      { error: "Failed to ingest prices", details: String(error) },
+      { status: 500 },
     );
   }
 }
