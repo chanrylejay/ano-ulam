@@ -1,0 +1,266 @@
+'use client';
+
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import {
+  Heart,
+  Github,
+  ExternalLink,
+  Database,
+  Bot,
+  Clock,
+  Sparkles,
+  Home,
+  Code,
+  Mail
+} from 'lucide-react';
+
+export default function AboutPage() {
+  return (
+    <div className="min-h-screen pb-20">
+      {/* Header */}
+      <header className="bg-gradient-to-r from-teal-500 via-cyan-500 to-blue-500 text-white py-10 px-4 shadow-lg">
+        <div className="max-w-4xl mx-auto">
+          <Button
+            variant="ghost"
+            className="text-white hover:bg-white/20 mb-4"
+            onClick={() => window.location.href = '/'}
+          >
+            <Home className="w-4 h-4 mr-2" />
+            Back to Home
+          </Button>
+
+          <div className="flex items-center gap-3 mb-2">
+            <Sparkles className="w-8 h-8" />
+            <h1 className="text-3xl md:text-4xl font-bold">About Ano Ulam?</h1>
+          </div>
+
+          <p className="text-teal-100 text-sm md:text-base">
+            Free, open-source meal planning for Filipino families
+          </p>
+        </div>
+      </header>
+
+      <main className="max-w-4xl mx-auto px-4 py-8">
+        {/* Mission Statement */}
+        <Card className="mb-6 border-amber-200 bg-gradient-to-br from-amber-50 to-orange-50">
+          <CardContent className="p-8">
+            <div className="flex items-center gap-3 mb-4">
+              <Heart className="w-6 h-6 text-red-500" />
+              <h2 className="text-2xl font-bold text-amber-900">Our Mission</h2>
+            </div>
+            <p className="text-gray-700 leading-relaxed mb-4">
+              <strong>Ano Ulam?</strong> is a free and open-source web application built to help
+              Filipino families plan meals on a budget. We understand that meal planning can be
+              challenging, especially when trying to balance nutrition, taste, and cost.
+            </p>
+            <p className="text-gray-700 leading-relaxed">
+              By providing daily AI-generated meal suggestions based on current market prices from the
+              Department of Agriculture, we aim to make it easier for families to prepare delicious,
+              nutritious, and affordable meals every day.
+            </p>
+          </CardContent>
+        </Card>
+
+        {/* Data Source */}
+        <Card className="mb-6 border-green-200 bg-white">
+          <CardContent className="p-8">
+            <div className="flex items-center gap-3 mb-4">
+              <Database className="w-6 h-6 text-green-600" />
+              <h2 className="text-2xl font-bold text-green-900">Data Source</h2>
+            </div>
+            <p className="text-gray-700 leading-relaxed mb-4">
+              All market price data is sourced from the{' '}
+              <a
+                href="https://www.da.gov.ph/price-monitoring/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-semibold text-green-700 hover:underline inline-flex items-center gap-1"
+              >
+                Department of Agriculture Bantay Presyo Daily Price Index
+                <ExternalLink className="w-4 h-4" />
+              </a>
+            </p>
+            <p className="text-gray-700 leading-relaxed mb-4">
+              The Department of Agriculture monitors and publishes daily commodity prices from various
+              markets across the Philippines. This data helps consumers make informed decisions about
+              their purchases and promotes transparency in market pricing.
+            </p>
+            <Badge variant="outline" className="bg-green-50 border-green-300 text-green-700">
+              Data updated daily at 8:00 AM Manila time
+            </Badge>
+          </CardContent>
+        </Card>
+
+        {/* How It Works */}
+        <Card className="mb-6 border-blue-200 bg-white">
+          <CardContent className="p-8">
+            <div className="flex items-center gap-3 mb-4">
+              <Bot className="w-6 h-6 text-blue-600" />
+              <h2 className="text-2xl font-bold text-blue-900">How It Works</h2>
+            </div>
+            <div className="space-y-4">
+              <div className="flex gap-4">
+                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center font-bold text-blue-700">
+                  1
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-800">Daily Data Collection</h3>
+                  <p className="text-gray-600 text-sm">
+                    Every morning, our system fetches the latest Daily Price Index PDF from the DA website
+                    and extracts commodity prices using AI.
+                  </p>
+                </div>
+              </div>
+              <div className="flex gap-4">
+                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center font-bold text-blue-700">
+                  2
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-800">Smart Analysis</h3>
+                  <p className="text-gray-600 text-sm">
+                    DeepSeek AI analyzes the prices and identifies the cheapest ingredients across all
+                    categories while considering nutritional balance.
+                  </p>
+                </div>
+              </div>
+              <div className="flex gap-4">
+                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center font-bold text-blue-700">
+                  3
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-800">Meal Suggestions</h3>
+                  <p className="text-gray-600 text-sm">
+                    The AI generates 5 budget-friendly Filipino meal suggestions with recipes,
+                    ingredient costs, and cooking instructions.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Tech Stack */}
+        <Card className="mb-6 border-purple-200 bg-white">
+          <CardContent className="p-8">
+            <div className="flex items-center gap-3 mb-4">
+              <Code className="w-6 h-6 text-purple-600" />
+              <h2 className="text-2xl font-bold text-purple-900">Built With</h2>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+              <Badge variant="outline" className="justify-center py-2 border-purple-200 bg-purple-50 text-purple-700">
+                Next.js 14
+              </Badge>
+              <Badge variant="outline" className="justify-center py-2 border-blue-200 bg-blue-50 text-blue-700">
+                TypeScript
+              </Badge>
+              <Badge variant="outline" className="justify-center py-2 border-cyan-200 bg-cyan-50 text-cyan-700">
+                Tailwind CSS
+              </Badge>
+              <Badge variant="outline" className="justify-center py-2 border-green-200 bg-green-50 text-green-700">
+                Neon PostgreSQL
+              </Badge>
+              <Badge variant="outline" className="justify-center py-2 border-orange-200 bg-orange-50 text-orange-700">
+                DeepSeek AI
+              </Badge>
+              <Badge variant="outline" className="justify-center py-2 border-pink-200 bg-pink-50 text-pink-700">
+                Vercel Cron
+              </Badge>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Creator */}
+        <Card className="mb-6 border-amber-200 bg-gradient-to-br from-yellow-50 to-amber-50">
+          <CardContent className="p-8">
+            <div className="flex items-center gap-3 mb-4">
+              <Sparkles className="w-6 h-6 text-amber-600" />
+              <h2 className="text-2xl font-bold text-amber-900">Created By</h2>
+            </div>
+            <p className="text-gray-700 leading-relaxed mb-4">
+              Built with love by <strong>Chanryle Jay Cagara</strong> - a Filipino developer passionate
+              about creating tools that make everyday life easier for Filipino families.
+            </p>
+            <div className="flex flex-wrap gap-3">
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-2"
+                onClick={() => window.open('https://github.com', '_blank')}
+              >
+                <Github className="w-4 h-4" />
+                GitHub
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Important Notes */}
+        <Card className="mb-6 border-gray-200 bg-gray-50">
+          <CardContent className="p-6">
+            <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+              <Clock className="w-5 h-5 text-gray-600" />
+              Important Notes
+            </h3>
+            <ul className="space-y-2 text-sm text-gray-700">
+              <li className="flex gap-2">
+                <span className="text-gray-500">•</span>
+                <span>Prices are updated daily and may vary by location and market</span>
+              </li>
+              <li className="flex gap-2">
+                <span className="text-gray-500">•</span>
+                <span>Meal suggestions assume basic pantry staples are available</span>
+              </li>
+              <li className="flex gap-2">
+                <span className="text-gray-500">•</span>
+                <span>AI-generated suggestions are for inspiration - adjust to your taste!</span>
+              </li>
+              <li className="flex gap-2">
+                <span className="text-gray-500">•</span>
+                <span>Always verify prices at your local market before purchasing</span>
+              </li>
+            </ul>
+          </CardContent>
+        </Card>
+
+        {/* Action Buttons */}
+        <div className="flex flex-wrap justify-center gap-4 mt-8">
+          <Button
+            variant="default"
+            className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600"
+            onClick={() => window.location.href = '/'}
+          >
+            <Home className="w-4 h-4 mr-2" />
+            Back to Home
+          </Button>
+          <Button
+            variant="outline"
+            className="border-gray-300"
+            onClick={() => window.open('https://www.da.gov.ph/price-monitoring/', '_blank')}
+          >
+            <ExternalLink className="w-4 h-4 mr-2" />
+            View DA Price Monitoring
+          </Button>
+        </div>
+      </main>
+
+      {/* Footer */}
+      <footer className="border-t border-amber-200 bg-white/80 backdrop-blur-sm mt-16">
+        <div className="max-w-4xl mx-auto px-4 py-6">
+          <p className="text-center text-sm text-amber-700">
+            Data mula sa{' '}
+            <a
+              href="https://www.da.gov.ph/price-monitoring/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold hover:underline"
+            >
+              Department of Agriculture Bantay Presyo
+            </a>
+          </p>
+        </div>
+      </footer>
+    </div>
+  );
+}
