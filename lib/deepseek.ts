@@ -1,31 +1,29 @@
-export async function callDeepSeekAPI(
-  prompt: string,
-  systemPrompt?: string
-): Promise<string> {
+export async function callDeepSeekAPI(prompt: string, systemPrompt?: string): Promise<string> {
   const apiKey = process.env.DEEPSEEK_API_KEY;
 
   if (!apiKey) {
-    throw new Error('DEEPSEEK_API_KEY is not configured');
+    throw new Error("DEEPSEEK_API_KEY is not configured");
   }
 
   const messages: Array<{ role: string; content: string }> = [];
 
   if (systemPrompt) {
-    messages.push({ role: 'system', content: systemPrompt });
+    messages.push({ role: "system", content: systemPrompt });
   }
 
-  messages.push({ role: 'user', content: prompt });
+  messages.push({ role: "user", content: prompt });
 
-  const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
-    method: 'POST',
+  const response = await fetch("https://api.deepseek.com/v1/chat/completions", {
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
-      model: 'deepseek-chat',
+      model: "deepseek-chat",
       messages,
-      response_format: { type: 'json_object' },
+      response_format: { type: "json_object" },
+      max_tokens: 8192,
       temperature: 0.7,
     }),
   });
@@ -36,5 +34,13 @@ export async function callDeepSeekAPI(
   }
 
   const data = await response.json();
-  return data.choices[0].message.content;
+  let content = data.choices[0].message.content;
+
+  // Safety net: clean markdown wrapping if present
+  content = content
+    .replace(/```json\s*/g, "")
+    .replace(/```\s*/g, "")
+    .trim();
+
+  return content;
 }

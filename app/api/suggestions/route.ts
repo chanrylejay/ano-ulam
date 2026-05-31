@@ -10,7 +10,7 @@ export async function GET() {
     // Try to get today's suggestions
     const todaySuggestions = await sql`
       SELECT * FROM daily_suggestions
-      WHERE date = ${today}
+      WHERE suggestion_date = ${today}
       LIMIT 1
     `;
 
@@ -24,7 +24,7 @@ export async function GET() {
     // If no suggestions for today, get the most recent
     const latestSuggestions = await sql`
       SELECT * FROM daily_suggestions
-      ORDER BY date DESC
+      ORDER BY suggestion_date DESC
       LIMIT 1
     `;
 

@@ -96,9 +96,6 @@ Return as a JSON object with a "meals" array.`;
 
     const systemPrompt = `You are a Filipino home cooking expert specializing in budget-friendly meal planning. You have deep knowledge of traditional Filipino dishes and know how to make delicious meals using affordable ingredients available in Philippine public markets.`;
 
-    const responseText = await callDeepSeekAPI(prompt, systemPrompt);
-    const parsed = JSON.parse(responseText);
-
     // Save to database
     await sql`
       INSERT INTO daily_suggestions (suggestion_date, meals, cheapest_ingredients)

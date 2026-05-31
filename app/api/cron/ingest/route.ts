@@ -94,9 +94,6 @@ ${pdfText.substring(0, 8000)}`;
 
     const systemPrompt = `You are a data extraction specialist for Philippine agricultural price reports. You accurately extract commodity name, category, specification, and prevailing prices from Department of Agriculture Daily Price Index documents. Always return valid JSON.`;
 
-    const responseText = await callDeepSeekAPI(prompt, systemPrompt);
-    const parsed = JSON.parse(responseText);
-
     if (!parsed.commodities || !Array.isArray(parsed.commodities)) {
       throw new Error("Invalid response format from AI");
     }
