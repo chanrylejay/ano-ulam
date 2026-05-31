@@ -6,11 +6,13 @@ import { usePathname } from "next/navigation";
 import { MealCard } from "@/components/MealCard";
 import { Footer } from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
+import { defaultItems } from "@/lib/commodity-names";
 
 interface Ingredient {
   name: string;
   trend: "down" | "up" | "stable";
   optional?: boolean;
+  amount?: string;
 }
 
 interface Meal {
@@ -31,18 +33,6 @@ interface PriceItem {
   commodities: { name: string };
   price_prevailing: number;
 }
-
-const defaultItemKeys = [
-  { key: "Pork liempo", label: "Baboy" },
-  { key: "Chicken legs", label: "Manok" },
-  { key: "Beef litid", label: "Beef" },
-  { key: "Itlog", label: "Itlog" },
-  { key: "Bangus", label: "Bangus" },
-  { key: "Tilapia", label: "Tilapia" },
-  { key: "Bigas pinakamura", label: "Bigas" },
-  { key: "Sibuyas pula", label: "Sibuyas" },
-  { key: "Bawang", label: "Bawang" },
-];
 
 function formatPeso(amount: number): string {
   return new Intl.NumberFormat("fil-PH", {
@@ -84,7 +74,7 @@ export default function HomePage() {
         const priceData = await pricesRes.json();
         if (priceData.prices) {
           const tags: PriceTag[] = [];
-          for (const item of defaultItemKeys) {
+          for (const item of defaultItems) {
             const found = (priceData.prices as PriceItem[]).find(
               (p) => p.commodities.name.toLowerCase() === item.key.toLowerCase(),
             );
@@ -113,7 +103,7 @@ export default function HomePage() {
   const today = new Date();
   const formattedDate = format(today, "EEEE, MMMM d, yyyy");
 
-  // Error state — network/server failure
+  // Error state
   if (error && meals.length === 0) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-amber-50 to-orange-50 px-4">
@@ -121,10 +111,7 @@ export default function HomePage() {
           <div className="text-5xl">😕</div>
           <p className="text-amber-900 font-bold text-xl">{error}</p>
           <button
-            onClick={() => {
-              setError(null);
-              fetchData();
-            }}
+            onClick={() => { setError(null); fetchData(); }}
             className="inline-flex items-center gap-2 bg-amber-600 text-white font-semibold px-6 py-3 rounded-xl hover:bg-amber-700 transition-colors"
           >
             Subukan Muli
@@ -134,46 +121,35 @@ export default function HomePage() {
     );
   }
 
-  // Loading state — skeleton
+  // Loading — skeleton
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50">
-        {/* Skeleton Header */}
-        <div
-          className="bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 px-4 pt-10 pb-8 shadow-lg"
-          style={{ minHeight: "38vh" }}
-        >
-          <div className="max-w-2xl mx-auto flex flex-col h-full">
-            <div className="flex-1 flex flex-col justify-center space-y-3">
-              <div className="h-12 w-72 bg-white/20 rounded-lg animate-pulse" />
-              <div className="h-5 w-48 bg-white/15 rounded animate-pulse" />
-              <div className="h-4 w-36 bg-white/10 rounded animate-pulse mb-5" />
+        <div className="bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 shadow-lg" style={{ minHeight: "42vh" }}>
+          <div className="max-w-2xl mx-auto px-4 pt-10 pb-8 flex flex-col h-full items-center text-center" style={{ minHeight: "42vh" }}>
+            <div className="flex-1 flex flex-col items-center justify-center space-y-3">
+              <div className="h-16 w-80 bg-white/20 rounded-lg animate-pulse" />
+              <div className="h-5 w-56 bg-white/15 rounded animate-pulse" />
+              <div className="h-4 w-44 bg-white/10 rounded animate-pulse mt-4" />
             </div>
-            <div className="flex flex-wrap gap-1.5">
-              {[...Array(9)].map((_, i) => (
+            <div className="flex flex-wrap justify-center gap-1.5 mt-auto">
+              {[...Array(12)].map((_, i) => (
                 <div key={i} className="h-6 w-20 bg-white/15 rounded-full animate-pulse" />
               ))}
-              <div className="h-6 w-16 bg-white/10 rounded-full animate-pulse" />
+              <div className="h-7 w-20 bg-white/25 rounded-full animate-pulse" />
             </div>
           </div>
         </div>
-        {/* Skeleton Cards */}
         <main className="max-w-2xl mx-auto px-4 py-6 space-y-3">
           {[...Array(3)].map((_, i) => (
-            <div
-              key={i}
-              className="bg-white rounded-xl shadow-sm border border-amber-200 p-3.5 space-y-2.5 animate-pulse"
-            >
+            <div key={i} className="bg-white rounded-xl shadow-sm border border-amber-200 p-3.5 space-y-2.5 animate-pulse">
               <div className="flex justify-between">
                 <div className="h-6 w-40 bg-amber-100 rounded" />
-                <div className="h-6 w-16 bg-amber-100 rounded" />
+                <div className="h-6 w-16 bg-amber-100 rounded-full" />
               </div>
               <div className="grid grid-cols-2 gap-1.5">
                 {[...Array(4)].map((_, j) => (
-                  <div key={j} className="flex gap-2">
-                    <div className="h-4 w-20 bg-amber-50 rounded" />
-                    <div className="h-4 w-6 bg-amber-50 rounded" />
-                  </div>
+                  <div key={j} className="flex gap-2"><div className="h-4 w-20 bg-amber-50 rounded" /><div className="h-4 w-6 bg-amber-50 rounded" /></div>
                 ))}
               </div>
               <div className="h-4 w-32 bg-amber-50 rounded" />
@@ -187,32 +163,38 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50">
-      {/* Header — left-aligned, ~35-40% of mobile screen height */}
+      {/* Header — centered, 42vh height */}
       <header
-        className="bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 text-white px-4 pt-10 pb-8 shadow-lg"
-        style={{ minHeight: "38vh" }}
+        className="bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 text-white shadow-lg flex flex-col"
+        style={{ minHeight: "42vh" }}
       >
-        <div className="max-w-2xl mx-auto flex flex-col h-full">
-          <div className="flex-1 flex flex-col justify-center">
-            <h1 className="text-5xl font-black mb-1 tracking-tight">ma, Ano Ulam?</h1>
-            <p className="text-lg text-white/90 mb-1">Anong murang ulam ngayon</p>
-            <p className="text-xs text-white/70 mb-5">{formattedDate}</p>
+        <div className="max-w-2xl mx-auto w-full px-4 pt-12 pb-8 flex flex-col flex-1 items-center text-center">
+          {/* Hero text */}
+          <div className="flex-1 flex flex-col items-center justify-center">
+            <h1 className="text-6xl md:text-8xl font-black mb-2 tracking-tight">
+              ma, Ano ulam?
+            </h1>
+            <p className="text-lg text-white/90 mb-6">Anong murang ulam ngayon</p>
+            <p className="text-sm text-white/70">{formattedDate}</p>
           </div>
 
-          {/* Price Tags — all uniform semi-transparent white, left-aligned */}
-          <div className="flex flex-wrap gap-1.5">
+          {/* Price Tags — pushed to bottom, stock market style */}
+          <div className="flex flex-wrap justify-center gap-1.5 mt-auto pt-6">
             {priceTags.map((tag) => (
               <span
                 key={tag.label}
-                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold bg-white/15 text-white hover:bg-white/25 transition-colors"
+                className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold text-white ${
+                  tag.price <= 100 ? "bg-green-500" : "bg-red-500"
+                }`}
               >
-                {tag.label} {formatPeso(tag.price)}
+                {tag.label} {formatPeso(tag.price)}{" "}
+                {tag.price <= 100 ? "↓" : "↑"}
               </span>
             ))}
             <a
               href="/prices"
               aria-label="View all commodity prices"
-              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold border border-white/30 text-white hover:bg-white/25 transition-colors"
+              className="inline-flex items-center gap-1 px-4 py-1.5 rounded-full text-sm font-bold bg-white text-amber-700 shadow-md hover:shadow-lg transition-shadow"
             >
               More →
             </a>
@@ -222,7 +204,6 @@ export default function HomePage() {
 
       {/* Meal Cards */}
       <main id="main-content" className="max-w-2xl mx-auto px-4 py-6 space-y-3" aria-live="polite" aria-atomic="false">
-        {/* Empty state */}
         {meals.length === 0 && !error && (
           <Card className="border-amber-200 bg-gradient-to-br from-amber-50 to-orange-50">
             <CardContent className="text-center p-12">
@@ -233,7 +214,6 @@ export default function HomePage() {
           </Card>
         )}
 
-        {/* Meal cards */}
         {meals.length > 0 && (
           <ul className="space-y-3" aria-label="Meal suggestions">
             {meals.map((meal, i) => (
@@ -242,7 +222,6 @@ export default function HomePage() {
           </ul>
         )}
 
-        {/* Bottom Buttons */}
         {meals.length > 0 && (
           <div className="flex flex-col gap-3 pt-4 pb-8">
             {pathname !== "/prices" && (

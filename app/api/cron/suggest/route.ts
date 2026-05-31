@@ -108,10 +108,18 @@ export async function POST(request: NextRequest) {
 
 For each meal, provide:
 - name: Filipino dish name in Tagalog
-- estimated_cost: total cost for the dish in pesos (just the number, for 2-4 servings)
+- estimated_cost: total cost for ONE meal (for 2-4 servings). Calculate based on ACTUAL amount needed, NOT 1kg each:
+  * Meat/Fish: 1/2 kg or 1 kg
+  * Vegetables: 1/4 kg or "1 tali" or "2-3 pcs"
+  * Spices (bawang, sibuyas, luya): "2-3 pcs" or "1 ulo" (about 1/8 the kg price)
+  * Rice: 1 kg
+  * Cooking oil: already in pantry, do NOT include
+  * IMPORTANT: If Bawang is ₱383/kg but you only need 2-3 cloves (~1/8 kg ≈ ₱48), use ₱48 in cost.
+  * Total cost should reflect what a family actually spends sa palengke for ONE meal
 - servings: "2-4 na tao"
 - ingredients: array of objects, each with:
   - name: ingredient name in Filipino (use the names from the price list)
+  - amount: realistic palengke amount as a human-readable string. Examples: "1 kg", "1/2 kg", "1/4 kg", "2-3 pcs", "1 ulo", "1 tali". Do NOT use "1/8 kg" — convert to "2-3 pcs" or "1 ulo"
   - trend: "down", "up", or "stable" (from the price data)
   - optional: true or false (vegetables and non-essential items are usually optional)
 - reason: 1-2 sentences in Tagalog explaining WHY this dish is suggested today based on current prices. Example: "Mura ang manok ngayon, bumaba presyo ng Bawang at Sibuyas this week."
@@ -119,14 +127,25 @@ For each meal, provide:
 Current prices (with trends):
 ${priceListWithTrends}
 
+AUTHENTIC FILIPINO RECIPES — IMPORTANT RULES:
+- Tinola uses: chicken, sayote OR papaya, luya, dahon ng sili OR malunggay. It does NOT use kamatis.
+- Adobo uses: meat (pork/chicken), toyo, suka, bawang, paminta, dahon ng laurel. Basic. No vegetables.
+- Sinigang uses: meat/fish, kangkong OR sitaw, labanos, okra, kamatis, sibuyas, sampalok mix (pantry).
+- Nilaga uses: beef/pork, repolyo, pechay, patatas, sibuyas, luya/black pepper.
+- Pinakbet uses: pork (liempo/pigue), kalabasa, talong, okra, sitaw, ampalaya, kamatis, bagoong (pantry).
+- Paksiw uses: fish (bangus/galunggong), suka, luya, sibuyas, sili. Simple. No vegetables.
+- Ginisang monggo: monggo, pork/chicken (small amount), malunggay OR ampalaya leaves, bawang, sibuyas, kamatis.
+- Use ONLY authentic Filipino recipe ingredients. Do NOT add ingredients that don't belong in the dish.
+- DO NOT include pantry staples in ingredients array (toyo, suka, patis, paminta, mantika, asin, asukal) — they are always available.
+- Keep it simple — 3-6 ingredients per dish max.
+
 Requirements:
 1. Focus on common Filipino dishes that families actually cook daily
 2. Use the CHEAPEST available ingredients — prioritize items marked [down]
-3. Assume basic pantry staples (toyo, suka, patis, paminta, mantika) are already available — do NOT include them in ingredients
-4. Keep it simple — 3-6 ingredients per dish max
-5. The "reason" field must reference specific ingredient prices or trends
-6. Use Filipino ingredient names from the list above
-7. Mix different proteins across the 5 meals (don't repeat the same meat)
+3. Every ingredient MUST include the "amount" field with a real palengke amount
+4. The "reason" field must reference specific ingredient prices or trends
+5. Use Filipino ingredient names from the price list above
+6. Mix different proteins across the 5 meals (don't repeat the same meat)
 
 Return as a JSON object with a "meals" array.`;
 

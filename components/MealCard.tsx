@@ -7,6 +7,7 @@ interface Ingredient {
   name: string;
   trend: "down" | "up" | "stable";
   optional?: boolean;
+  amount?: string;
 }
 
 interface Meal {
@@ -47,7 +48,7 @@ export function MealCard({ meal, index }: MealCardProps) {
               <h2 className="text-lg font-bold text-gray-900">
                 {getDishEmoji(meal.name)} {meal.name}
               </h2>
-              <span className="text-base font-bold text-amber-800 shrink-0 ml-2 pt-0.5">
+              <span className="bg-amber-500 text-white text-sm font-bold px-3 py-1 rounded-full shrink-0 ml-2">
                 ₱{meal.estimated_cost}
               </span>
             </div>
@@ -58,10 +59,22 @@ export function MealCard({ meal, index }: MealCardProps) {
                 <div key={j} className="flex items-center gap-1 text-sm">
                   <span className="font-medium text-gray-800">{ing.name}</span>
                   {ing.trend === "down" && (
-                    <TrendingDown className="w-3.5 h-3.5 text-green-700 flex-shrink-0" aria-label="Price trending down" />
+                    <span className="text-green-600 font-bold flex items-center gap-0.5 flex-shrink-0">
+                      ↓
+                    </span>
                   )}
                   {ing.trend === "up" && (
-                    <TrendingUp className="w-3.5 h-3.5 text-red-600 flex-shrink-0" aria-label="Price trending up" />
+                    <span className="text-red-600 font-bold flex items-center gap-0.5 flex-shrink-0">
+                      ↑
+                    </span>
+                  )}
+                  {ing.trend === "stable" && (
+                    <span className="text-gray-400 flex items-center gap-0.5 flex-shrink-0">
+                      →
+                    </span>
+                  )}
+                  {ing.amount && (
+                    <span className="text-gray-400 text-xs">{ing.amount}</span>
                   )}
                   {ing.optional && <span className="text-gray-400 text-xs">(optional)</span>}
                 </div>

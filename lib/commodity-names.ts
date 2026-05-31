@@ -128,7 +128,7 @@ export const hiddenCommodities: string[] = [
   "Salt (Iodized)",
 ];
 
-// Default items to show in header price tags
+// Default items to show in header price tags (13 items)
 export const defaultItems = [
   { key: "Pork Belly (Liempo)", label: "Baboy" },
   { key: "Chicken Legs", label: "Manok" },
@@ -139,6 +139,10 @@ export const defaultItems = [
   { key: "Regular Milled 20-40% bran streak", label: "Bigas" },
   { key: "Red Onion Local", label: "Sibuyas" },
   { key: "Garlic Native/Local", label: "Bawang" },
+  { key: "Banana (Saba)", label: "Saging" },
+  { key: "Cooking Oil (Palm)", label: "Mantika" },
+  { key: "Calamansi", label: "Kalamansi" },
+  { key: "Chilli (Red) Local", label: "Sili" },
 ];
 
 // Helper function
