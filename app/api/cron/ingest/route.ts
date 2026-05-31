@@ -118,8 +118,8 @@ ${pdfText.substring(0, 8000)}`;
           const parts = line.split(",");
           if (parts.length < 4) return null;
           const price = parseFloat(parts[parts.length - 1]);
-          const category = parts[parts.length - 2]?.trim() || "other";
-          const specification = parts[parts.length - 3]?.trim() || "";
+          const specification = parts[parts.length - 2]?.trim() || "";
+          const category = parts[parts.length - 3]?.trim() || "other";
           const name = parts
             .slice(0, parts.length - 3)
             .join(",")
