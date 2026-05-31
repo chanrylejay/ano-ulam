@@ -1,6 +1,7 @@
 // ═══════════════════════════════════════════════════════════
 // Ano Ulam? — Recipe Database & Cost Engine
-// 47 authentic Filipino recipes with DA price mapping
+// V2 Balanced Recommendation Engine
+// 47 Filipino recipes with DA price mapping + smarter variety rules
 // ═══════════════════════════════════════════════════════════
 
 export interface RecipeIngredient {
@@ -28,7 +29,7 @@ export interface Recipe {
 }
 
 export interface PriceMap {
-  [daKey: string]: number; // price per kg or per piece
+  [daKey: string]: number;
 }
 
 export interface CostResult {
@@ -43,2354 +44,624 @@ export interface CostResult {
   }[];
 }
 
+type Unit = "kg" | "pcs";
+
+type RawIngredient = [
+  name: string,
+  daKey: string | null,
+  qty: number,
+  unit: Unit,
+  amount: string,
+  optional?: boolean,
+  fallbackPrice?: number,
+];
+
+function ing(
+  name: string,
+  daKey: string | null,
+  qty: number,
+  unit: Unit,
+  amount: string,
+  optional = false,
+  fallbackPrice?: number,
+): RecipeIngredient {
+  return { name, daKey, qty, unit, amount, optional, fallbackPrice };
+}
+
+function recipe(id: string, name: string, ingredients: RawIngredient[]): Recipe {
+  return {
+    id,
+    name,
+    servings: "2-4 na tao",
+    ingredients: ingredients.map((x) => ing(...x)),
+  };
+}
+
 // ═══════════════════════════════════════════════════════════
 // RECIPES (47 dishes)
+// Notes:
+// - Optional ingredients are displayed but not counted in base cost.
+// - Missing required DA prices now exclude a recipe from recommendations.
+// - Main chicken/fish portions are normalized by the cost engine, not manually duplicated here.
 // ═══════════════════════════════════════════════════════════
 
 export const RECIPES: Recipe[] = [
-  // ─── 1. Adobong Manok ────────────────────────────────
-  {
-    id: "adobong-manok",
-    name: "Adobong Manok",
-    servings: "2-4 na tao",
-    ingredients: [
-      {
-        name: "Paa ng manok",
-        daKey: "Chicken Leg Quarter",
-        qty: 0.625,
-        unit: "kg",
-        amount: "1/2 kg",
-        optional: false,
-      },
-      {
-        name: "Bawang",
-        daKey: "Garlic Native/Local",
-        qty: 0.06,
-        unit: "kg",
-        amount: "1 ulo",
-        optional: false,
-      },
-      {
-        name: "Sibuyas",
-        daKey: "Red Onion Local",
-        qty: 0.15,
-        unit: "kg",
-        amount: "1-2 pcs",
-        optional: false,
-      },
-      {
-        name: "Patatas",
-        daKey: "White Potato Local",
-        qty: 0.3,
-        unit: "kg",
-        amount: "1-2 pcs",
-        optional: true,
-      },
-      {
-        name: "Itlog",
-        daKey: "Chicken Egg (White Medium)",
-        qty: 2,
-        unit: "pcs",
-        amount: "2 pcs",
-        optional: true,
-      },
-    ],
-  },
+  recipe("adobong-manok", "Adobong Manok", [
+    ["Paa ng manok", "Chicken Leg Quarter", 0.625, "kg", "1/2 kg"],
+    ["Bawang", "Garlic Native/Local", 0.06, "kg", "1 ulo"],
+    ["Sibuyas", "Red Onion Local", 0.15, "kg", "1-2 pcs"],
+    ["Patatas", "White Potato Local", 0.3, "kg", "1-2 pcs", true],
+    ["Itlog", "Chicken Egg (White Medium)", 2, "pcs", "2 pcs", true],
+  ]),
 
-  // ─── 2. Sinigang na Baboy ────────────────────────────
-  {
-    id: "sinigang-na-baboy",
-    name: "Sinigang na Baboy",
-    servings: "2-4 na tao",
-    ingredients: [
-      {
-        name: "Kasim",
-        daKey: "Pork Picnic Shoulder (Kasim)",
-        qty: 0.5,
-        unit: "kg",
-        amount: "1/2 kg",
-        optional: false,
-      },
-      { name: "Kamatis", daKey: "Tomato", qty: 0.2, unit: "kg", amount: "2 pcs", optional: false },
-      {
-        name: "Sibuyas",
-        daKey: "Red Onion Local",
-        qty: 0.1,
-        unit: "kg",
-        amount: "1 pc",
-        optional: false,
-      },
-      {
-        name: "Gabi",
-        daKey: null,
-        qty: 0.25,
-        unit: "kg",
-        amount: "1 pc",
-        optional: false,
-        fallbackPrice: 50,
-      },
-      {
-        name: "Kangkong",
-        daKey: null,
-        qty: 0.175,
-        unit: "kg",
-        amount: "1 tali",
-        optional: false,
-        fallbackPrice: 100,
-      },
-      {
-        name: "Sitaw",
-        daKey: "Pole Sitao",
-        qty: 0.125,
-        unit: "kg",
-        amount: "5-8 pcs",
-        optional: true,
-      },
-      { name: "Talong", daKey: "Eggplant", qty: 0.2, unit: "kg", amount: "1 pc", optional: true },
-      {
-        name: "Okra",
-        daKey: null,
-        qty: 0.1,
-        unit: "kg",
-        amount: "4-6 pcs",
-        optional: true,
-        fallbackPrice: 90,
-      },
-      {
-        name: "Siling haba",
-        daKey: "Chilli (Green) Local",
-        qty: 0.02,
-        unit: "kg",
-        amount: "1-2 pcs",
-        optional: true,
-      },
-    ],
-  },
+  recipe("sinigang-na-baboy", "Sinigang na Baboy", [
+    ["Kasim", "Pork Picnic Shoulder (Kasim)", 0.5, "kg", "1/2 kg"],
+    ["Kamatis", "Tomato", 0.2, "kg", "2 pcs"],
+    ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
+    ["Gabi", null, 0.25, "kg", "1 pc", false, 50],
+    ["Kangkong", null, 0.175, "kg", "1 tali", false, 100],
+    ["Sitaw", "Pole Sitao", 0.125, "kg", "5-8 pcs", true],
+    ["Talong", "Eggplant", 0.2, "kg", "1 pc", true],
+    ["Okra", null, 0.1, "kg", "4-6 pcs", true, 90],
+    ["Siling haba", "Chilli (Green) Local", 0.02, "kg", "1-2 pcs", true],
+  ]),
 
-  // ─── 3. Kare-Kare ───────────────────────────────────
-  {
-    id: "kare-kare",
-    name: "Kare-Kare",
-    servings: "2-4 na tao",
-    ingredients: [
-      {
-        name: "Beef litid",
-        daKey: "Beef Brisket",
-        qty: 0.5,
-        unit: "kg",
-        amount: "1/2 kg",
-        optional: false,
-      },
-      { name: "Talong", daKey: "Eggplant", qty: 0.2, unit: "kg", amount: "1 pc", optional: false },
-      {
-        name: "Sitaw",
-        daKey: "Pole Sitao",
-        qty: 0.125,
-        unit: "kg",
-        amount: "5-8 pcs",
-        optional: false,
-      },
-      {
-        name: "Pechay",
-        daKey: "Native Pechay",
-        qty: 0.2,
-        unit: "kg",
-        amount: "1 tali",
-        optional: false,
-      },
-      {
-        name: "Bawang",
-        daKey: "Garlic Native/Local",
-        qty: 0.035,
-        unit: "kg",
-        amount: "4 cloves",
-        optional: false,
-      },
-      {
-        name: "Sibuyas",
-        daKey: "Red Onion Local",
-        qty: 0.1,
-        unit: "kg",
-        amount: "1 pc",
-        optional: false,
-      },
-    ],
-  },
+  recipe("kare-kare", "Kare-Kare", [
+    ["Beef litid", "Beef Brisket", 0.5, "kg", "1/2 kg"],
+    ["Talong", "Eggplant", 0.2, "kg", "1 pc"],
+    ["Sitaw", "Pole Sitao", 0.125, "kg", "5-8 pcs"],
+    ["Pechay", "Native Pechay", 0.2, "kg", "1 tali"],
+    ["Bawang", "Garlic Native/Local", 0.035, "kg", "4 cloves"],
+    ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
+  ]),
 
-  // ─── 4. Tinolang Manok ──────────────────────────────
-  {
-    id: "tinolang-manok",
-    name: "Tinolang Manok",
-    servings: "2-4 na tao",
-    ingredients: [
-      {
-        name: "Paa ng manok",
-        daKey: "Chicken Leg Quarter",
-        qty: 0.5,
-        unit: "kg",
-        amount: "1/2 kg",
-        optional: false,
-      },
-      { name: "Sayote", daKey: "Chayote", qty: 0.4, unit: "kg", amount: "1 pc", optional: false },
-      {
-        name: "Luya",
-        daKey: "Ginger Local",
-        qty: 0.04,
-        unit: "kg",
-        amount: "1 piraso",
-        optional: false,
-      },
-      {
-        name: "Bawang",
-        daKey: "Garlic Native/Local",
-        qty: 0.04,
-        unit: "kg",
-        amount: "1 ulo",
-        optional: false,
-      },
-      {
-        name: "Sibuyas",
-        daKey: "Red Onion Local",
-        qty: 0.1,
-        unit: "kg",
-        amount: "1 pc",
-        optional: false,
-      },
-      {
-        name: "Malunggay",
-        daKey: null,
-        qty: 0.04,
-        unit: "kg",
-        amount: "1 tali",
-        optional: true,
-        fallbackPrice: 250,
-      },
-    ],
-  },
+  recipe("tinolang-manok", "Tinolang Manok", [
+    ["Paa ng manok", "Chicken Leg Quarter", 0.5, "kg", "1/2 kg"],
+    ["Sayote", "Chayote", 0.4, "kg", "1 pc"],
+    ["Luya", "Ginger Local", 0.04, "kg", "1 piraso"],
+    ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
+    ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
+    ["Malunggay", null, 0.04, "kg", "1 tali", true, 250],
+  ]),
 
-  // ─── 5. Lechon Kawali ───────────────────────────────
-  {
-    id: "lechon-kawali",
-    name: "Lechon Kawali",
-    servings: "2-4 na tao",
-    ingredients: [
-      {
-        name: "Liempo",
-        daKey: "Pork Belly (Liempo)",
-        qty: 0.5,
-        unit: "kg",
-        amount: "1/2 kg",
-        optional: false,
-      },
-      {
-        name: "Bawang",
-        daKey: "Garlic Native/Local",
-        qty: 0.035,
-        unit: "kg",
-        amount: "4-6 cloves",
-        optional: false,
-      },
-    ],
-  },
+  recipe("lechon-kawali", "Lechon Kawali", [
+    ["Liempo", "Pork Belly (Liempo)", 0.5, "kg", "1/2 kg"],
+    ["Bawang", "Garlic Native/Local", 0.035, "kg", "4-6 cloves"],
+  ]),
 
-  // ─── 6. Lumpiang Shanghai ───────────────────────────
-  {
-    id: "lumpiang-shanghai",
-    name: "Lumpiang Shanghai",
-    servings: "2-4 na tao",
-    ingredients: [
-      {
-        name: "Giniling (Kasim)",
-        daKey: "Pork Picnic Shoulder (Kasim)",
-        qty: 0.5,
-        unit: "kg",
-        amount: "1/2 kg",
-        optional: false,
-      },
-      {
-        name: "Carrots",
-        daKey: "Carrots Local",
-        qty: 0.1,
-        unit: "kg",
-        amount: "1 pc",
-        optional: false,
-      },
-      {
-        name: "Sibuyas",
-        daKey: "Red Onion Local",
-        qty: 0.1,
-        unit: "kg",
-        amount: "1 pc",
-        optional: false,
-      },
-      {
-        name: "Bawang",
-        daKey: "Garlic Native/Local",
-        qty: 0.035,
-        unit: "kg",
-        amount: "4 cloves",
-        optional: false,
-      },
-      {
-        name: "Itlog",
-        daKey: "Chicken Egg (White Medium)",
-        qty: 1,
-        unit: "pcs",
-        amount: "1 pc",
-        optional: true,
-      },
-    ],
-  },
+  recipe("lumpiang-shanghai", "Lumpiang Shanghai", [
+    ["Giniling (Kasim)", "Pork Picnic Shoulder (Kasim)", 0.5, "kg", "1/2 kg"],
+    ["Carrots", "Carrots Local", 0.1, "kg", "1 pc"],
+    ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
+    ["Bawang", "Garlic Native/Local", 0.035, "kg", "4 cloves"],
+    ["Itlog", "Chicken Egg (White Medium)", 1, "pcs", "1 pc", true],
+  ]),
 
-  // ─── 7. Pork Sisig ─────────────────────────────────
-  {
-    id: "pork-sisig",
-    name: "Pork Sisig",
-    servings: "2-4 na tao",
-    ingredients: [
-      {
-        name: "Liempo",
-        daKey: "Pork Belly (Liempo)",
-        qty: 0.5,
-        unit: "kg",
-        amount: "1/2 kg",
-        optional: false,
-      },
-      {
-        name: "Sibuyas",
-        daKey: "Red Onion Local",
-        qty: 0.15,
-        unit: "kg",
-        amount: "1-2 pcs",
-        optional: false,
-      },
-      {
-        name: "Siling green",
-        daKey: "Chilli (Green) Local",
-        qty: 0.02,
-        unit: "kg",
-        amount: "2-4 pcs",
-        optional: false,
-      },
-      {
-        name: "Kalamansi",
-        daKey: "Calamansi",
-        qty: 0.04,
-        unit: "kg",
-        amount: "3-5 pcs",
-        optional: false,
-      },
-      {
-        name: "Itlog",
-        daKey: "Chicken Egg (White Medium)",
-        qty: 1,
-        unit: "pcs",
-        amount: "1 pc",
-        optional: true,
-      },
-    ],
-  },
+  recipe("pork-sisig", "Pork Sisig", [
+    ["Liempo", "Pork Belly (Liempo)", 0.5, "kg", "1/2 kg"],
+    ["Sibuyas", "Red Onion Local", 0.15, "kg", "1-2 pcs"],
+    ["Siling green", "Chilli (Green) Local", 0.02, "kg", "2-4 pcs"],
+    ["Kalamansi", "Calamansi", 0.04, "kg", "3-5 pcs"],
+    ["Itlog", "Chicken Egg (White Medium)", 1, "pcs", "1 pc", true],
+  ]),
 
-  // ─── 8. Nilagang Baboy ──────────────────────────────
-  {
-    id: "nilagang-baboy",
-    name: "Nilagang Baboy",
-    servings: "2-4 na tao",
-    ingredients: [
-      {
-        name: "Kasim",
-        daKey: "Pork Picnic Shoulder (Kasim)",
-        qty: 0.5,
-        unit: "kg",
-        amount: "1/2 kg",
-        optional: false,
-      },
-      {
-        name: "Repolyo",
-        daKey: "Cabbage (Scorpio)",
-        qty: 0.25,
-        unit: "kg",
-        amount: "1/4 head",
-        optional: false,
-      },
-      {
-        name: "Patatas",
-        daKey: "White Potato Local",
-        qty: 0.3,
-        unit: "kg",
-        amount: "1-2 pcs",
-        optional: false,
-      },
-      {
-        name: "Sibuyas",
-        daKey: "Red Onion Local",
-        qty: 0.1,
-        unit: "kg",
-        amount: "1 pc",
-        optional: false,
-      },
-      {
-        name: "Bawang",
-        daKey: "Garlic Native/Local",
-        qty: 0.04,
-        unit: "kg",
-        amount: "1 ulo",
-        optional: false,
-      },
-      {
-        name: "Pechay",
-        daKey: "Native Pechay",
-        qty: 0.2,
-        unit: "kg",
-        amount: "1 tali",
-        optional: true,
-      },
-      {
-        name: "Mais",
-        daKey: null,
-        qty: 1,
-        unit: "pcs",
-        amount: "1 pc",
-        optional: true,
-        fallbackPrice: 18,
-      },
-    ],
-  },
+  recipe("nilagang-baboy", "Nilagang Baboy", [
+    ["Kasim", "Pork Picnic Shoulder (Kasim)", 0.5, "kg", "1/2 kg"],
+    ["Repolyo", "Cabbage (Scorpio)", 0.25, "kg", "1/4 head"],
+    ["Patatas", "White Potato Local", 0.3, "kg", "1-2 pcs"],
+    ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
+    ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
+    ["Pechay", "Native Pechay", 0.2, "kg", "1 tali", true],
+    ["Mais", null, 1, "pcs", "1 pc", true, 18],
+  ]),
 
-  // ─── 9. Chicken Afritada ────────────────────────────
-  {
-    id: "chicken-afritada",
-    name: "Chicken Afritada",
-    servings: "2-4 na tao",
-    ingredients: [
-      {
-        name: "Paa ng manok",
-        daKey: "Chicken Leg Quarter",
-        qty: 0.5,
-        unit: "kg",
-        amount: "1/2 kg",
-        optional: false,
-      },
-      {
-        name: "Patatas",
-        daKey: "White Potato Local",
-        qty: 0.3,
-        unit: "kg",
-        amount: "1-2 pcs",
-        optional: false,
-      },
-      {
-        name: "Carrots",
-        daKey: "Carrots Local",
-        qty: 0.1,
-        unit: "kg",
-        amount: "1 pc",
-        optional: false,
-      },
-      {
-        name: "Sibuyas",
-        daKey: "Red Onion Local",
-        qty: 0.1,
-        unit: "kg",
-        amount: "1 pc",
-        optional: false,
-      },
-      {
-        name: "Bawang",
-        daKey: "Garlic Native/Local",
-        qty: 0.04,
-        unit: "kg",
-        amount: "1 ulo",
-        optional: false,
-      },
-      {
-        name: "Bell pepper",
-        daKey: "Bell Pepper (Red) Local",
-        qty: 0.125,
-        unit: "kg",
-        amount: "1 pc",
-        optional: true,
-      },
-    ],
-  },
+  recipe("chicken-afritada", "Chicken Afritada", [
+    ["Paa ng manok", "Chicken Leg Quarter", 0.5, "kg", "1/2 kg"],
+    ["Patatas", "White Potato Local", 0.3, "kg", "1-2 pcs"],
+    ["Carrots", "Carrots Local", 0.1, "kg", "1 pc"],
+    ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
+    ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
+    ["Bell pepper", "Bell Pepper (Red) Local", 0.125, "kg", "1 pc", true],
+  ]),
 
-  // ─── 10. Pork Menudo ────────────────────────────────
-  {
-    id: "pork-menudo",
-    name: "Pork Menudo",
-    servings: "2-4 na tao",
-    ingredients: [
-      {
-        name: "Kasim",
-        daKey: "Pork Picnic Shoulder (Kasim)",
-        qty: 0.5,
-        unit: "kg",
-        amount: "1/2 kg",
-        optional: false,
-      },
-      {
-        name: "Patatas",
-        daKey: "White Potato Local",
-        qty: 0.3,
-        unit: "kg",
-        amount: "1-2 pcs",
-        optional: false,
-      },
-      {
-        name: "Carrots",
-        daKey: "Carrots Local",
-        qty: 0.1,
-        unit: "kg",
-        amount: "1 pc",
-        optional: false,
-      },
-      {
-        name: "Sibuyas",
-        daKey: "Red Onion Local",
-        qty: 0.1,
-        unit: "kg",
-        amount: "1 pc",
-        optional: false,
-      },
-      {
-        name: "Bawang",
-        daKey: "Garlic Native/Local",
-        qty: 0.04,
-        unit: "kg",
-        amount: "1 ulo",
-        optional: false,
-      },
-      {
-        name: "Atay ng baboy",
-        daKey: null,
-        qty: 0.25,
-        unit: "kg",
-        amount: "1/4 kg",
-        optional: true,
-        fallbackPrice: 225,
-      },
-      {
-        name: "Bell pepper",
-        daKey: "Bell Pepper (Red) Local",
-        qty: 0.125,
-        unit: "kg",
-        amount: "1 pc",
-        optional: true,
-      },
-    ],
-  },
+  recipe("pork-menudo", "Pork Menudo", [
+    ["Kasim", "Pork Picnic Shoulder (Kasim)", 0.5, "kg", "1/2 kg"],
+    ["Patatas", "White Potato Local", 0.3, "kg", "1-2 pcs"],
+    ["Carrots", "Carrots Local", 0.1, "kg", "1 pc"],
+    ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
+    ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
+    ["Atay ng baboy", null, 0.25, "kg", "1/4 kg", true, 225],
+    ["Bell pepper", "Bell Pepper (Red) Local", 0.125, "kg", "1 pc", true],
+  ]),
 
-  // ─── 11. Ginataang Kalabasa ─────────────────────────
-  {
-    id: "ginataang-kalabasa",
-    name: "Ginataang Kalabasa",
-    servings: "2-4 na tao",
-    ingredients: [
-      {
-        name: "Kalabasa",
-        daKey: "Squash",
-        qty: 0.5,
-        unit: "kg",
-        amount: "1/2 kg",
-        optional: false,
-      },
-      {
-        name: "Bawang",
-        daKey: "Garlic Native/Local",
-        qty: 0.04,
-        unit: "kg",
-        amount: "1 ulo",
-        optional: false,
-      },
-      {
-        name: "Sibuyas",
-        daKey: "Red Onion Local",
-        qty: 0.1,
-        unit: "kg",
-        amount: "1 pc",
-        optional: false,
-      },
-      {
-        name: "Luya",
-        daKey: "Ginger Local",
-        qty: 0.04,
-        unit: "kg",
-        amount: "1 piraso",
-        optional: false,
-      },
-      {
-        name: "Sitaw",
-        daKey: "Pole Sitao",
-        qty: 0.125,
-        unit: "kg",
-        amount: "5-8 pcs",
-        optional: true,
-      },
-      {
-        name: "Kasim",
-        daKey: "Pork Picnic Shoulder (Kasim)",
-        qty: 0.25,
-        unit: "kg",
-        amount: "1/4 kg",
-        optional: true,
-      },
-      {
-        name: "Siling haba",
-        daKey: "Chilli (Green) Local",
-        qty: 0.02,
-        unit: "kg",
-        amount: "1-2 pcs",
-        optional: true,
-      },
-    ],
-  },
+  recipe("ginataang-kalabasa", "Ginataang Kalabasa", [
+    ["Kalabasa", "Squash", 0.5, "kg", "1/2 kg"],
+    ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
+    ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
+    ["Luya", "Ginger Local", 0.04, "kg", "1 piraso"],
+    ["Sitaw", "Pole Sitao", 0.125, "kg", "5-8 pcs", true],
+    ["Kasim", "Pork Picnic Shoulder (Kasim)", 0.25, "kg", "1/4 kg", true],
+    ["Siling haba", "Chilli (Green) Local", 0.02, "kg", "1-2 pcs", true],
+  ]),
 
-  // ─── 12. Tortang Talong ─────────────────────────────
-  {
-    id: "tortang-talong",
-    name: "Tortang Talong",
-    servings: "2-4 na tao",
-    ingredients: [
-      {
-        name: "Talong",
-        daKey: "Eggplant",
-        qty: 0.4,
-        unit: "kg",
-        amount: "2-3 pcs",
-        optional: false,
-      },
-      {
-        name: "Itlog",
-        daKey: "Chicken Egg (White Medium)",
-        qty: 3,
-        unit: "pcs",
-        amount: "3 pcs",
-        optional: false,
-      },
-      {
-        name: "Sibuyas",
-        daKey: "Red Onion Local",
-        qty: 0.065,
-        unit: "kg",
-        amount: "1 pc",
-        optional: true,
-      },
-      {
-        name: "Bawang",
-        daKey: "Garlic Native/Local",
-        qty: 0.015,
-        unit: "kg",
-        amount: "2-3 cloves",
-        optional: true,
-      },
-      {
-        name: "Giniling (Kasim)",
-        daKey: "Pork Picnic Shoulder (Kasim)",
-        qty: 0.25,
-        unit: "kg",
-        amount: "1/4 kg",
-        optional: true,
-      },
-    ],
-  },
+  recipe("tortang-talong", "Tortang Talong", [
+    ["Talong", "Eggplant", 0.4, "kg", "2-3 pcs"],
+    ["Itlog", "Chicken Egg (White Medium)", 3, "pcs", "3 pcs"],
+    ["Sibuyas", "Red Onion Local", 0.065, "kg", "1 pc", true],
+    ["Bawang", "Garlic Native/Local", 0.015, "kg", "2-3 cloves", true],
+    ["Giniling (Kasim)", "Pork Picnic Shoulder (Kasim)", 0.25, "kg", "1/4 kg", true],
+  ]),
 
-  // ─── 13. Pinakbet ───────────────────────────────────
-  {
-    id: "pinakbet",
-    name: "Pinakbet",
-    servings: "2-4 na tao",
-    ingredients: [
-      {
-        name: "Kalabasa",
-        daKey: "Squash",
-        qty: 0.25,
-        unit: "kg",
-        amount: "1/4 kg",
-        optional: false,
-      },
-      {
-        name: "Sitaw",
-        daKey: "Pole Sitao",
-        qty: 0.125,
-        unit: "kg",
-        amount: "5-8 pcs",
-        optional: false,
-      },
-      {
-        name: "Talong",
-        daKey: "Eggplant",
-        qty: 0.275,
-        unit: "kg",
-        amount: "1-2 pcs",
-        optional: false,
-      },
-      { name: "Kamatis", daKey: "Tomato", qty: 0.2, unit: "kg", amount: "2 pcs", optional: false },
-      {
-        name: "Sibuyas",
-        daKey: "Red Onion Local",
-        qty: 0.1,
-        unit: "kg",
-        amount: "1 pc",
-        optional: false,
-      },
-      {
-        name: "Bawang",
-        daKey: "Garlic Native/Local",
-        qty: 0.04,
-        unit: "kg",
-        amount: "1 ulo",
-        optional: false,
-      },
-      {
-        name: "Okra",
-        daKey: null,
-        qty: 0.1,
-        unit: "kg",
-        amount: "4-6 pcs",
-        optional: true,
-        fallbackPrice: 90,
-      },
-      { name: "Ampalaya", daKey: "Ampalaya", qty: 0.2, unit: "kg", amount: "1 pc", optional: true },
-      {
-        name: "Kasim",
-        daKey: "Pork Picnic Shoulder (Kasim)",
-        qty: 0.25,
-        unit: "kg",
-        amount: "1/4 kg",
-        optional: true,
-      },
-    ],
-  },
+  recipe("pinakbet", "Pinakbet", [
+    ["Kalabasa", "Squash", 0.25, "kg", "1/4 kg"],
+    ["Sitaw", "Pole Sitao", 0.125, "kg", "5-8 pcs"],
+    ["Talong", "Eggplant", 0.275, "kg", "1-2 pcs"],
+    ["Kamatis", "Tomato", 0.2, "kg", "2 pcs"],
+    ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
+    ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
+    ["Okra", null, 0.1, "kg", "4-6 pcs", true, 90],
+    ["Ampalaya", "Ampalaya", 0.2, "kg", "1 pc", true],
+    ["Kasim", "Pork Picnic Shoulder (Kasim)", 0.25, "kg", "1/4 kg", true],
+  ]),
 
-  // ─── 14. Giniling na Baboy ──────────────────────────
-  {
-    id: "giniling-na-baboy",
-    name: "Giniling na Baboy",
-    servings: "2-4 na tao",
-    ingredients: [
-      {
-        name: "Giniling (Kasim)",
-        daKey: "Pork Picnic Shoulder (Kasim)",
-        qty: 0.5,
-        unit: "kg",
-        amount: "1/2 kg",
-        optional: false,
-      },
-      {
-        name: "Patatas",
-        daKey: "White Potato Local",
-        qty: 0.175,
-        unit: "kg",
-        amount: "1 pc",
-        optional: false,
-      },
-      {
-        name: "Carrots",
-        daKey: "Carrots Local",
-        qty: 0.1,
-        unit: "kg",
-        amount: "1 pc",
-        optional: false,
-      },
-      {
-        name: "Bell pepper",
-        daKey: "Bell Pepper (Red) Local",
-        qty: 0.125,
-        unit: "kg",
-        amount: "1 pc",
-        optional: false,
-      },
-      {
-        name: "Sibuyas",
-        daKey: "Red Onion Local",
-        qty: 0.1,
-        unit: "kg",
-        amount: "1 pc",
-        optional: false,
-      },
-      {
-        name: "Bawang",
-        daKey: "Garlic Native/Local",
-        qty: 0.04,
-        unit: "kg",
-        amount: "1 ulo",
-        optional: false,
-      },
-    ],
-  },
+  recipe("giniling-na-baboy", "Giniling na Baboy", [
+    ["Giniling (Kasim)", "Pork Picnic Shoulder (Kasim)", 0.5, "kg", "1/2 kg"],
+    ["Patatas", "White Potato Local", 0.175, "kg", "1 pc"],
+    ["Carrots", "Carrots Local", 0.1, "kg", "1 pc"],
+    ["Bell pepper", "Bell Pepper (Red) Local", 0.125, "kg", "1 pc"],
+    ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
+    ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
+  ]),
 
-  // ─── 16. Ginisang Sayote ────────────────────────────
-  {
-    id: "ginisang-sayote",
-    name: "Ginisang Sayote",
-    servings: "2-4 na tao",
-    ingredients: [
-      { name: "Sayote", daKey: "Chayote", qty: 0.5, unit: "kg", amount: "2 pcs", optional: false },
-      {
-        name: "Kasim",
-        daKey: "Pork Picnic Shoulder (Kasim)",
-        qty: 0.25,
-        unit: "kg",
-        amount: "1/4 kg",
-        optional: false,
-      },
-      { name: "Kamatis", daKey: "Tomato", qty: 0.1, unit: "kg", amount: "1 pc", optional: false },
-      {
-        name: "Sibuyas",
-        daKey: "Red Onion Local",
-        qty: 0.1,
-        unit: "kg",
-        amount: "1 pc",
-        optional: false,
-      },
-      {
-        name: "Bawang",
-        daKey: "Garlic Native/Local",
-        qty: 0.04,
-        unit: "kg",
-        amount: "1 ulo",
-        optional: false,
-      },
-    ],
-  },
+  recipe("ginisang-sayote", "Ginisang Sayote", [
+    ["Sayote", "Chayote", 0.5, "kg", "2 pcs"],
+    ["Kasim", "Pork Picnic Shoulder (Kasim)", 0.25, "kg", "1/4 kg"],
+    ["Kamatis", "Tomato", 0.1, "kg", "1 pc"],
+    ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
+    ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
+  ]),
 
-  // ─── 17. Pritong Tilapia ────────────────────────────
-  {
-    id: "pritong-tilapia",
-    name: "Pritong Tilapia",
-    servings: "2-4 na tao",
-    ingredients: [
-      {
-        name: "Tilapia",
-        daKey: "Tilapia",
-        qty: 0.75,
-        unit: "kg",
-        amount: "2-3 pcs",
-        optional: false,
-      },
-      {
-        name: "Kalamansi",
-        daKey: "Calamansi",
-        qty: 0.025,
-        unit: "kg",
-        amount: "2-3 pcs",
-        optional: true,
-      },
-    ],
-  },
+  recipe("pritong-tilapia", "Pritong Tilapia", [
+    ["Tilapia", "Tilapia", 0.75, "kg", "3/4 kg"],
+    ["Kalamansi", "Calamansi", 0.025, "kg", "2-3 pcs", true],
+  ]),
 
-  // ─── 18. Ginisang Repolyo at Manok ──────────────────
-  {
-    id: "ginisang-repolyo-at-manok",
-    name: "Ginisang Repolyo at Manok",
-    servings: "2-4 na tao",
-    ingredients: [
-      {
-        name: "Repolyo",
-        daKey: "Cabbage (Scorpio)",
-        qty: 0.5,
-        unit: "kg",
-        amount: "1/2 head",
-        optional: false,
-      },
-      {
-        name: "Dibdib ng manok",
-        daKey: "Chicken Breast",
-        qty: 0.625,
-        unit: "kg",
-        amount: "1/2 kg",
-        optional: false,
-      },
-      {
-        name: "Carrots",
-        daKey: "Carrots Local",
-        qty: 0.1,
-        unit: "kg",
-        amount: "1 pc",
-        optional: false,
-      },
-      {
-        name: "Sibuyas",
-        daKey: "Red Onion Local",
-        qty: 0.1,
-        unit: "kg",
-        amount: "1 pc",
-        optional: false,
-      },
-      {
-        name: "Bawang",
-        daKey: "Garlic Native/Local",
-        qty: 0.04,
-        unit: "kg",
-        amount: "1 ulo",
-        optional: false,
-      },
-    ],
-  },
+  recipe("ginisang-repolyo-at-manok", "Ginisang Repolyo at Manok", [
+    ["Repolyo", "Cabbage (Scorpio)", 0.5, "kg", "1/2 head"],
+    ["Dibdib ng manok", "Chicken Breast", 0.625, "kg", "1/2 kg"],
+    ["Carrots", "Carrots Local", 0.1, "kg", "1 pc"],
+    ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
+    ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
+  ]),
 
-  // ─── 19. Sopas ──────────────────────────────────────
-  {
-    id: "sopas",
-    name: "Sopas",
-    servings: "2-4 na tao",
-    ingredients: [
-      {
-        name: "Dibdib ng manok",
-        daKey: "Chicken Breast",
-        qty: 0.25,
-        unit: "kg",
-        amount: "1/4 kg",
-        optional: false,
-      },
-      {
-        name: "Repolyo",
-        daKey: "Cabbage (Scorpio)",
-        qty: 0.25,
-        unit: "kg",
-        amount: "1/4 head",
-        optional: false,
-      },
-      {
-        name: "Carrots",
-        daKey: "Carrots Local",
-        qty: 0.1,
-        unit: "kg",
-        amount: "1 pc",
-        optional: false,
-      },
-      {
-        name: "Sibuyas",
-        daKey: "Red Onion Local",
-        qty: 0.1,
-        unit: "kg",
-        amount: "1 pc",
-        optional: false,
-      },
-      {
-        name: "Bawang",
-        daKey: "Garlic Native/Local",
-        qty: 0.04,
-        unit: "kg",
-        amount: "1 ulo",
-        optional: false,
-      },
-    ],
-  },
+  recipe("sopas", "Sopas", [
+    ["Dibdib ng manok", "Chicken Breast", 0.25, "kg", "1/4 kg"],
+    ["Repolyo", "Cabbage (Scorpio)", 0.25, "kg", "1/4 head"],
+    ["Carrots", "Carrots Local", 0.1, "kg", "1 pc"],
+    ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
+    ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
+  ]),
 
-  // ─── 20. Ginisang Ampalaya ──────────────────────────
-  {
-    id: "ginisang-ampalaya",
-    name: "Ginisang Ampalaya",
-    servings: "2-4 na tao",
-    ingredients: [
-      {
-        name: "Ampalaya",
-        daKey: "Ampalaya",
-        qty: 0.4,
-        unit: "kg",
-        amount: "1-2 pcs",
-        optional: false,
-      },
-      {
-        name: "Itlog",
-        daKey: "Chicken Egg (White Medium)",
-        qty: 3,
-        unit: "pcs",
-        amount: "3 pcs",
-        optional: false,
-      },
-      {
-        name: "Kamatis",
-        daKey: "Tomato",
-        qty: 0.14,
-        unit: "kg",
-        amount: "1-2 pcs",
-        optional: false,
-      },
-      {
-        name: "Sibuyas",
-        daKey: "Red Onion Local",
-        qty: 0.1,
-        unit: "kg",
-        amount: "1 pc",
-        optional: false,
-      },
-      {
-        name: "Bawang",
-        daKey: "Garlic Native/Local",
-        qty: 0.04,
-        unit: "kg",
-        amount: "1 ulo",
-        optional: false,
-      },
-      {
-        name: "Giniling (Kasim)",
-        daKey: "Pork Picnic Shoulder (Kasim)",
-        qty: 0.25,
-        unit: "kg",
-        amount: "1/4 kg",
-        optional: true,
-      },
-    ],
-  },
+  recipe("ginisang-ampalaya", "Ginisang Ampalaya", [
+    ["Ampalaya", "Ampalaya", 0.4, "kg", "1-2 pcs"],
+    ["Itlog", "Chicken Egg (White Medium)", 3, "pcs", "3 pcs"],
+    ["Kamatis", "Tomato", 0.14, "kg", "1-2 pcs"],
+    ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
+    ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
+    ["Giniling (Kasim)", "Pork Picnic Shoulder (Kasim)", 0.25, "kg", "1/4 kg", true],
+  ]),
 
-  // ─── 21. Chicken Caldereta ──────────────────────────
-  {
-    id: "chicken-caldereta",
-    name: "Chicken Caldereta",
-    servings: "2-4 na tao",
-    ingredients: [
-      {
-        name: "Paa ng manok",
-        daKey: "Chicken Leg Quarter",
-        qty: 0.625,
-        unit: "kg",
-        amount: "1/2 kg",
-        optional: false,
-      },
-      {
-        name: "Patatas",
-        daKey: "White Potato Local",
-        qty: 0.3,
-        unit: "kg",
-        amount: "1-2 pcs",
-        optional: false,
-      },
-      {
-        name: "Carrots",
-        daKey: "Carrots Local",
-        qty: 0.1,
-        unit: "kg",
-        amount: "1 pc",
-        optional: false,
-      },
-      {
-        name: "Sibuyas",
-        daKey: "Red Onion Local",
-        qty: 0.1,
-        unit: "kg",
-        amount: "1 pc",
-        optional: false,
-      },
-      {
-        name: "Bawang",
-        daKey: "Garlic Native/Local",
-        qty: 0.04,
-        unit: "kg",
-        amount: "1 ulo",
-        optional: false,
-      },
-      {
-        name: "Bell pepper",
-        daKey: "Bell Pepper (Red) Local",
-        qty: 0.125,
-        unit: "kg",
-        amount: "1 pc",
-        optional: true,
-      },
-    ],
-  },
+  recipe("chicken-caldereta", "Chicken Caldereta", [
+    ["Paa ng manok", "Chicken Leg Quarter", 0.625, "kg", "1/2 kg"],
+    ["Patatas", "White Potato Local", 0.3, "kg", "1-2 pcs"],
+    ["Carrots", "Carrots Local", 0.1, "kg", "1 pc"],
+    ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
+    ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
+    ["Bell pepper", "Bell Pepper (Red) Local", 0.125, "kg", "1 pc", true],
+  ]),
 
-  // ─── 22. Beef Nilaga ────────────────────────────────
-  {
-    id: "beef-nilaga",
-    name: "Beef Nilaga",
-    servings: "2-4 na tao",
-    ingredients: [
-      {
-        name: "Beef litid",
-        daKey: "Beef Brisket",
-        qty: 0.5,
-        unit: "kg",
-        amount: "1/2 kg",
-        optional: false,
-      },
-      {
-        name: "Repolyo",
-        daKey: "Cabbage (Scorpio)",
-        qty: 0.25,
-        unit: "kg",
-        amount: "1/4 head",
-        optional: false,
-      },
-      {
-        name: "Patatas",
-        daKey: "White Potato Local",
-        qty: 0.3,
-        unit: "kg",
-        amount: "1-2 pcs",
-        optional: false,
-      },
-      {
-        name: "Sibuyas",
-        daKey: "Red Onion Local",
-        qty: 0.1,
-        unit: "kg",
-        amount: "1 pc",
-        optional: false,
-      },
-      {
-        name: "Bawang",
-        daKey: "Garlic Native/Local",
-        qty: 0.04,
-        unit: "kg",
-        amount: "1 ulo",
-        optional: false,
-      },
-      {
-        name: "Pechay",
-        daKey: "Native Pechay",
-        qty: 0.2,
-        unit: "kg",
-        amount: "1 tali",
-        optional: true,
-      },
-      {
-        name: "Mais",
-        daKey: null,
-        qty: 1,
-        unit: "pcs",
-        amount: "1 pc",
-        optional: true,
-        fallbackPrice: 18,
-      },
-    ],
-  },
+  recipe("beef-nilaga", "Beef Nilaga", [
+    ["Beef litid", "Beef Brisket", 0.5, "kg", "1/2 kg"],
+    ["Repolyo", "Cabbage (Scorpio)", 0.25, "kg", "1/4 head"],
+    ["Patatas", "White Potato Local", 0.3, "kg", "1-2 pcs"],
+    ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
+    ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
+    ["Pechay", "Native Pechay", 0.2, "kg", "1 tali", true],
+    ["Mais", null, 1, "pcs", "1 pc", true, 18],
+  ]),
 
-  // ─── 23. Ginataang Sitaw at Kalabasa ────────────────
-  {
-    id: "ginataang-sitaw-at-kalabasa",
-    name: "Ginataang Sitaw at Kalabasa",
-    servings: "2-4 na tao",
-    ingredients: [
-      {
-        name: "Kalabasa",
-        daKey: "Squash",
-        qty: 0.5,
-        unit: "kg",
-        amount: "1/2 kg",
-        optional: false,
-      },
-      {
-        name: "Sitaw",
-        daKey: "Pole Sitao",
-        qty: 0.125,
-        unit: "kg",
-        amount: "5-8 pcs",
-        optional: false,
-      },
-      {
-        name: "Kasim",
-        daKey: "Pork Picnic Shoulder (Kasim)",
-        qty: 0.25,
-        unit: "kg",
-        amount: "1/4 kg",
-        optional: false,
-      },
-      {
-        name: "Bawang",
-        daKey: "Garlic Native/Local",
-        qty: 0.04,
-        unit: "kg",
-        amount: "1 ulo",
-        optional: false,
-      },
-      {
-        name: "Sibuyas",
-        daKey: "Red Onion Local",
-        qty: 0.1,
-        unit: "kg",
-        amount: "1 pc",
-        optional: false,
-      },
-      {
-        name: "Luya",
-        daKey: "Ginger Local",
-        qty: 0.04,
-        unit: "kg",
-        amount: "1 piraso",
-        optional: true,
-      },
-      {
-        name: "Siling haba",
-        daKey: "Chilli (Green) Local",
-        qty: 0.02,
-        unit: "kg",
-        amount: "1-2 pcs",
-        optional: true,
-      },
-    ],
-  },
+  recipe("ginataang-sitaw-at-kalabasa", "Ginataang Sitaw at Kalabasa", [
+    ["Kalabasa", "Squash", 0.5, "kg", "1/2 kg"],
+    ["Sitaw", "Pole Sitao", 0.125, "kg", "5-8 pcs"],
+    ["Kasim", "Pork Picnic Shoulder (Kasim)", 0.25, "kg", "1/4 kg"],
+    ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
+    ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
+    ["Luya", "Ginger Local", 0.04, "kg", "1 piraso", true],
+    ["Siling haba", "Chilli (Green) Local", 0.02, "kg", "1-2 pcs", true],
+  ]),
 
-  // ─── 24. Ginisang Pechay at Baboy ───────────────────
-  {
-    id: "ginisang-pechay-at-baboy",
-    name: "Ginisang Pechay at Baboy",
-    servings: "2-4 na tao",
-    ingredients: [
-      {
-        name: "Pechay",
-        daKey: "Native Pechay",
-        qty: 0.325,
-        unit: "kg",
-        amount: "1-2 tali",
-        optional: false,
-      },
-      {
-        name: "Kasim",
-        daKey: "Pork Picnic Shoulder (Kasim)",
-        qty: 0.25,
-        unit: "kg",
-        amount: "1/4 kg",
-        optional: false,
-      },
-      { name: "Kamatis", daKey: "Tomato", qty: 0.1, unit: "kg", amount: "1 pc", optional: false },
-      {
-        name: "Sibuyas",
-        daKey: "Red Onion Local",
-        qty: 0.1,
-        unit: "kg",
-        amount: "1 pc",
-        optional: false,
-      },
-      {
-        name: "Bawang",
-        daKey: "Garlic Native/Local",
-        qty: 0.04,
-        unit: "kg",
-        amount: "1 ulo",
-        optional: false,
-      },
-    ],
-  },
+  recipe("ginisang-pechay-at-baboy", "Ginisang Pechay at Baboy", [
+    ["Pechay", "Native Pechay", 0.325, "kg", "1-2 tali"],
+    ["Kasim", "Pork Picnic Shoulder (Kasim)", 0.25, "kg", "1/4 kg"],
+    ["Kamatis", "Tomato", 0.1, "kg", "1 pc"],
+    ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
+    ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
+  ]),
 
-  // ─── 25. Ginisang Sayote at Manok ───────────────────
-  {
-    id: "ginisang-sayote-at-manok",
-    name: "Ginisang Sayote at Manok",
-    servings: "2-4 na tao",
-    ingredients: [
-      {
-        name: "Paa ng manok",
-        daKey: "Chicken Leg Quarter",
-        qty: 0.5,
-        unit: "kg",
-        amount: "1/2 kg",
-        optional: false,
-      },
-      { name: "Sayote", daKey: "Chayote", qty: 0.5, unit: "kg", amount: "2 pcs", optional: false },
-      { name: "Kamatis", daKey: "Tomato", qty: 0.1, unit: "kg", amount: "1 pc", optional: false },
-      {
-        name: "Sibuyas",
-        daKey: "Red Onion Local",
-        qty: 0.1,
-        unit: "kg",
-        amount: "1 pc",
-        optional: false,
-      },
-      {
-        name: "Bawang",
-        daKey: "Garlic Native/Local",
-        qty: 0.04,
-        unit: "kg",
-        amount: "1 ulo",
-        optional: false,
-      },
-      {
-        name: "Luya",
-        daKey: "Ginger Local",
-        qty: 0.04,
-        unit: "kg",
-        amount: "1 piraso",
-        optional: true,
-      },
-    ],
-  },
+  recipe("ginisang-sayote-at-manok", "Ginisang Sayote at Manok", [
+    ["Paa ng manok", "Chicken Leg Quarter", 0.5, "kg", "1/2 kg"],
+    ["Sayote", "Chayote", 0.5, "kg", "2 pcs"],
+    ["Kamatis", "Tomato", 0.1, "kg", "1 pc"],
+    ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
+    ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
+    ["Luya", "Ginger Local", 0.04, "kg", "1 piraso", true],
+  ]),
 
-  // ─── 26. Ginisang Sayote at Baboy ───────────────────
-  {
-    id: "ginisang-sayote-at-baboy",
-    name: "Ginisang Sayote at Baboy",
-    servings: "2-4 na tao",
-    ingredients: [
-      {
-        name: "Kasim",
-        daKey: "Pork Picnic Shoulder (Kasim)",
-        qty: 0.5,
-        unit: "kg",
-        amount: "1/2 kg",
-        optional: false,
-      },
-      { name: "Sayote", daKey: "Chayote", qty: 0.5, unit: "kg", amount: "2 pcs", optional: false },
-      { name: "Kamatis", daKey: "Tomato", qty: 0.1, unit: "kg", amount: "1 pc", optional: false },
-      {
-        name: "Sibuyas",
-        daKey: "Red Onion Local",
-        qty: 0.1,
-        unit: "kg",
-        amount: "1 pc",
-        optional: false,
-      },
-      {
-        name: "Bawang",
-        daKey: "Garlic Native/Local",
-        qty: 0.04,
-        unit: "kg",
-        amount: "1 ulo",
-        optional: false,
-      },
-    ],
-  },
+  recipe("ginisang-sayote-at-baboy", "Ginisang Sayote at Baboy", [
+    ["Kasim", "Pork Picnic Shoulder (Kasim)", 0.5, "kg", "1/2 kg"],
+    ["Sayote", "Chayote", 0.5, "kg", "2 pcs"],
+    ["Kamatis", "Tomato", 0.1, "kg", "1 pc"],
+    ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
+    ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
+  ]),
 
-  // ─── 27. Pritong Manok ──────────────────────────────
-  {
-    id: "pritong-manok",
-    name: "Pritong Manok",
-    servings: "2-4 na tao",
-    ingredients: [
-      {
-        name: "Paa ng manok",
-        daKey: "Chicken Leg Quarter",
-        qty: 0.625,
-        unit: "kg",
-        amount: "1/2 kg",
-        optional: false,
-      },
-      {
-        name: "Kalamansi",
-        daKey: "Calamansi",
-        qty: 0.04,
-        unit: "kg",
-        amount: "3-5 pcs",
-        optional: true,
-      },
-      {
-        name: "Itlog",
-        daKey: "Chicken Egg (White Medium)",
-        qty: 1,
-        unit: "pcs",
-        amount: "1 pc",
-        optional: true,
-      },
-    ],
-  },
+  recipe("pritong-manok", "Pritong Manok", [
+    ["Paa ng manok", "Chicken Leg Quarter", 0.625, "kg", "1/2 kg"],
+    ["Kalamansi", "Calamansi", 0.04, "kg", "3-5 pcs", true],
+    ["Itlog", "Chicken Egg (White Medium)", 1, "pcs", "1 pc", true],
+  ]),
 
-  // ─── 28. Beef Broccoli ──────────────────────────────
-  {
-    id: "beef-broccoli",
-    name: "Beef Broccoli",
-    servings: "2-4 na tao",
-    ingredients: [
-      {
-        name: "Beef litid",
-        daKey: "Beef Brisket",
-        qty: 0.5,
-        unit: "kg",
-        amount: "1/2 kg",
-        optional: false,
-      },
-      {
-        name: "Broccoli",
-        daKey: "Broccoli Local",
-        qty: 0.4,
-        unit: "kg",
-        amount: "1 head",
-        optional: false,
-      },
-      {
-        name: "Sibuyas",
-        daKey: "Red Onion Local",
-        qty: 0.1,
-        unit: "kg",
-        amount: "1 pc",
-        optional: false,
-      },
-      {
-        name: "Bawang",
-        daKey: "Garlic Native/Local",
-        qty: 0.04,
-        unit: "kg",
-        amount: "1 ulo",
-        optional: false,
-      },
-      {
-        name: "Carrots",
-        daKey: "Carrots Local",
-        qty: 0.1,
-        unit: "kg",
-        amount: "1 pc",
-        optional: true,
-      },
-    ],
-  },
+  recipe("beef-broccoli", "Beef Broccoli", [
+    ["Beef litid", "Beef Brisket", 0.5, "kg", "1/2 kg"],
+    ["Broccoli", "Broccoli Local", 0.4, "kg", "1 head"],
+    ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
+    ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
+    ["Carrots", "Carrots Local", 0.1, "kg", "1 pc", true],
+  ]),
 
-  // ─── 29. Ginisang Upo ──────────────────────────────
-  {
-    id: "ginisang-upo",
-    name: "Ginisang Upo",
-    servings: "2-4 na tao",
-    ingredients: [
-      {
-        name: "Upo",
-        daKey: null,
-        qty: 0.7,
-        unit: "kg",
-        amount: "1 pc",
-        optional: false,
-        fallbackPrice: 50,
-      },
-      { name: "Kamatis", daKey: "Tomato", qty: 0.1, unit: "kg", amount: "1 pc", optional: false },
-      {
-        name: "Sibuyas",
-        daKey: "Red Onion Local",
-        qty: 0.1,
-        unit: "kg",
-        amount: "1 pc",
-        optional: false,
-      },
-      {
-        name: "Bawang",
-        daKey: "Garlic Native/Local",
-        qty: 0.04,
-        unit: "kg",
-        amount: "1 ulo",
-        optional: false,
-      },
-      {
-        name: "Kasim",
-        daKey: "Pork Picnic Shoulder (Kasim)",
-        qty: 0.25,
-        unit: "kg",
-        amount: "1/4 kg",
-        optional: true,
-      },
-    ],
-  },
+  recipe("ginisang-upo", "Ginisang Upo", [
+    ["Upo", null, 0.7, "kg", "1 pc", false, 50],
+    ["Kamatis", "Tomato", 0.1, "kg", "1 pc"],
+    ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
+    ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
+    ["Kasim", "Pork Picnic Shoulder (Kasim)", 0.25, "kg", "1/4 kg", true],
+  ]),
 
-  // ─── 30. Ginataang Tilapia ──────────────────────────
-  {
-    id: "ginataang-tilapia",
-    name: "Ginataang Tilapia",
-    servings: "2-4 na tao",
-    ingredients: [
-      {
-        name: "Tilapia",
-        daKey: "Tilapia",
-        qty: 0.625,
-        unit: "kg",
-        amount: "2-3 pcs",
-        optional: false,
-      },
-      {
-        name: "Pechay",
-        daKey: "Native Pechay",
-        qty: 0.2,
-        unit: "kg",
-        amount: "1 tali",
-        optional: false,
-      },
-      {
-        name: "Luya",
-        daKey: "Ginger Local",
-        qty: 0.04,
-        unit: "kg",
-        amount: "1 piraso",
-        optional: false,
-      },
-      {
-        name: "Bawang",
-        daKey: "Garlic Native/Local",
-        qty: 0.04,
-        unit: "kg",
-        amount: "1 ulo",
-        optional: false,
-      },
-      {
-        name: "Sibuyas",
-        daKey: "Red Onion Local",
-        qty: 0.1,
-        unit: "kg",
-        amount: "1 pc",
-        optional: false,
-      },
-      {
-        name: "Siling haba",
-        daKey: "Chilli (Green) Local",
-        qty: 0.02,
-        unit: "kg",
-        amount: "1-2 pcs",
-        optional: true,
-      },
-    ],
-  },
+  recipe("ginataang-tilapia", "Ginataang Tilapia", [
+    ["Tilapia", "Tilapia", 0.625, "kg", "2-3 pcs"],
+    ["Pechay", "Native Pechay", 0.2, "kg", "1 tali"],
+    ["Luya", "Ginger Local", 0.04, "kg", "1 piraso"],
+    ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
+    ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
+    ["Siling haba", "Chilli (Green) Local", 0.02, "kg", "1-2 pcs", true],
+  ]),
 
-  // ─── 31. Pritong Bangus ─────────────────────────────
-  {
-    id: "pritong-bangus",
-    name: "Pritong Bangus",
-    servings: "2-4 na tao",
-    ingredients: [
-      { name: "Bangus", daKey: "Bangus", qty: 0.75, unit: "kg", amount: "1 pc", optional: false },
-      {
-        name: "Kalamansi",
-        daKey: "Calamansi",
-        qty: 0.04,
-        unit: "kg",
-        amount: "3-5 pcs",
-        optional: true,
-      },
-      {
-        name: "Bawang",
-        daKey: "Garlic Native/Local",
-        qty: 0.04,
-        unit: "kg",
-        amount: "1 ulo",
-        optional: true,
-      },
-    ],
-  },
+  recipe("pritong-bangus", "Pritong Bangus", [
+    ["Bangus", "Bangus", 0.75, "kg", "3/4 kg"],
+    ["Kalamansi", "Calamansi", 0.04, "kg", "3-5 pcs", true],
+    ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo", true],
+  ]),
 
-  // ─── 32. Sarciadong Tilapia ─────────────────────────
-  {
-    id: "sarciadong-tilapia",
-    name: "Sarciadong Tilapia",
-    servings: "2-4 na tao",
-    ingredients: [
-      {
-        name: "Tilapia",
-        daKey: "Tilapia",
-        qty: 0.625,
-        unit: "kg",
-        amount: "2-3 pcs",
-        optional: false,
-      },
-      {
-        name: "Kamatis",
-        daKey: "Tomato",
-        qty: 0.225,
-        unit: "kg",
-        amount: "2-3 pcs",
-        optional: false,
-      },
-      {
-        name: "Sibuyas",
-        daKey: "Red Onion Local",
-        qty: 0.1,
-        unit: "kg",
-        amount: "1 pc",
-        optional: false,
-      },
-      {
-        name: "Bawang",
-        daKey: "Garlic Native/Local",
-        qty: 0.04,
-        unit: "kg",
-        amount: "1 ulo",
-        optional: false,
-      },
-      {
-        name: "Itlog",
-        daKey: "Chicken Egg (White Medium)",
-        qty: 2,
-        unit: "pcs",
-        amount: "1-2 pcs",
-        optional: false,
-      },
-    ],
-  },
+  recipe("sarciadong-tilapia", "Sarciadong Tilapia", [
+    ["Tilapia", "Tilapia", 0.625, "kg", "2-3 pcs"],
+    ["Kamatis", "Tomato", 0.225, "kg", "2-3 pcs"],
+    ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
+    ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
+    ["Itlog", "Chicken Egg (White Medium)", 2, "pcs", "1-2 pcs"],
+  ]),
 
-  // ─── 33. Pritong Galunggong ─────────────────────────
-  {
-    id: "pritong-galunggong",
-    name: "Pritong Galunggong",
-    servings: "2-4 na tao",
-    ingredients: [
-      {
-        name: "Galunggong",
-        daKey: "Galunggong",
-        qty: 0.625,
-        unit: "kg",
-        amount: "1/2 kg",
-        optional: false,
-      },
-      {
-        name: "Kalamansi",
-        daKey: "Calamansi",
-        qty: 0.025,
-        unit: "kg",
-        amount: "2-3 pcs",
-        optional: true,
-      },
-      {
-        name: "Bawang",
-        daKey: "Garlic Native/Local",
-        qty: 0.025,
-        unit: "kg",
-        amount: "3-4 cloves",
-        optional: true,
-      },
-    ],
-  },
+  recipe("pritong-galunggong", "Pritong Galunggong", [
+    ["Galunggong", "Galunggong", 0.625, "kg", "1/2 kg"],
+    ["Kalamansi", "Calamansi", 0.025, "kg", "2-3 pcs", true],
+    ["Bawang", "Garlic Native/Local", 0.025, "kg", "3-4 cloves", true],
+  ]),
 
-  // ─── 34. Sarciadong Galunggong ──────────────────────
-  {
-    id: "sarciadong-galunggong",
-    name: "Sarciadong Galunggong",
-    servings: "2-4 na tao",
-    ingredients: [
-      {
-        name: "Galunggong",
-        daKey: "Galunggong",
-        qty: 0.5,
-        unit: "kg",
-        amount: "1/2 kg",
-        optional: false,
-      },
-      {
-        name: "Kamatis",
-        daKey: "Tomato",
-        qty: 0.225,
-        unit: "kg",
-        amount: "2-3 pcs",
-        optional: false,
-      },
-      {
-        name: "Sibuyas",
-        daKey: "Red Onion Local",
-        qty: 0.1,
-        unit: "kg",
-        amount: "1 pc",
-        optional: false,
-      },
-      {
-        name: "Bawang",
-        daKey: "Garlic Native/Local",
-        qty: 0.04,
-        unit: "kg",
-        amount: "1 ulo",
-        optional: false,
-      },
-      {
-        name: "Itlog",
-        daKey: "Chicken Egg (White Medium)",
-        qty: 2,
-        unit: "pcs",
-        amount: "1-2 pcs",
-        optional: false,
-      },
-    ],
-  },
+  recipe("sarciadong-galunggong", "Sarciadong Galunggong", [
+    ["Galunggong", "Galunggong", 0.5, "kg", "1/2 kg"],
+    ["Kamatis", "Tomato", 0.225, "kg", "2-3 pcs"],
+    ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
+    ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
+    ["Itlog", "Chicken Egg (White Medium)", 2, "pcs", "1-2 pcs"],
+  ]),
 
-  // ─── 35. Pritong Tamban ─────────────────────────────
-  {
-    id: "pritong-tamban",
-    name: "Pritong Tamban",
-    servings: "2-4 na tao",
-    ingredients: [
-      {
-        name: "Tamban",
-        daKey: "Sardines (Tamban)",
-        qty: 0.5,
-        unit: "kg",
-        amount: "1/2 kg",
-        optional: false,
-      },
-      {
-        name: "Kalamansi",
-        daKey: "Calamansi",
-        qty: 0.025,
-        unit: "kg",
-        amount: "2-3 pcs",
-        optional: true,
-      },
-      {
-        name: "Bawang",
-        daKey: "Garlic Native/Local",
-        qty: 0.025,
-        unit: "kg",
-        amount: "3-4 cloves",
-        optional: true,
-      },
-    ],
-  },
+  recipe("pritong-tamban", "Pritong Tamban", [
+    ["Tamban", "Sardines (Tamban)", 0.5, "kg", "1/2 kg"],
+    ["Kalamansi", "Calamansi", 0.025, "kg", "2-3 pcs", true],
+    ["Bawang", "Garlic Native/Local", 0.025, "kg", "3-4 cloves", true],
+  ]),
 
-  // ─── 36. Tortang Giniling ───────────────────────────
-  {
-    id: "tortang-giniling",
-    name: "Tortang Giniling",
-    servings: "2-4 na tao",
-    ingredients: [
-      {
-        name: "Giniling (Kasim)",
-        daKey: "Pork Picnic Shoulder (Kasim)",
-        qty: 0.25,
-        unit: "kg",
-        amount: "1/4 kg",
-        optional: false,
-      },
-      {
-        name: "Itlog",
-        daKey: "Chicken Egg (White Medium)",
-        qty: 3,
-        unit: "pcs",
-        amount: "3 pcs",
-        optional: false,
-      },
-      {
-        name: "Sibuyas",
-        daKey: "Red Onion Local",
-        qty: 0.1,
-        unit: "kg",
-        amount: "1 pc",
-        optional: false,
-      },
-      {
-        name: "Bawang",
-        daKey: "Garlic Native/Local",
-        qty: 0.04,
-        unit: "kg",
-        amount: "1 ulo",
-        optional: false,
-      },
-      {
-        name: "Patatas",
-        daKey: "White Potato Local",
-        qty: 0.175,
-        unit: "kg",
-        amount: "1 pc",
-        optional: true,
-      },
-      {
-        name: "Carrots",
-        daKey: "Carrots Local",
-        qty: 0.1,
-        unit: "kg",
-        amount: "1 pc",
-        optional: true,
-      },
-    ],
-  },
+  recipe("tortang-giniling", "Tortang Giniling", [
+    ["Giniling (Kasim)", "Pork Picnic Shoulder (Kasim)", 0.25, "kg", "1/4 kg"],
+    ["Itlog", "Chicken Egg (White Medium)", 3, "pcs", "3 pcs"],
+    ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
+    ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
+    ["Patatas", "White Potato Local", 0.175, "kg", "1 pc", true],
+    ["Carrots", "Carrots Local", 0.1, "kg", "1 pc", true],
+  ]),
 
-  // ─── 38. Pritong Pork Chop ──────────────────────────
-  {
-    id: "pritong-pork-chop",
-    name: "Pritong Pork Chop",
-    servings: "2-4 na tao",
-    ingredients: [
-      {
-        name: "Pork chop",
-        daKey: "Pork Chop",
-        qty: 0.5,
-        unit: "kg",
-        amount: "1/2 kg",
-        optional: false,
-      },
-      {
-        name: "Kalamansi",
-        daKey: "Calamansi",
-        qty: 0.04,
-        unit: "kg",
-        amount: "3-5 pcs",
-        optional: true,
-      },
-      {
-        name: "Bawang",
-        daKey: "Garlic Native/Local",
-        qty: 0.035,
-        unit: "kg",
-        amount: "4-6 cloves",
-        optional: true,
-      },
-      {
-        name: "Itlog",
-        daKey: "Chicken Egg (White Medium)",
-        qty: 1,
-        unit: "pcs",
-        amount: "1 pc",
-        optional: true,
-      },
-    ],
-  },
+  recipe("pritong-pork-chop", "Pritong Pork Chop", [
+    ["Pork chop", "Pork Chop", 0.5, "kg", "1/2 kg"],
+    ["Kalamansi", "Calamansi", 0.04, "kg", "3-5 pcs", true],
+    ["Bawang", "Garlic Native/Local", 0.035, "kg", "4-6 cloves", true],
+    ["Itlog", "Chicken Egg (White Medium)", 1, "pcs", "1 pc", true],
+  ]),
 
-  // ─── 39. Pritong Liempo ─────────────────────────────
-  {
-    id: "pritong-liempo",
-    name: "Pritong Liempo",
-    servings: "2-4 na tao",
-    ingredients: [
-      {
-        name: "Liempo",
-        daKey: "Pork Belly (Liempo)",
-        qty: 0.5,
-        unit: "kg",
-        amount: "1/2 kg",
-        optional: false,
-      },
-      {
-        name: "Bawang",
-        daKey: "Garlic Native/Local",
-        qty: 0.035,
-        unit: "kg",
-        amount: "4-6 cloves",
-        optional: true,
-      },
-      {
-        name: "Kalamansi",
-        daKey: "Calamansi",
-        qty: 0.025,
-        unit: "kg",
-        amount: "2-3 pcs",
-        optional: true,
-      },
-    ],
-  },
+  recipe("pritong-liempo", "Pritong Liempo", [
+    ["Liempo", "Pork Belly (Liempo)", 0.5, "kg", "1/2 kg"],
+    ["Bawang", "Garlic Native/Local", 0.035, "kg", "4-6 cloves", true],
+    ["Kalamansi", "Calamansi", 0.025, "kg", "2-3 pcs", true],
+  ]),
 
-  // ─── 40. Pritong Pakpak ng Manok ────────────────────
-  {
-    id: "pritong-pakpak-ng-manok",
-    name: "Pritong Pakpak ng Manok",
-    servings: "2-4 na tao",
-    ingredients: [
-      {
-        name: "Pakpak ng manok",
-        daKey: "Chicken Wing",
-        qty: 0.625,
-        unit: "kg",
-        amount: "1/2 kg",
-        optional: false,
-      },
-      {
-        name: "Kalamansi",
-        daKey: "Calamansi",
-        qty: 0.04,
-        unit: "kg",
-        amount: "3-5 pcs",
-        optional: true,
-      },
-    ],
-  },
+  recipe("pritong-pakpak-ng-manok", "Pritong Pakpak ng Manok", [
+    ["Pakpak ng manok", "Chicken Wing", 0.625, "kg", "1/2 kg"],
+    ["Kalamansi", "Calamansi", 0.04, "kg", "3-5 pcs", true],
+  ]),
 
-  // ─── 41. Adobong Baboy ──────────────────────────────
-  {
-    id: "adobong-baboy",
-    name: "Adobong Baboy",
-    servings: "2-4 na tao",
-    ingredients: [
-      {
-        name: "Kasim",
-        daKey: "Pork Picnic Shoulder (Kasim)",
-        qty: 0.5,
-        unit: "kg",
-        amount: "1/2 kg",
-        optional: false,
-      },
-      {
-        name: "Bawang",
-        daKey: "Garlic Native/Local",
-        qty: 0.04,
-        unit: "kg",
-        amount: "1 ulo",
-        optional: false,
-      },
-      {
-        name: "Sibuyas",
-        daKey: "Red Onion Local",
-        qty: 0.15,
-        unit: "kg",
-        amount: "1-2 pcs",
-        optional: false,
-      },
-      {
-        name: "Patatas",
-        daKey: "White Potato Local",
-        qty: 0.3,
-        unit: "kg",
-        amount: "1-2 pcs",
-        optional: true,
-      },
-      {
-        name: "Itlog",
-        daKey: "Chicken Egg (White Medium)",
-        qty: 2,
-        unit: "pcs",
-        amount: "2 pcs",
-        optional: true,
-      },
-    ],
-  },
+  recipe("adobong-baboy", "Adobong Baboy", [
+    ["Kasim", "Pork Picnic Shoulder (Kasim)", 0.5, "kg", "1/2 kg"],
+    ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
+    ["Sibuyas", "Red Onion Local", 0.15, "kg", "1-2 pcs"],
+    ["Patatas", "White Potato Local", 0.3, "kg", "1-2 pcs", true],
+    ["Itlog", "Chicken Egg (White Medium)", 2, "pcs", "2 pcs", true],
+  ]),
 
-  // ─── 42. Pork Mechado ───────────────────────────────
-  {
-    id: "pork-mechado",
-    name: "Pork Mechado",
-    servings: "2-4 na tao",
-    ingredients: [
-      {
-        name: "Kasim",
-        daKey: "Pork Picnic Shoulder (Kasim)",
-        qty: 0.5,
-        unit: "kg",
-        amount: "1/2 kg",
-        optional: false,
-      },
-      {
-        name: "Patatas",
-        daKey: "White Potato Local",
-        qty: 0.3,
-        unit: "kg",
-        amount: "1-2 pcs",
-        optional: false,
-      },
-      {
-        name: "Carrots",
-        daKey: "Carrots Local",
-        qty: 0.1,
-        unit: "kg",
-        amount: "1 pc",
-        optional: false,
-      },
-      {
-        name: "Kamatis",
-        daKey: "Tomato",
-        qty: 0.14,
-        unit: "kg",
-        amount: "1-2 pcs",
-        optional: false,
-      },
-      {
-        name: "Sibuyas",
-        daKey: "Red Onion Local",
-        qty: 0.1,
-        unit: "kg",
-        amount: "1 pc",
-        optional: false,
-      },
-      {
-        name: "Bawang",
-        daKey: "Garlic Native/Local",
-        qty: 0.04,
-        unit: "kg",
-        amount: "1 ulo",
-        optional: false,
-      },
-      {
-        name: "Bell pepper",
-        daKey: "Bell Pepper (Red) Local",
-        qty: 0.125,
-        unit: "kg",
-        amount: "1 pc",
-        optional: true,
-      },
-    ],
-  },
+  recipe("pork-mechado", "Pork Mechado", [
+    ["Kasim", "Pork Picnic Shoulder (Kasim)", 0.5, "kg", "1/2 kg"],
+    ["Patatas", "White Potato Local", 0.3, "kg", "1-2 pcs"],
+    ["Carrots", "Carrots Local", 0.1, "kg", "1 pc"],
+    ["Kamatis", "Tomato", 0.14, "kg", "1-2 pcs"],
+    ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
+    ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
+    ["Bell pepper", "Bell Pepper (Red) Local", 0.125, "kg", "1 pc", true],
+  ]),
 
-  // ─── 43. Beef Mechado ───────────────────────────────
-  {
-    id: "beef-mechado",
-    name: "Beef Mechado",
-    servings: "2-4 na tao",
-    ingredients: [
-      {
-        name: "Beef litid",
-        daKey: "Beef Brisket",
-        qty: 0.5,
-        unit: "kg",
-        amount: "1/2 kg",
-        optional: false,
-      },
-      {
-        name: "Patatas",
-        daKey: "White Potato Local",
-        qty: 0.3,
-        unit: "kg",
-        amount: "1-2 pcs",
-        optional: false,
-      },
-      {
-        name: "Carrots",
-        daKey: "Carrots Local",
-        qty: 0.1,
-        unit: "kg",
-        amount: "1 pc",
-        optional: false,
-      },
-      {
-        name: "Sibuyas",
-        daKey: "Red Onion Local",
-        qty: 0.1,
-        unit: "kg",
-        amount: "1 pc",
-        optional: false,
-      },
-      {
-        name: "Bawang",
-        daKey: "Garlic Native/Local",
-        qty: 0.04,
-        unit: "kg",
-        amount: "1 ulo",
-        optional: false,
-      },
-      {
-        name: "Bell pepper",
-        daKey: "Bell Pepper (Red) Local",
-        qty: 0.125,
-        unit: "kg",
-        amount: "1 pc",
-        optional: true,
-      },
-      {
-        name: "Kamatis",
-        daKey: "Tomato",
-        qty: 0.14,
-        unit: "kg",
-        amount: "1-2 pcs",
-        optional: true,
-      },
-    ],
-  },
+  recipe("beef-mechado", "Beef Mechado", [
+    ["Beef litid", "Beef Brisket", 0.5, "kg", "1/2 kg"],
+    ["Patatas", "White Potato Local", 0.3, "kg", "1-2 pcs"],
+    ["Carrots", "Carrots Local", 0.1, "kg", "1 pc"],
+    ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
+    ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
+    ["Bell pepper", "Bell Pepper (Red) Local", 0.125, "kg", "1 pc", true],
+    ["Kamatis", "Tomato", 0.14, "kg", "1-2 pcs", true],
+  ]),
 
-  // ─── 44. Pork Caldereta ─────────────────────────────
-  {
-    id: "pork-caldereta",
-    name: "Pork Caldereta",
-    servings: "2-4 na tao",
-    ingredients: [
-      {
-        name: "Kasim",
-        daKey: "Pork Picnic Shoulder (Kasim)",
-        qty: 0.5,
-        unit: "kg",
-        amount: "1/2 kg",
-        optional: false,
-      },
-      {
-        name: "Patatas",
-        daKey: "White Potato Local",
-        qty: 0.3,
-        unit: "kg",
-        amount: "1-2 pcs",
-        optional: false,
-      },
-      {
-        name: "Carrots",
-        daKey: "Carrots Local",
-        qty: 0.1,
-        unit: "kg",
-        amount: "1 pc",
-        optional: false,
-      },
-      {
-        name: "Sibuyas",
-        daKey: "Red Onion Local",
-        qty: 0.1,
-        unit: "kg",
-        amount: "1 pc",
-        optional: false,
-      },
-      {
-        name: "Bawang",
-        daKey: "Garlic Native/Local",
-        qty: 0.04,
-        unit: "kg",
-        amount: "1 ulo",
-        optional: false,
-      },
-    ],
-  },
+  recipe("pork-caldereta", "Pork Caldereta", [
+    ["Kasim", "Pork Picnic Shoulder (Kasim)", 0.5, "kg", "1/2 kg"],
+    ["Patatas", "White Potato Local", 0.3, "kg", "1-2 pcs"],
+    ["Carrots", "Carrots Local", 0.1, "kg", "1 pc"],
+    ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
+    ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
+  ]),
 
-  // ─── 45. Beef Caldereta ─────────────────────────────
-  {
-    id: "beef-caldereta",
-    name: "Beef Caldereta",
-    servings: "2-4 na tao",
-    ingredients: [
-      {
-        name: "Beef litid",
-        daKey: "Beef Brisket",
-        qty: 0.5,
-        unit: "kg",
-        amount: "1/2 kg",
-        optional: false,
-      },
-      {
-        name: "Patatas",
-        daKey: "White Potato Local",
-        qty: 0.3,
-        unit: "kg",
-        amount: "1-2 pcs",
-        optional: false,
-      },
-      {
-        name: "Carrots",
-        daKey: "Carrots Local",
-        qty: 0.1,
-        unit: "kg",
-        amount: "1 pc",
-        optional: false,
-      },
-      {
-        name: "Sibuyas",
-        daKey: "Red Onion Local",
-        qty: 0.1,
-        unit: "kg",
-        amount: "1 pc",
-        optional: false,
-      },
-      {
-        name: "Bawang",
-        daKey: "Garlic Native/Local",
-        qty: 0.04,
-        unit: "kg",
-        amount: "1 ulo",
-        optional: false,
-      },
-      {
-        name: "Bell pepper",
-        daKey: "Bell Pepper (Red) Local",
-        qty: 0.125,
-        unit: "kg",
-        amount: "1 pc",
-        optional: true,
-      },
-    ],
-  },
+  recipe("beef-caldereta", "Beef Caldereta", [
+    ["Beef litid", "Beef Brisket", 0.5, "kg", "1/2 kg"],
+    ["Patatas", "White Potato Local", 0.3, "kg", "1-2 pcs"],
+    ["Carrots", "Carrots Local", 0.1, "kg", "1 pc"],
+    ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
+    ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
+    ["Bell pepper", "Bell Pepper (Red) Local", 0.125, "kg", "1 pc", true],
+  ]),
 
-  // ─── 51. Chicken Inasal ─────────────────────────────
-  {
-    id: "chicken-inasal",
-    name: "Chicken Inasal",
-    servings: "2-4 na tao",
-    ingredients: [
-      {
-        name: "Paa ng manok",
-        daKey: "Chicken Leg Quarter",
-        qty: 0.625,
-        unit: "kg",
-        amount: "1/2 kg",
-        optional: false,
-      },
-      {
-        name: "Kalamansi",
-        daKey: "Calamansi",
-        qty: 0.04,
-        unit: "kg",
-        amount: "3-5 pcs",
-        optional: true,
-      },
-    ],
-  },
+  recipe("chicken-inasal", "Chicken Inasal", [
+    ["Paa ng manok", "Chicken Leg Quarter", 0.625, "kg", "1/2 kg"],
+    ["Kalamansi", "Calamansi", 0.04, "kg", "3-5 pcs", true],
+  ]),
 
-  // ─── 52. Inihaw na Liempo ───────────────────────────
-  {
-    id: "inihaw-na-liempo",
-    name: "Inihaw na Liempo",
-    servings: "2-4 na tao",
-    ingredients: [
-      {
-        name: "Liempo",
-        daKey: "Pork Belly (Liempo)",
-        qty: 0.5,
-        unit: "kg",
-        amount: "1/2 kg",
-        optional: false,
-      },
-      {
-        name: "Kalamansi",
-        daKey: "Calamansi",
-        qty: 0.04,
-        unit: "kg",
-        amount: "3-5 pcs",
-        optional: true,
-      },
-      {
-        name: "Bawang",
-        daKey: "Garlic Native/Local",
-        qty: 0.035,
-        unit: "kg",
-        amount: "4-6 cloves",
-        optional: true,
-      },
-    ],
-  },
+  recipe("inihaw-na-liempo", "Inihaw na Liempo", [
+    ["Liempo", "Pork Belly (Liempo)", 0.5, "kg", "1/2 kg"],
+    ["Kalamansi", "Calamansi", 0.04, "kg", "3-5 pcs", true],
+    ["Bawang", "Garlic Native/Local", 0.035, "kg", "4-6 cloves", true],
+  ]),
 
-  // ─── 53. Inihaw na Bangus ───────────────────────────
-  {
-    id: "inihaw-na-bangus",
-    name: "Inihaw na Bangus",
-    servings: "2-4 na tao",
-    ingredients: [
-      { name: "Bangus", daKey: "Bangus", qty: 0.75, unit: "kg", amount: "1 pc", optional: false },
-      { name: "Kamatis", daKey: "Tomato", qty: 0.2, unit: "kg", amount: "2 pcs", optional: false },
-      {
-        name: "Sibuyas",
-        daKey: "Red Onion Local",
-        qty: 0.1,
-        unit: "kg",
-        amount: "1 pc",
-        optional: false,
-      },
-      {
-        name: "Luya",
-        daKey: "Ginger Local",
-        qty: 0.04,
-        unit: "kg",
-        amount: "1 piraso",
-        optional: true,
-      },
-      {
-        name: "Kalamansi",
-        daKey: "Calamansi",
-        qty: 0.04,
-        unit: "kg",
-        amount: "3-5 pcs",
-        optional: true,
-      },
-      {
-        name: "Siling haba",
-        daKey: "Chilli (Green) Local",
-        qty: 0.02,
-        unit: "kg",
-        amount: "1-2 pcs",
-        optional: true,
-      },
-    ],
-  },
+  recipe("inihaw-na-bangus", "Inihaw na Bangus", [
+    ["Bangus", "Bangus", 0.75, "kg", "3/4 kg"],
+    ["Kamatis", "Tomato", 0.2, "kg", "2 pcs"],
+    ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
+    ["Luya", "Ginger Local", 0.04, "kg", "1 piraso", true],
+    ["Kalamansi", "Calamansi", 0.04, "kg", "3-5 pcs", true],
+    ["Siling haba", "Chilli (Green) Local", 0.02, "kg", "1-2 pcs", true],
+  ]),
 
-  // ─── 56. Sinigang na Bangus ─────────────────────────
-  {
-    id: "sinigang-na-bangus",
-    name: "Sinigang na Bangus",
-    servings: "2-4 na tao",
-    ingredients: [
-      {
-        name: "Bangus",
-        daKey: "Bangus",
-        qty: 0.625,
-        unit: "kg",
-        amount: "1/2 kg",
-        optional: false,
-      },
-      {
-        name: "Kamatis",
-        daKey: "Tomato",
-        qty: 0.225,
-        unit: "kg",
-        amount: "2-3 pcs",
-        optional: false,
-      },
-      {
-        name: "Sibuyas",
-        daKey: "Red Onion Local",
-        qty: 0.1,
-        unit: "kg",
-        amount: "1 pc",
-        optional: false,
-      },
-      {
-        name: "Kangkong",
-        daKey: null,
-        qty: 0.175,
-        unit: "kg",
-        amount: "1 tali",
-        optional: false,
-        fallbackPrice: 100,
-      },
-      {
-        name: "Gabi",
-        daKey: null,
-        qty: 0.25,
-        unit: "kg",
-        amount: "1 pc",
-        optional: false,
-        fallbackPrice: 50,
-      },
-      { name: "Talong", daKey: "Eggplant", qty: 0.2, unit: "kg", amount: "1 pc", optional: true },
-      {
-        name: "Okra",
-        daKey: null,
-        qty: 0.1,
-        unit: "kg",
-        amount: "4-6 pcs",
-        optional: true,
-        fallbackPrice: 90,
-      },
-      {
-        name: "Siling haba",
-        daKey: "Chilli (Green) Local",
-        qty: 0.02,
-        unit: "kg",
-        amount: "1-2 pcs",
-        optional: true,
-      },
-    ],
-  },
+  recipe("sinigang-na-bangus", "Sinigang na Bangus", [
+    ["Bangus", "Bangus", 0.625, "kg", "1/2 kg"],
+    ["Kamatis", "Tomato", 0.225, "kg", "2-3 pcs"],
+    ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
+    ["Kangkong", null, 0.175, "kg", "1 tali", false, 100],
+    ["Gabi", null, 0.25, "kg", "1 pc", false, 50],
+    ["Talong", "Eggplant", 0.2, "kg", "1 pc", true],
+    ["Okra", null, 0.1, "kg", "4-6 pcs", true, 90],
+    ["Siling haba", "Chilli (Green) Local", 0.02, "kg", "1-2 pcs", true],
+  ]),
 ];
 
 // ═══════════════════════════════════════════════════════════
-// COST CALCULATION ENGINE
+// SMART COST ENGINE
 // ═══════════════════════════════════════════════════════════
 
-/**
- * Calculate the cost of a single ingredient.
- * For "kg" items: price_per_kg * qty
- * For "pcs" items: price_per_piece * qty
- */
-function getIngredientCost(ing: RecipeIngredient, priceMap: PriceMap): number {
-  if (ing.daKey && priceMap[ing.daKey] !== undefined) {
-    return priceMap[ing.daKey] * ing.qty;
+function getProteinType(recipe: Recipe): "fish" | "chicken" | "pork" | "beef" | "egg" | "veggie" | "other" {
+  const id = recipe.id;
+
+  if (
+    id.includes("manok") ||
+    id.includes("chicken") ||
+    id.includes("inasal") ||
+    id.includes("pakpak") ||
+    id.includes("afritada") ||
+    id.includes("sopas") ||
+    id.includes("repolyo-at-manok")
+  ) return "chicken";
+
+  if (
+    id.includes("baboy") ||
+    id.includes("pork") ||
+    id.includes("liempo") ||
+    id.includes("lechon") ||
+    id.includes("sisig") ||
+    id.includes("lumpia") ||
+    id.includes("giniling") ||
+    id.includes("menudo") ||
+    id.includes("mechado") ||
+    id.includes("caldereta") ||
+    id.includes("inihaw-na-liempo")
+  ) return "pork";
+
+  if (id.includes("beef") || id.includes("kare-kare") || id.includes("broccoli")) return "beef";
+
+  if (
+    id.includes("bangus") ||
+    id.includes("tilapia") ||
+    id.includes("galunggong") ||
+    id.includes("tamban") ||
+    id.includes("sarciadong")
+  ) return "fish";
+
+  if (id.includes("tortang-talong") || id.includes("ampalaya") || id.includes("tortang-giniling")) return "egg";
+
+  if (
+    id.includes("pinakbet") ||
+    id.includes("ginataang-kalabasa") ||
+    id.includes("upo") ||
+    id.includes("sayote") ||
+    id.includes("pechay")
+  ) return "veggie";
+
+  return "other";
+}
+
+function getMainIngredientKey(recipe: Recipe): string {
+  const required = recipe.ingredients.find((ing) => !ing.optional);
+  if (!required) return recipe.id;
+
+  const key = (required.daKey || required.name).toLowerCase();
+
+  if (key.includes("galunggong")) return "galunggong";
+  if (key.includes("tilapia")) return "tilapia";
+  if (key.includes("bangus")) return "bangus";
+  if (key.includes("tamban") || key.includes("sardines")) return "tamban";
+  if (key.includes("chicken leg") || key.includes("paa ng manok")) return "chicken-leg";
+  if (key.includes("chicken breast") || key.includes("dibdib")) return "chicken-breast";
+  if (key.includes("chicken wing") || key.includes("pakpak")) return "chicken-wing";
+  if (key.includes("pork belly") || key.includes("liempo")) return "liempo";
+  if (key.includes("pork chop")) return "pork-chop";
+  if (key.includes("pork picnic") || key.includes("kasim")) return "kasim";
+  if (key.includes("beef")) return "beef";
+  if (key.includes("eggplant") || key.includes("talong")) return "talong";
+  if (key.includes("ampalaya")) return "ampalaya";
+  if (key.includes("squash") || key.includes("kalabasa")) return "kalabasa";
+  if (key.includes("upo")) return "upo";
+  if (key.includes("sayote") || key.includes("chayote")) return "sayote";
+  if (key.includes("pechay")) return "pechay";
+
+  return key;
+}
+
+function isMainProteinIngredient(recipe: Recipe, ing: RecipeIngredient): boolean {
+  if (ing.optional) return false;
+  const protein = getProteinType(recipe);
+  const key = (ing.daKey || ing.name).toLowerCase();
+
+  if (protein === "chicken") return key.includes("chicken");
+  if (protein === "fish") {
+    return (
+      key.includes("bangus") ||
+      key.includes("tilapia") ||
+      key.includes("galunggong") ||
+      key.includes("tamban") ||
+      key.includes("sardines")
+    );
   }
-  if (ing.fallbackPrice !== undefined) {
-    return ing.fallbackPrice * ing.qty;
+  return false;
+}
+
+function normalizeIngredientForCost(recipe: Recipe, ing: RecipeIngredient): RecipeIngredient {
+  // Family-realistic adjustment:
+  // Main chicken/fish dishes should not look artificially cheap at 1/2 kg.
+  // Sopas and mixed ginisa chicken dishes remain as-is because protein is not the main bulk.
+  const excludedSmallProteinRecipes = new Set([
+    "sopas",
+    "ginisang-repolyo-at-manok",
+    "ginisang-sayote-at-manok",
+  ]);
+
+  if (
+    !excludedSmallProteinRecipes.has(recipe.id) &&
+    isMainProteinIngredient(recipe, ing) &&
+    ing.unit === "kg" &&
+    ing.qty < 0.75
+  ) {
+    return {
+      ...ing,
+      qty: 0.75,
+      amount: "3/4 kg",
+    };
   }
-  // Unknown price — skip (will not affect total)
+
+  return ing;
+}
+
+function hasRequiredPrices(recipe: Recipe, priceMap: PriceMap): boolean {
+  return recipe.ingredients.every((ing) => {
+    if (ing.optional) return true;
+    if (ing.daKey === null) return ing.fallbackPrice !== undefined;
+    const price = priceMap[ing.daKey];
+    return typeof price === "number" && Number.isFinite(price) && price > 0;
+  });
+}
+
+function getIngredientCost(recipe: Recipe, ing: RecipeIngredient, priceMap: PriceMap): number {
+  const normalized = normalizeIngredientForCost(recipe, ing);
+
+  if (normalized.daKey && priceMap[normalized.daKey] !== undefined) {
+    return priceMap[normalized.daKey] * normalized.qty;
+  }
+
+  if (normalized.fallbackPrice !== undefined) {
+    return normalized.fallbackPrice * normalized.qty;
+  }
+
   return 0;
 }
 
-/**
- * Get the trend for an ingredient by comparing today vs last price.
- */
 function getIngredientTrend(
   ing: RecipeIngredient,
   todayPrices: PriceMap,
   lastPrices: PriceMap,
 ): "down" | "up" | "stable" {
   if (!ing.daKey) return "stable";
+
   const today = todayPrices[ing.daKey];
   const last = lastPrices[ing.daKey];
+
   if (today === undefined || last === undefined) return "stable";
   if (today < last) return "down";
   if (today > last) return "up";
   return "stable";
 }
 
-/**
- * Calculate total required cost for a recipe using today's prices.
- * Only counts non-optional ingredients.
- */
 export function calculateRecipeCost(recipe: Recipe, priceMap: PriceMap): number {
+  if (!hasRequiredPrices(recipe, priceMap)) return Number.POSITIVE_INFINITY;
+
   let total = 0;
   for (const ing of recipe.ingredients) {
-    if (!ing.optional) {
-      total += getIngredientCost(ing, priceMap);
-    }
+    if (!ing.optional) total += getIngredientCost(recipe, ing, priceMap);
   }
+
   return Math.round(total);
 }
 
-/**
- * Calculate full cost result with per-ingredient breakdown.
- */
 export function calculateRecipeCostDetailed(
   recipe: Recipe,
   todayPrices: PriceMap,
   lastPrices: PriceMap,
 ): CostResult {
   let totalCost = 0;
-  const ingredientCosts = recipe.ingredients.map((ing) => {
-    const cost = getIngredientCost(ing, todayPrices);
-    if (!ing.optional) {
-      totalCost += cost;
-    }
+
+  const ingredientCosts = recipe.ingredients.map((originalIng) => {
+    const ing = normalizeIngredientForCost(recipe, originalIng);
+    const cost = getIngredientCost(recipe, ing, todayPrices);
+
+    if (!ing.optional) totalCost += cost;
+
     return {
       name: ing.name,
       amount: ing.amount,
@@ -2407,109 +678,81 @@ export function calculateRecipeCostDetailed(
   };
 }
 
-/**
- * Find the cheapest N meals from all recipes.
- * Returns detailed cost results sorted by price ascending.
- * Ensures protein diversity: max 2 dishes per protein type.
- */
-export function findCheapestMeals(
-  recipes: Recipe[],
-  todayPrices: PriceMap,
-  lastPrices: PriceMap,
-  count: number = 5,
-): CostResult[] {
-  // Calculate cost for all recipes
-  const allResults = recipes.map((recipe) =>
-    calculateRecipeCostDetailed(recipe, todayPrices, lastPrices),
-  );
+function getProteinLimit(protein: string): number {
+  switch (protein) {
+    case "fish": return 2;
+    case "chicken": return 2;
+    case "pork": return 2;
+    case "beef": return 1;
+    case "egg": return 1;
+    case "veggie": return 1;
+    default: return 1;
+  }
+}
 
-  // Sort by total cost ascending
-  allResults.sort((a, b) => a.totalCost - b.totalCost);
-
-  // Pick top N with protein diversity
+function chooseBalancedMeals(allResults: CostResult[], count: number): CostResult[] {
   const selected: CostResult[] = [];
   const proteinCount: Record<string, number> = {};
+  const mainIngredientUsed = new Set<string>();
 
+  // Pass 1: strict balanced selection
   for (const result of allResults) {
     if (selected.length >= count) break;
 
-    // Determine primary protein from first required ingredient
-    const mainProtein = getProteinType(result.recipe);
-    const currentCount = proteinCount[mainProtein] || 0;
+    const protein = getProteinType(result.recipe);
+    const mainKey = getMainIngredientKey(result.recipe);
+    const limit = getProteinLimit(protein);
+    const current = proteinCount[protein] || 0;
 
-    // Allow max 2 of same protein type
-    if (currentCount < 2) {
-      selected.push(result);
-      proteinCount[mainProtein] = currentCount + 1;
-    }
+    if (current >= limit) continue;
+    if (mainIngredientUsed.has(mainKey)) continue;
+
+    selected.push(result);
+    proteinCount[protein] = current + 1;
+    mainIngredientUsed.add(mainKey);
   }
 
-  // If we still need more (unlikely), fill without restriction
+  // Pass 2: relax main ingredient duplication, keep protein caps
   if (selected.length < count) {
     for (const result of allResults) {
       if (selected.length >= count) break;
-      if (!selected.includes(result)) {
-        selected.push(result);
-      }
+      if (selected.some((x) => x.recipe.id === result.recipe.id)) continue;
+
+      const protein = getProteinType(result.recipe);
+      const limit = getProteinLimit(protein);
+      const current = proteinCount[protein] || 0;
+
+      if (current >= limit) continue;
+
+      selected.push(result);
+      proteinCount[protein] = current + 1;
+    }
+  }
+
+  // Pass 3: final fill only if there are not enough categories available
+  if (selected.length < count) {
+    for (const result of allResults) {
+      if (selected.length >= count) break;
+      if (selected.some((x) => x.recipe.id === result.recipe.id)) continue;
+      selected.push(result);
     }
   }
 
   return selected;
 }
 
-/**
- * Helper to determine protein type from a recipe.
- */
-function getProteinType(recipe: Recipe): string {
-  const id = recipe.id;
-  if (
-    id.includes("manok") ||
-    id.includes("chicken") ||
-    id.includes("inasal") ||
-    id.includes("pakpak") ||
-    id.includes("afritada") ||
-    id.includes("sopas") ||
-    id.includes("repolyo-at-manok")
-  )
-    return "chicken";
-  if (
-    id.includes("baboy") ||
-    id.includes("pork") ||
-    id.includes("liempo") ||
-    id.includes("lechon") ||
-    id.includes("sisig") ||
-    id.includes("lumpia") ||
-    id.includes("giniling") ||
-    id.includes("menudo") ||
-    id.includes("mechado-pork") ||
-    id.includes("caldereta-pork") ||
-    id.includes("inihaw-na-liempo")
-  )
-    return "pork";
-  if (
-    id.includes("beef") ||
-    id.includes("kare-kare") ||
-    id.includes("broccoli") ||
-    id.includes("bistek")
-  )
-    return "beef";
-  if (
-    id.includes("bangus") ||
-    id.includes("tilapia") ||
-    id.includes("galunggong") ||
-    id.includes("tamban") ||
-    id.includes("sarciadong")
-  )
-    return "fish";
-  if (id.includes("tortang-talong") || id.includes("ampalaya") || id.includes("tortang-giniling"))
-    return "egg";
-  if (
-    id.includes("pinakbet") ||
-    id.includes("ginataang-kalabasa") ||
-    id.includes("upo") ||
-    id.includes("sayote") ||
-    id.includes("pechay")
-  )
-    return "veggie";
-  return "other";
+export function findCheapestMeals(
+  recipes: Recipe[],
+  todayPrices: PriceMap,
+  lastPrices: PriceMap,
+  count: number = 8,
+): CostResult[] {
+  const validRecipes = recipes.filter((recipe) => hasRequiredPrices(recipe, todayPrices));
+
+  const allResults = validRecipes
+    .map((recipe) => calculateRecipeCostDetailed(recipe, todayPrices, lastPrices))
+    .filter((result) => Number.isFinite(result.totalCost) && result.totalCost > 0)
+    .sort((a, b) => a.totalCost - b.totalCost);
+
+  return chooseBalancedMeals(allResults, count);
 }
