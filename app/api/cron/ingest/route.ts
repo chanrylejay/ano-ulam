@@ -136,6 +136,7 @@ ${pdfText.substring(0, 8000)}`;
     // Deduplicate by name+category (keep last occurrence)
     const seen = new Map();
     for (const item of items) {
+      if (!item) continue;
       seen.set(`${item.name}||${item.category}`, item);
     }
     const uniqueItems = Array.from(seen.values());
