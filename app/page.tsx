@@ -197,33 +197,42 @@ export default function HomePage() {
       >
         <div className="max-w-2xl mx-auto w-full px-4 pt-12 pb-8 flex flex-col flex-1 items-center text-center">
           <div className="flex-1 flex flex-col items-center justify-center">
-            <h1 className="text-7xl md:text-[10rem] md:leading-none font-black mb-2 tracking-tight">
-              ma, Ano ulam?
-            </h1>
+             <h1 className="text-[4.5rem] sm:text-7xl md:text-[10rem] md:leading-none font-black mb-2 tracking-tight leading-none">
+               ma, Ano ulam?
+             </h1>
             <p className="text-lg text-white/90 mb-6">Anong murang ulam ngayon</p>
             <p className="text-sm text-white/70">{formattedDate}</p>
           </div>
 
-          <div className="flex flex-wrap justify-center gap-1 mt-auto pt-6">
-            {priceTags.map((tag) => (
-              <span
-                key={tag.label}
-                className={`inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[10px] font-bold text-white ${
-                  tag.price <= 100 ? "bg-green-500" : "bg-red-500"
-                }`}
-              >
-                {tag.label} {formatPeso(tag.price)}
-                {tag.price <= 100 ? " ↓" : " ↑"}
-              </span>
-            ))}
-            <a
-              href="/prices"
-              aria-label="View all commodity prices"
-              className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-white text-amber-700 shadow-md hover:shadow-lg transition-shadow"
-            >
-              More →
-            </a>
-          </div>
+           <div className="w-full mt-auto pt-6">
+             <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 scrollbar-hide justify-center sm:flex-wrap sm:justify-center">
+               {priceTags.map((tag) => (
+                 <div
+                   key={tag.label}
+                   className={`shrink-0 flex flex-col items-center justify-center px-3 py-1.5 rounded-xl min-w-[72px] shadow-sm ${
+                     tag.price <= 100
+                       ? "bg-green-500"
+                       : "bg-red-500"
+                   }`}
+                 >
+                   <span className="text-[11px] font-extrabold text-white leading-tight">
+                     {tag.label}
+                   </span>
+                   <span className="text-sm font-extrabold text-white leading-tight">
+                     {formatPeso(tag.price)}
+                     {tag.price <= 100 ? " ↓" : " ↑"}
+                   </span>
+                 </div>
+               ))}
+               <a
+                 href="/prices"
+                 aria-label="View all commodity prices"
+                 className="shrink-0 flex flex-col items-center justify-center px-4 py-1.5 rounded-xl min-w-[72px] bg-white text-amber-700 shadow-md hover:shadow-lg transition-shadow font-extrabold text-sm"
+               >
+                 More Prices →
+               </a>
+             </div>
+           </div>
         </div>
       </header>
 

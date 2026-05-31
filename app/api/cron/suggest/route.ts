@@ -107,47 +107,49 @@ export async function POST(request: NextRequest) {
     const prompt = `Based on these current market prices in the Philippines (with price trends vs last week), suggest 5 budget-friendly Filipino meals.
 
 For each meal, provide:
-- name: Filipino dish name in Tagalog
-- estimated_cost: total cost for ONE meal (for 2-4 servings). Calculate based on ACTUAL amount needed, NOT 1kg each:
-  * Meat/Fish: 1/2 kg or 1 kg
-  * Vegetables: 1/4 kg or "1 tali" or "2-3 pcs"
-  * Spices (bawang, sibuyas, luya): "2-3 pcs" or "1 ulo" (about 1/8 the kg price)
-  * Rice: 1 kg
-  * Cooking oil: already in pantry, do NOT include
-  * IMPORTANT: If Bawang is ₱383/kg but you only need 2-3 cloves (~1/8 kg ≈ ₱48), use ₱48 in cost.
-  * Total cost should reflect what a family actually spends sa palengke for ONE meal
+- name: Filipino dish name in Tagalog (e.g., "Tinolang Manok", "Adobong Baboy", "Sinigang na Bangus")
+- estimated_cost: total cost for ONE meal (for 2-4 servings). Calculate based on ACTUAL household quantity needed, NOT 1kg each:
+  * Meat/Fish: 1/2 kg to 1 kg
+  * Vegetables: 1/4 kg, 1/2 kg, "1 tali", or "2-3 pcs"
+  * Garlic/Onion/Ginger: "1-2 pcs", "2-3 cloves", or "1 small piece"
+  * Do NOT show "1/8 kg" to users — convert to "2-3 pcs" or "1 ulo"
+  * Rice: 1 kg if included
+  * Pantry staples like toyo, suka, patis, paminta, and cooking oil are assumed available unless the dish depends on them
+  * IMPORTANT: If Bawang is ₱383/kg but you only need 2-3 cloves (~₱48), use ₱48 in the cost calculation
+  * Total cost must reflect what a family actually spends sa palengke for ONE meal, not 1 kg x price for every ingredient
 - servings: "2-4 na tao"
 - ingredients: array of objects, each with:
   - name: ingredient name in Filipino (use the names from the price list)
-  - amount: realistic palengke amount as a human-readable string. Examples: "1 kg", "1/2 kg", "1/4 kg", "2-3 pcs", "1 ulo", "1 tali". Do NOT use "1/8 kg" — convert to "2-3 pcs" or "1 ulo"
+  - amount: realistic palengke amount as a human-readable string. Examples: "1 kg", "1/2 kg", "1/4 kg", "2-3 pcs", "1 ulo", "1 tali", "1-2 pcs", "2-3 cloves", "1 small piece". Do NOT use "1/8 kg".
   - trend: "down", "up", or "stable" (from the price data)
-  - optional: true or false (vegetables and non-essential items are usually optional)
-- reason: 1-2 sentences in Tagalog explaining WHY this dish is suggested today based on current prices. Example: "Mura ang manok ngayon, bumaba presyo ng Bawang at Sibuyas this week."
+  - optional: true or false (vegetables and non-essential items are usually optional, set to true for optional ingredients)
+- reason: 1-2 sentences in natural Tagalog explaining WHY this dish is suggested based on cheap/current ingredients. Reference specific price trends. Example: "Mura ang manok ngayon at sayote lang ang gulay na kailangan. Konti lang ang luya, bawang, at sibuyas kaya sulit ito."
 
 Current prices (with trends):
 ${priceListWithTrends}
 
-AUTHENTIC FILIPINO RECIPES — IMPORTANT RULES:
-- Tinola uses: chicken, sayote OR papaya, luya, dahon ng sili OR malunggay. It does NOT use kamatis.
-- Adobo uses: meat (pork/chicken), toyo, suka, bawang, paminta, dahon ng laurel. Basic. No vegetables.
-- Sinigang uses: meat/fish, kangkong OR sitaw, labanos, okra, kamatis, sibuyas, sampalok mix (pantry).
-- Nilaga uses: beef/pork, repolyo, pechay, patatas, sibuyas, luya/black pepper.
+AUTHENTIC FILIPINO RECIPES — IMPORTANT RECIPE CORRECTNESS RULES:
+- Tinolang Manok uses: chicken, luya, sayote OR papaya (not both), malunggay OR dahon ng sili. It does NOT use kamatis.
+- Adobo uses: meat (pork/chicken), bawang, toyo, suka, paminta, dahon ng laurel. Basic. Do NOT add random vegetables (no carrots, no potatoes, no bell pepper).
+- Sinigang uses: protein (meat/fish) + souring ingredient (sampalok mix or bayabas or kamias) + common vegetables (kangkong OR sitaw, labanos, okra, kamatis, sibuyas). Choose vegetables that make sense together.
+- Nilaga uses: beef/pork, repolyo, pechay, patatas, sibuyas, luya or black pepper.
 - Pinakbet uses: pork (liempo/pigue), kalabasa, talong, okra, sitaw, ampalaya, kamatis, bagoong (pantry).
 - Paksiw uses: fish (bangus/galunggong), suka, luya, sibuyas, sili. Simple. No vegetables.
-- Ginisang monggo: monggo, pork/chicken (small amount), malunggay OR ampalaya leaves, bawang, sibuyas, kamatis.
+- Ginisang Munggo uses: munggo, bawang, sibuyas, optional leafy vegetable (malunggay or ampalaya leaves) or small amount of pork/chicken. Optional kamatis.
+- Tortang Talong uses: talong and itlog. Simple. Optional giniling is a bonus.
 - Use ONLY authentic Filipino recipe ingredients. Do NOT add ingredients that don't belong in the dish.
-- DO NOT include pantry staples in ingredients array (toyo, suka, patis, paminta, mantika, asin, asukal) — they are always available.
+- DO NOT include pantry staples in the ingredients array (toyo, suka, patis, paminta, mantika, asin, asukal, dahon ng laurel, bagoong, sampalok mix) — these are always available in a Filipino kitchen.
 - Keep it simple — 3-6 ingredients per dish max.
 
 Requirements:
 1. Focus on common Filipino dishes that families actually cook daily
 2. Use the CHEAPEST available ingredients — prioritize items marked [down]
-3. Every ingredient MUST include the "amount" field with a real palengke amount
-4. The "reason" field must reference specific ingredient prices or trends
+3. Every ingredient MUST include the "amount" field with a realistic palengke amount
+4. The "reason" field must explain the suggestion in natural Tagalog based on current prices
 5. Use Filipino ingredient names from the price list above
-6. Mix different proteins across the 5 meals (don't repeat the same meat)
+6. Mix different proteins across the 5 meals (don't repeat the same meat/fish)
 
-Return as a JSON object with a "meals" array.`;
+Return as a valid JSON object with a "meals" array.`;
 
     const systemPrompt = `You are a Filipino nanay who knows how to cook budget-friendly meals for the family. You shop at the palengke and always pick the cheapest, freshest ingredients. You speak Tagalog naturally. Always return valid JSON.`;
 

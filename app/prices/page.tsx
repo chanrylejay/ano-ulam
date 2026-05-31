@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { format } from "date-fns";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowUpDown, Calendar, Home, Search, ShoppingCart } from "lucide-react";
+import { ArrowUpDown, Home, Search, ShoppingCart } from "lucide-react";
 import { Footer } from "@/components/Footer";
 import type { Price, Commodity } from "@/lib/db";
 
@@ -43,6 +43,49 @@ function getPriceColor(price: number): string {
   if (price <= 150) return "text-green-700";
   if (price <= 300) return "text-amber-700";
   return "text-red-600";
+}
+
+function getEmojiForItem(name: string): string {
+  const lower = name.toLowerCase();
+  if (lower.includes("itlog") || lower.includes("egg")) return "🥚";
+  if (lower.includes("baboy") || lower.includes("pork") || lower.includes("liempo") || lower.includes("kasim") || lower.includes("pigue")) return "🐖";
+  if (lower.includes("manok") || lower.includes("chicken")) return "🐔";
+  if (lower.includes("beef") || lower.includes("baka") || lower.includes("tadyang") || lower.includes("litid")) return "🐄";
+  if (lower.includes("bangus")) return "🐟";
+  if (lower.includes("tilapia")) return "🐟";
+  if (lower.includes("galunggong")) return "🐟";
+  if (lower.includes("tamban")) return "🐟";
+  if (lower.includes("alumahan")) return "🐟";
+  if (lower.includes("tambakol") || lower.includes("tuna")) return "🐟";
+  if (lower.includes("pusit")) return "🦑";
+  if (lower.includes("bigas") || lower.includes("rice")) return "🍚";
+  if (lower.includes("sibuyas")) return "🧅";
+  if (lower.includes("bawang")) return "🧄";
+  if (lower.includes("luya") || lower.includes("ginger")) return "🫚";
+  if (lower.includes("kamatis") || lower.includes("tomato")) return "🍅";
+  if (lower.includes("talong") || lower.includes("eggplant")) return "🍆";
+  if (lower.includes("kalabasa") || lower.includes("squash")) return "🎃";
+  if (lower.includes("sitaw")) return "🫘";
+  if (lower.includes("ampalaya")) return "🥒";
+  if (lower.includes("repolyo") || lower.includes("cabbage")) return "🥬";
+  if (lower.includes("pechay")) return "🥬";
+  if (lower.includes("kangkong")) return "🥬";
+  if (lower.includes("malunggay")) return "🌿";
+  if (lower.includes("saging") || lower.includes("banana")) return "🍌";
+  if (lower.includes("mangga") || lower.includes("mango")) return "🥭";
+  if (lower.includes("papaya")) return "🥝";
+  if (lower.includes("kalamansi")) return "🍋";
+  if (lower.includes("sili") || lower.includes("chilli")) return "🌶️";
+  if (lower.includes("sayote")) return "🥒";
+  if (lower.includes("carrots")) return "🥕";
+  if (lower.includes("patatas") || lower.includes("potato")) return "🥔";
+  if (lower.includes("bell pepper")) return "🫑";
+  if (lower.includes("mantika") || lower.includes("oil")) return "🫗";
+  if (lower.includes("munggo") || lower.includes("mungbean")) return "🫘";
+  if (lower.includes("asin") || lower.includes("salt")) return "🧂";
+  if (lower.includes("asukal") || lower.includes("sugar")) return "🍬";
+  if (lower.includes("gatas") || lower.includes("milk")) return "🥛";
+  return "🛒";
 }
 
 export default function PricesPage() {
@@ -138,7 +181,7 @@ export default function PricesPage() {
   return (
     <div className="min-h-screen pb-20 bg-gradient-to-b from-amber-50 to-orange-50">
       {/* Header — centered, back top-left */}
-      <header className="bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 text-white py-10 px-4 shadow-lg relative">
+      <header className="bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 text-white pt-10 pb-8 px-4 shadow-lg relative">
         <Button
           variant="ghost"
           className="absolute top-4 left-4 text-sm text-white/80 hover:text-white hover:bg-white/20"
@@ -149,10 +192,11 @@ export default function PricesPage() {
         </Button>
 
         <div className="max-w-2xl mx-auto text-center">
-          <h1 className="text-4xl md:text-5xl font-black mb-2">Presyo Ngayon</h1>
-          <p className="text-base text-white font-medium">
-            <Calendar className="w-4 h-4 inline mr-1" />
-            {date ? `Data as of ${format(new Date(date), "MMMM d, yyyy")}` : "Loading..."}
+          <h1 className="text-[4.5rem] sm:text-7xl md:text-[8rem] md:leading-none font-black mb-3 leading-none tracking-tight">
+            Presyo Ngayon
+          </h1>
+          <p className="text-base text-white/80 font-medium">
+            {date ? format(new Date(date), "MMMM d, yyyy") : "Loading..."}
           </p>
         </div>
       </header>
@@ -163,7 +207,7 @@ export default function PricesPage() {
         aria-live="polite"
         aria-atomic="false"
       >
-        {/* Search Bar */}
+        {/* Search Bar — bigger and prominent */}
         <div className="relative mb-4">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
           <input
@@ -171,21 +215,21 @@ export default function PricesPage() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Hanapin ang presyo... (e.g., Bangus, Manok)"
-            className="w-full pl-12 pr-4 py-3 text-base rounded-xl border-2 border-gray-200 bg-white focus:border-amber-500 focus:ring-2 focus:ring-amber-200 focus:outline-none transition-colors"
+            className="w-full pl-12 pr-4 py-4 text-base rounded-xl border-2 border-gray-200 bg-white shadow-sm focus:border-amber-500 focus:ring-2 focus:ring-amber-200 focus:outline-none transition-colors"
             aria-label="Search commodity prices"
           />
         </div>
 
-        {/* Category Tabs — one line, compact */}
-        <div className="flex flex-nowrap gap-1.5 mb-3 overflow-x-auto pb-1">
+        {/* Category Tabs — one line, larger pills */}
+        <div className="flex flex-nowrap gap-2 mb-3 overflow-x-auto pb-1">
           {tabCategories.map((tab) => (
             <button
               key={tab.value}
               onClick={() => setSelectedTab(tab.value)}
-              className={`shrink-0 px-2.5 py-1 rounded-full text-xs font-semibold transition-colors whitespace-nowrap ${
+              className={`shrink-0 px-4 py-2 rounded-full text-sm font-bold transition-colors whitespace-nowrap ${
                 selectedTab === tab.value
                   ? "bg-amber-500 text-white shadow-sm"
-                  : "bg-white text-amber-700 border border-gray-200 hover:bg-amber-50"
+                  : "bg-white text-amber-700 border border-amber-200 hover:bg-amber-50"
               }`}
             >
               {tab.label}
@@ -193,10 +237,10 @@ export default function PricesPage() {
           ))}
         </div>
 
-        {/* Sort + count — on their own line */}
+        {/* Sort — clean row */}
         <div className="flex items-center justify-between mb-3">
           <p className="text-sm text-gray-500">
-            {filteredPrices.length} item{filteredPrices.length !== 1 ? "s" : ""} found
+            {filteredPrices.length} item{filteredPrices.length !== 1 ? "s" : ""}
           </p>
           <Button
             variant="outline"
@@ -204,7 +248,7 @@ export default function PricesPage() {
             onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
             aria-pressed={sortOrder === "asc"}
             aria-label={`Sort prices ${sortOrder === "asc" ? "high to low" : "low to high"}`}
-            className="gap-1"
+            className="gap-1 font-semibold"
           >
             <ArrowUpDown className="w-4 h-4" />
             {sortOrder === "asc" ? "Low to High" : "High to Low"}
@@ -229,16 +273,16 @@ export default function PricesPage() {
           </div>
         )}
 
-        {/* Price List — clean: name + spec | price, no emojis */}
+        {/* Price List — emojis on items, responsive grid 1-4 cols */}
         {!isLoading && filteredPrices.length > 0 && (
-          <ul className="space-y-1.5" aria-label="Commodity prices">
+          <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2" aria-label="Commodity prices">
             {filteredPrices.map((price) => (
               <li key={price.id}>
-                <Card className="overflow-hidden border-gray-200 bg-white shadow-sm hover:shadow transition-shadow duration-150">
-                  <CardContent className="p-3 flex items-center justify-between gap-3">
+                <Card className="overflow-hidden border-gray-200 bg-white shadow-sm hover:shadow transition-shadow duration-150 h-full">
+                  <CardContent className="p-3 flex items-center justify-between gap-2">
                     <div className="min-w-0 flex-1">
-                      <h2 className="font-medium text-gray-800 text-sm truncate">
-                        {price.commodities?.name || "Unknown"}
+                      <h2 className="font-semibold text-gray-800 text-sm truncate">
+                        {getEmojiForItem(price.commodities?.name || "")} {price.commodities?.name || "Unknown"}
                       </h2>
                       {shouldShowSpecification(price.commodities?.specification) && (
                         <p className="text-xs text-gray-400 truncate">
@@ -247,7 +291,7 @@ export default function PricesPage() {
                       )}
                     </div>
                     <p
-                      className={`text-base font-bold shrink-0 ${getPriceColor(price.price_prevailing || 0)}`}
+                      className={`text-sm font-bold shrink-0 ${getPriceColor(price.price_prevailing || 0)}`}
                     >
                       ₱{price.price_prevailing?.toFixed(2) || "N/A"}
                     </p>
