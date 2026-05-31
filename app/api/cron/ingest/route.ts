@@ -143,8 +143,7 @@ ${pdfText.substring(0, 8000)}`;
       throw new Error("No commodities extracted from PDF");
     }
 
-    // BATCH INSERT: All commodities in ONE query
-    const commoditiesJson = JSON.stringify(uniqueItems);
+    // BATCH INSERT: All commodities in ONE query (skip existing)
     await sql`
           INSERT INTO commodities (name, category, specification)
           SELECT DISTINCT ON (name, category)
@@ -152,8 +151,7 @@ ${pdfText.substring(0, 8000)}`;
             elem->>'category' AS category,
             COALESCE(elem->>'specification', '') AS specification
           FROM jsonb_array_elements(${commoditiesJson}::jsonb) AS elem
-          ON CONFLICT (name, category) DO UPDATE
-            SET specification = EXCLUDED.specification
+          ON CONFLICT (name, category) DO NOTHING
         `;
 
     // BATCH INSERT: All prices in ONE query
