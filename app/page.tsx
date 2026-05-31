@@ -75,13 +75,6 @@ function getPriceTone(price: number): {
   };
 }
 
-  return {
-    tileClass: "bg-rose-900 shadow-rose-950/30",
-    arrow: "\u2191",
-    arrowLabel: "mahal",
-  };
-}
-
 export default function HomePage() {
   const [meals, setMeals] = useState<Meal[]>([]);
   const [priceTags, setPriceTags] = useState<PriceTag[]>([]);
@@ -156,7 +149,7 @@ export default function HomePage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-amber-50 to-orange-50 px-4">
         <div className="text-center space-y-4 max-w-sm">
-          <div className="text-5xl">{"\uD83D\uDE15"}</div>
+          <div className="text-5xl">😕</div>
           <p className="text-amber-900 font-bold text-xl">{error}</p>
           <button
             onClick={() => {
@@ -281,7 +274,7 @@ export default function HomePage() {
                 className="shrink-0 flex flex-col items-center justify-center px-4 py-2.5 rounded-2xl min-w-[112px] bg-white text-amber-700 shadow-lg hover:shadow-xl transition-all font-extrabold text-sm ring-2 ring-amber-200/70 hover:ring-amber-300"
               >
                 <span className="leading-tight">More</span>
-                <span className="leading-tight">Prices {"\u2192"}</span>
+                <span className="leading-tight">Prices →</span>
               </a>
             </div>
           </div>
@@ -297,7 +290,7 @@ export default function HomePage() {
         {meals.length === 0 && !error && (
           <Card className="border-gray-200 bg-gradient-to-br from-amber-50 to-orange-50">
             <CardContent className="text-center p-12">
-              <div className="text-5xl mb-4">{"\uD83C\uDF73"}</div>
+              <div className="text-5xl mb-4">🍳</div>
               <p className="text-amber-900 font-bold text-xl mb-2">Wala pang data ngayon.</p>
               <p className="text-amber-700 text-lg">Babalik kami bukas ng 8AM!</p>
             </CardContent>
@@ -319,7 +312,7 @@ export default function HomePage() {
                 href="/prices"
                 className="flex items-center justify-center gap-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-bold py-4 rounded-xl shadow-sm hover:shadow-md transition-all text-lg"
               >
-                {"\uD83D\uDED2"} Tingnan ang Presyo
+                🛒 Tingnan ang Presyo
               </a>
             )}
 
@@ -328,7 +321,7 @@ export default function HomePage() {
                 href="/about"
                 className="flex items-center justify-center gap-2 bg-white text-amber-700 font-medium py-3 rounded-xl border border-gray-200 hover:bg-amber-50 transition-all text-sm"
               >
-                {"\u2139\uFE0F"} Tungkol sa Ano Ulam?
+                ℹ️ Tungkol sa Ano Ulam?
               </a>
             )}
           </div>
