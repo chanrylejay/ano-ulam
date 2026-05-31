@@ -101,8 +101,7 @@ Galunggong,fish,Medium,200
 Bangus,fish,Large,220
 
 Document text:
-${pdfText.substring(0, 8000)}`;
-
+${pdfText.substring(0, 16000)}`;
     const systemPrompt = `You are a data extraction specialist for Philippine agricultural price reports. Return ONLY CSV data, no markdown, no headers, no explanation.`;
 
     const responseText = await callDeepSeekAPI(prompt, systemPrompt);
