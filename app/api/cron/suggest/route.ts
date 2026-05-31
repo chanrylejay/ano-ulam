@@ -95,17 +95,32 @@ Requirements:
 
 Return as a JSON object with a "meals" array.`;
 
-    const systemPrompt = `You are a Filipino home cooking expert specializing in budget-friendly meal planning. You have deep knowledge of traditional Filipino dishes and know how to make delicious meals using affordable ingredients available in Philippine public markets.`;
+    const systemPrompt = `You are a Filipino home cooking expert specializing in budget-friendly meal planning. You have deep knowledge of traditional Filipino dishes and know how to make delicious meals using affordable ingredients available in Philippine public markets. Always return valid JSON.`;
+
+    // Call DeepSeek for meal suggestions
+    const responseText = await callDeepSeekAPI(prompt, systemPrompt);
+
+    // Clean and parse the response
+    const cleanedText = responseText
+      .replace(/```json\s*/g, "")
+      .replace(/```\s*/g, "")
+      .trim();
+
+    const parsed = JSON.parse(cleanedText);
+
+    if (!parsed.meals || !Array.isArray(parsed.meals)) {
+      throw new Error("Invalid response format from AI - no meals array");
+    }
 
     // Save to database
     await sql`
       INSERT INTO daily_suggestions (suggestion_date, meals, cheapest_ingredients)
-      VALUES (${today}, ${JSON.stringify(parsed.meals || [])}, ${JSON.stringify(cheapestIngredients.slice(0, 15))})
+      VALUES (${today}, ${JSON.stringify(parsed.meals)}, ${JSON.stringify(cheapestIngredients.slice(0, 15))})
     `;
 
     return NextResponse.json({
       success: true,
-      mealsCount: parsed.meals?.length || 0,
+      mealsCount: parsed.meals.length,
       ingredientsCount: cheapestIngredients.length,
     });
   } catch (error) {
