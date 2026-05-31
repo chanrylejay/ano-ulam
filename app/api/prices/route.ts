@@ -89,12 +89,19 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // Filter out null prices, convert to numbers, and sort
+    // Filter out null prices, convert to numbers, and restructure for frontend
     let filteredPrices = (prices || [])
       .filter((p: any) => p.price_prevailing !== null)
       .map((p: any) => ({
-        ...p,
+        id: p.id,
+        price_date: p.price_date,
         price_prevailing: parseFloat(p.price_prevailing),
+        commodity_id: p.commodity_id,
+        commodities: {
+          name: p.name,
+          category: p.category,
+          specification: p.specification,
+        },
       }));
 
     if (sort === "desc") {
