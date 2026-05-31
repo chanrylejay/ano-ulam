@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent } from "@/components/ui/card";
 
 interface Ingredient {
   name: string;
@@ -24,7 +24,7 @@ interface MealCardProps {
 }
 
 function formatPeso(amount?: number): string {
-  if (amount === undefined || amount === null || Number.isNaN(amount)) return "₱?";
+  if (amount === undefined || amount === null || Number.isNaN(amount)) return "";
   return `₱${Math.round(amount)}`;
 }
 
@@ -37,23 +37,22 @@ function formatCost(meal: Meal): string {
 }
 
 function getCostBadgeColor(cost: number): string {
-  const n = typeof cost === "number" ? cost : parseFloat(String(cost).replace(/[₱,]/g, ""));
+  const n =
+    typeof cost === "number"
+      ? cost
+      : parseFloat(String(cost).replace(/[₱,]/g, ""));
   if (isNaN(n)) return "bg-amber-500";
   if (n <= 150) return "bg-emerald-500";
   if (n <= 220) return "bg-amber-500";
   return "bg-rose-500";
 }
 
-function getTrendIcon(trend: string): string {
-  if (trend === "down") return "⬇️";
-  if (trend === "up") return "⬆️";
-  return "→";
-}
-
-function getTrendClass(trend: string): string {
-  if (trend === "down") return "text-emerald-600";
-  if (trend === "up") return "text-amber-600";
-  return "text-gray-300";
+function getTrendArrow(
+  trend: string,
+): { icon: string; colorClass: string } {
+  if (trend === "down") return { icon: "↓", colorClass: "text-emerald-600" };
+  if (trend === "up") return { icon: "↑", colorClass: "text-rose-500" };
+  return { icon: "→", colorClass: "text-gray-300" };
 }
 
 function sortIngredients(ingredients: Ingredient[] = []): Ingredient[] {
@@ -76,64 +75,87 @@ export function MealCard({ meal, index }: MealCardProps) {
         <Card className="overflow-hidden border-amber-100 bg-white shadow-sm hover:shadow-md transition-shadow duration-200 w-full max-w-2xl mx-auto">
           <CardContent className="p-5 sm:p-6">
             {/* Title + Total Price */}
-            <div className="flex items-start justify-between gap-3 mb-5">
+            <div className="flex items-start justify-between gap-3 mb-3">
               <h2 className="text-lg sm:text-xl font-bold text-gray-950 leading-tight">
                 {meal.name}
               </h2>
-              <span className={`${getCostBadgeColor(meal.estimated_cost)} text-white text-sm font-bold px-3 py-1.5 rounded-full shrink-0 whitespace-nowrap`}>
+              <span
+                className={`${getCostBadgeColor(meal.estimated_cost)} text-white text-sm font-bold px-3 py-1.5 rounded-full shrink-0 whitespace-nowrap`}
+              >
                 {formatCost(meal)}
               </span>
             </div>
 
-            {/* Ingredient cost breakdown */}
-            <div className="mb-4 divide-y divide-gray-50">
+            {/* Ingredient rows — compact single-line each */}
+            <div className="mb-3 space-y-0">
               {sortedIngredients.map((ing, j) => {
                 const isOptional = !!ing.optional;
+                const trend = getTrendArrow(ing.trend);
 
                 return (
-                  <div key={`${ing.name}-${j}`} className="py-2.5 first:pt-0 last:pb-0">
-                    <div className="grid grid-cols-[1fr_auto] gap-3 items-start">
-                      <div className="min-w-0">
-                        <div className="flex items-center gap-2 min-w-0">
-                          <span className={`text-base leading-none ${getTrendClass(ing.trend)}`} aria-hidden="true">
-                            {getTrendIcon(ing.trend)}
-                          </span>
-                          <span className={`font-semibold leading-snug ${isOptional ? "text-gray-500" : "text-gray-900"}`}>
-                            {ing.name}
-                          </span>
-                        </div>
+                  <div
+                    key={`${ing.name}-${j}`}
+                    className="flex items-center gap-2 py-1.5 border-b border-gray-50 last:border-0"
+                  >
+                    {/* Trend arrow */}
+                    <span
+                      className={`text-base font-bold shrink-0 w-4 text-center ${trend.colorClass}`}
+                      aria-hidden="true"
+                    >
+                      {trend.icon}
+                    </span>
 
-                        <div className="pl-7 mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5">
-                          {ing.amount && (
-                            <span className={`text-sm ${isOptional ? "text-gray-400" : "text-gray-500"}`}>
-                              {ing.amount}
-                            </span>
-                          )}
-                          {isOptional && (
-                            <span className="rounded-full bg-rose-50 px-2 py-0.5 text-[11px] font-medium text-rose-500 ring-1 ring-rose-100">
-                              optional
-                            </span>
-                          )}
-                        </div>
-                      </div>
+                    {/* Name + amount + optional badge */}
+                    <div className="flex flex-1 items-baseline gap-2 min-w-0 overflow-hidden">
+                      <span
+                        className={`font-semibold text-sm leading-snug shrink-0 ${
+                          isOptional ? "text-gray-400" : "text-gray-900"
+                        }`}
+                      >
+                        {ing.name}
+                      </span>
 
-                      <div className="text-right pt-0.5">
-                        <span className={`text-sm font-bold whitespace-nowrap ${isOptional ? "text-rose-500" : "text-emerald-600"}`}>
-                          {formatPeso(ing.cost)}
+                      {ing.amount && (
+                        <span
+                          className={`text-xs leading-snug shrink-0 ${
+                            isOptional ? "text-gray-300" : "text-gray-400"
+                          }`}
+                        >
+                          {ing.amount}
                         </span>
-                      </div>
+                      )}
+
+                      {isOptional && (
+                        <span className="rounded-full bg-rose-50 px-1.5 py-px text-[10px] font-medium text-rose-400 ring-1 ring-rose-100 shrink-0">
+                          optional
+                        </span>
+                      )}
                     </div>
+
+                    {/* Price */}
+                    <span
+                      className={`text-sm font-bold shrink-0 tabular-nums ${
+                        isOptional ? "text-rose-400" : "text-emerald-600"
+                      }`}
+                    >
+                      {formatPeso(ing.cost)}
+                    </span>
                   </div>
                 );
               })}
             </div>
 
             {/* Servings */}
-            <p className="text-xs text-gray-500 mb-3">🍽️ {meal.servings || "1-3 katao"}</p>
+            <p className="text-xs text-gray-500 mb-3">
+              🍽️ {meal.servings || "1-3 katao"}
+            </p>
 
             {/* Bakit? */}
             {meal.reason && (
-              <div className="bg-amber-50 rounded-lg p-3" style={{ border: "none" }}>
+              <div
+                className="bg-amber-50 rounded-lg p-3"
+                style={{ border: "none" }}
+              >
                 <p className="text-sm leading-relaxed">
                   <span className="font-bold text-amber-900">Bakit?</span>{" "}
                   <span className="text-stone-700">{meal.reason}</span>
