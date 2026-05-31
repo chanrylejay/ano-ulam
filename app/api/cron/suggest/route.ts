@@ -5,12 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@/lib/db";
 import { callDeepSeekAPI } from "@/lib/deepseek";
 import { isHidden } from "@/lib/commodity-names";
-import {
-  RECIPES,
-  findCheapestMeals,
-  type PriceMap,
-  type CostResult,
-} from "@/lib/recipes";
+import { RECIPES, findCheapestMeals, type PriceMap, type CostResult } from "@/lib/recipes";
 
 export async function POST(request: NextRequest) {
   try {
@@ -72,12 +67,7 @@ export async function POST(request: NextRequest) {
       lastPriceMap[p.name] = parseFloat(p.price_prevailing);
     });
 
-    const cheapestMeals: CostResult[] = findCheapestMeals(
-      RECIPES,
-      todayPriceMap,
-      lastPriceMap,
-      8,
-    );
+    const cheapestMeals: CostResult[] = findCheapestMeals(RECIPES, todayPriceMap, lastPriceMap, 8);
 
     const mealSummaries = cheapestMeals
       .map((result, i) => {
@@ -88,8 +78,7 @@ export async function POST(request: NextRequest) {
 
         return `${i + 1}. ${result.recipe.name} (₱${result.totalCost}) — ${ingDetails}`;
       })
-      .join("
-");
+      .join("\n");
 
     const prompt = `Ikaw ay isang Filipino nanay na nagtitipid sa palengke. Para sa bawat ulam na nasa ibaba, sumulat ng 1-2 pangungusap na nagpapaliwanag kung BAKIT ito ang pinili ngayong araw. I-reference ang specific na presyo o trend ng sangkap kung natural. Gamitin ang natural na Tagalog — parang kinukuwento mo sa kapitbahay.
 
@@ -160,9 +149,7 @@ Recipe IDs: ${cheapestMeals.map((r) => r.recipe.id).join(", ")}`;
     const cheapestIngredients: any[] = [];
     Object.entries(categorizedPrices).forEach(([category, items]) => {
       const sorted = [...items].sort(
-        (a, b) =>
-          (parseFloat(a.price_prevailing) || 0) -
-          (parseFloat(b.price_prevailing) || 0),
+        (a, b) => (parseFloat(a.price_prevailing) || 0) - (parseFloat(b.price_prevailing) || 0),
       );
       sorted.slice(0, 3).forEach((item) => {
         cheapestIngredients.push({
