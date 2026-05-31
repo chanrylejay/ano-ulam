@@ -51,7 +51,7 @@ function getCategoryEmoji(category: string | undefined): string {
   return map[category || ""] || "🧂";
 }
 
-function shouldShowSpecification(spec: string | undefined): boolean {
+function shouldShowSpecification(spec: string | null | undefined): boolean {
   if (!spec) return false;
   const lower = spec.toLowerCase();
   if (lower === "imported" || lower === "other" || lower === "" || lower === "n/a") return false;
@@ -190,7 +190,12 @@ export default function PricesPage() {
         </div>
       </header>
 
-      <main id="main-content" className="max-w-2xl mx-auto px-4 py-6" aria-live="polite" aria-atomic="false">
+      <main
+        id="main-content"
+        className="max-w-2xl mx-auto px-4 py-6"
+        aria-live="polite"
+        aria-atomic="false"
+      >
         {/* Stats Cards — unified subtle borders */}
         <div className="grid grid-cols-2 gap-3 mb-6">
           <Card className="bg-gradient-to-br from-blue-50 to-cyan-50 border-amber-200">
@@ -242,7 +247,11 @@ export default function PricesPage() {
                 <label id="category-label" className="sr-only">
                   Filter by category
                 </label>
-                <Select value={category} onValueChange={setCategory} aria-labelledby="category-label">
+                <Select
+                  value={category}
+                  onValueChange={setCategory}
+                  aria-labelledby="category-label"
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Select category" />
                   </SelectTrigger>
@@ -315,11 +324,15 @@ export default function PricesPage() {
                             {price.commodities?.name || "Unknown"}
                           </h2>
                           {shouldShowSpecification(price.commodities?.specification) && (
-                            <p className="text-xs text-gray-500">{price.commodities!.specification}</p>
+                            <p className="text-xs text-gray-500">
+                              {price.commodities!.specification}
+                            </p>
                           )}
                         </div>
                         <div className="text-right">
-                          <p className={`text-xl font-bold ${getPriceColor(price.price_prevailing || 0)}`}>
+                          <p
+                            className={`text-xl font-bold ${getPriceColor(price.price_prevailing || 0)}`}
+                          >
                             ₱{price.price_prevailing?.toFixed(2) || "N/A"}
                           </p>
                           <p className="text-xs text-gray-500">per kg</p>
