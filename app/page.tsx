@@ -239,7 +239,7 @@ export default function HomePage() {
               </a>
             </div>
 
-            <div className="hidden items-center justify-center gap-x-5 gap-y-2 sm:flex">
+            <div className="hidden items-center justify-center gap-x-6 gap-y-2 sm:flex">
               {priceTags.map((tag) => (
                 <div
                   key={tag.label}
