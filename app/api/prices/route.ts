@@ -89,8 +89,13 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // Filter out null prices and sort
-    let filteredPrices = (prices || []).filter((p: any) => p.price_prevailing !== null);
+    // Filter out null prices, convert to numbers, and sort
+    let filteredPrices = (prices || [])
+      .filter((p: any) => p.price_prevailing !== null)
+      .map((p: any) => ({
+        ...p,
+        price_prevailing: parseFloat(p.price_prevailing),
+      }));
 
     if (sort === "desc") {
       filteredPrices.sort(
