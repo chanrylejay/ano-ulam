@@ -9,114 +9,61 @@ export async function GET(request: NextRequest) {
     const category = searchParams.get("category");
     const sort = searchParams.get("sort") || "asc";
 
-    const today = new Date().toISOString().split("T")[0];
+    // Always get the latest available date
+    const latestDate = await sql`
+      SELECT DISTINCT price_date FROM prices
+      ORDER BY price_date DESC
+      LIMIT 1
+    `;
 
-    // Try to get today's prices
-    let prices;
+    if (latestDate.length === 0) {
+      return NextResponse.json({ prices: [], date: null });
+    }
+
+    const priceDate = latestDate[0].price_date;
+
+    // Get ALL prices for that date
+    const allPrices = await sql`
+      SELECT
+        p.id,
+        p.price_date,
+        p.price_prevailing,
+        p.commodity_id,
+        c.name,
+        c.category,
+        c.specification
+      FROM prices p
+      JOIN commodities c ON p.commodity_id = c.id
+      WHERE p.price_date = ${priceDate}
+        AND p.price_prevailing IS NOT NULL
+      ORDER BY p.price_prevailing ASC
+    `;
+
+    // Filter by category in JavaScript (not SQL)
+    let filtered = allPrices.map((p: any) => ({
+      id: p.id,
+      price_date: p.price_date,
+      price_prevailing: parseFloat(p.price_prevailing),
+      commodity_id: p.commodity_id,
+      commodities: {
+        name: p.name,
+        category: p.category,
+        specification: p.specification,
+      },
+    }));
 
     if (category && category !== "all") {
-      prices = await sql`
-        SELECT
-          p.id,
-          p.price_date,
-          p.price_prevailing,
-          c.id as commodity_id,
-          c.name,
-          c.category,
-          c.specification
-        FROM prices p
-        JOIN commodities c ON p.commodity_id = c.id
-        WHERE p.price_date = ${today}
-          AND c.category = ${category}
-      `;
-    } else {
-      prices = await sql`
-        SELECT
-          p.id,
-          p.price_date,
-          p.price_prevailing,
-          c.id as commodity_id,
-          c.name,
-          c.category,
-          c.specification
-        FROM prices p
-        JOIN commodities c ON p.commodity_id = c.id
-        WHERE p.price_date = ${today}
-      `;
+      filtered = filtered.filter((p: any) => p.commodities.category === category);
     }
-
-    // If no prices for today, get the most recent available date
-    if (prices.length === 0) {
-      const latestDates = await sql`
-        SELECT DISTINCT price_date FROM prices
-        ORDER BY price_date DESC
-        LIMIT 1
-      `;
-
-      if (latestDates.length > 0) {
-        const latestDate = latestDates[0].price_date;
-
-        if (category && category !== "all") {
-          prices = await sql`
-            SELECT
-              p.id,
-              p.price_date,
-              p.price_prevailing,
-              c.id as commodity_id,
-              c.name,
-              c.category,
-              c.specification
-            FROM prices p
-            JOIN commodities c ON p.commodity_id = c.id
-            WHERE p.price_date = ${latestDate}
-              AND c.category = ${category}
-          `;
-        } else {
-          prices = await sql`
-            SELECT
-              p.id,
-              p.price_date,
-              p.price_prevailing,
-              c.id as commodity_id,
-              c.name,
-              c.category,
-              c.specification
-            FROM prices p
-            JOIN commodities c ON p.commodity_id = c.id
-            WHERE p.price_date = ${latestDate}
-          `;
-        }
-      }
-    }
-
-    // Filter out null prices, convert to numbers, and restructure for frontend
-    let filteredPrices = (prices || [])
-      .filter((p: any) => p.price_prevailing !== null)
-      .map((p: any) => ({
-        id: p.id,
-        price_date: p.price_date,
-        price_prevailing: parseFloat(p.price_prevailing),
-        commodity_id: p.commodity_id,
-        commodities: {
-          name: p.name,
-          category: p.specification,
-          specification: p.category,
-        },
-      }));
 
     if (sort === "desc") {
-      filteredPrices.sort(
-        (a: any, b: any) => (b.price_prevailing || 0) - (a.price_prevailing || 0),
-      );
-    } else {
-      filteredPrices.sort(
-        (a: any, b: any) => (a.price_prevailing || 0) - (b.price_prevailing || 0),
-      );
+      filtered.sort((a: any, b: any) => b.price_prevailing - a.price_prevailing);
     }
 
     return NextResponse.json({
-      prices: filteredPrices,
-      date: filteredPrices[0]?.price_date || today,
+      prices: filtered,
+      date: priceDate,
+      debug_total: allPrices.length,
     });
   } catch (error) {
     console.error("Error fetching prices:", error);
