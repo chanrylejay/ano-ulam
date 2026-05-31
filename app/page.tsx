@@ -83,7 +83,7 @@ function PriceTile({ tag }: { tag: PriceTag }) {
 
   return (
     <div
-      className="flex items-center justify-between gap-2 rounded-2xl bg-white/14 px-3 py-2.5 shadow-md ring-1 ring-white/20 backdrop-blur-sm transition-transform duration-150 hover:-translate-y-0.5 hover:bg-white/18"
+      className="flex h-[54px] items-center justify-between gap-2 rounded-2xl bg-white/14 px-3 py-2 shadow-md ring-1 ring-white/20 backdrop-blur-sm transition-transform duration-150 hover:-translate-y-0.5 hover:bg-white/18"
       aria-label={`${tag.label} ${formatPeso(tag.price)} ${tone.label}`}
     >
       <div className="min-w-0 text-left">
@@ -259,7 +259,7 @@ export default function HomePage() {
         className="flex flex-col overflow-hidden bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 text-white shadow-lg"
         style={{ minHeight: "40vh" }}
       >
-        <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col items-center px-4 pb-6 pt-9 text-center">
+        <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col items-center px-4 pb-5 pt-9 text-center">
           <div className="flex flex-1 flex-col items-center justify-center">
             <h1 className="mb-2 text-[4.7rem] font-black leading-[0.85] tracking-tight sm:text-7xl md:text-[8rem] md:leading-none">
               ma, Ano ulam?
@@ -276,7 +276,7 @@ export default function HomePage() {
 
             <div className="scrollbar-hide -mx-4 flex gap-2.5 overflow-x-auto px-4 pb-2 sm:hidden">
               {priceTags.map((tag) => (
-                <div key={tag.label} className="min-w-[112px] shrink-0">
+                <div key={tag.label} className="min-w-[108px] shrink-0">
                   <PriceTile tag={tag} />
                 </div>
               ))}
@@ -284,14 +284,14 @@ export default function HomePage() {
               <a
                 href="/prices"
                 aria-label="View all commodity prices"
-                className="flex min-w-[112px] shrink-0 flex-col items-center justify-center rounded-2xl bg-white px-4 py-2.5 text-sm font-extrabold text-amber-700 shadow-lg ring-2 ring-amber-200/70 transition-all hover:shadow-xl hover:ring-amber-300"
+                className="flex min-w-[108px] shrink-0 flex-col items-center justify-center rounded-2xl bg-white px-4 py-2.5 text-sm font-extrabold text-amber-700 shadow-lg ring-2 ring-amber-200/70 transition-all hover:shadow-xl hover:ring-amber-300"
               >
                 <span className="leading-tight">More</span>
                 <span className="leading-tight">Prices →</span>
               </a>
             </div>
 
-            <div className="hidden sm:grid sm:grid-cols-7 sm:gap-2.5 md:gap-3">
+            <div className="mx-auto hidden max-w-[900px] sm:grid sm:grid-cols-7 sm:gap-2 md:gap-2.5">
               {priceTags.map((tag) => (
                 <PriceTile key={tag.label} tag={tag} />
               ))}
@@ -299,7 +299,7 @@ export default function HomePage() {
               <a
                 href="/prices"
                 aria-label="View all commodity prices"
-                className="flex min-h-[58px] flex-col items-center justify-center rounded-2xl bg-white px-3 py-2.5 text-sm font-extrabold text-amber-700 shadow-lg ring-2 ring-amber-200/70 transition-all hover:-translate-y-0.5 hover:shadow-xl hover:ring-amber-300"
+                className="flex h-[54px] flex-col items-center justify-center rounded-2xl bg-white px-3 py-2 text-sm font-extrabold text-amber-700 shadow-lg ring-2 ring-amber-200/70 transition-all hover:-translate-y-0.5 hover:shadow-xl hover:ring-amber-300"
               >
                 <span className="leading-tight">More</span>
                 <span className="leading-tight">Prices →</span>
