@@ -30,7 +30,8 @@ function getTrendArrow(trend: string) {
 
 function formatCost(meal: Meal): string {
   if (meal.estimated_cost) {
-    return `₱${meal.estimated_cost}`;
+    const cost = String(meal.estimated_cost).replace(/[₱,]/g, "");
+    return `₱${cost}`;
   }
   return "₱?";
 }
@@ -43,27 +44,33 @@ export function MealCard({ meal, index }: MealCardProps) {
         style={{ animationDelay: `${index * 80}ms` }}
         className="animate-card-enter"
       >
-        <Card className="overflow-hidden border-gray-200 bg-white shadow-sm hover:shadow-md transition-shadow duration-200">
-          <CardContent className="p-4 sm:p-5">
+        <Card className="overflow-hidden border-amber-100 bg-white shadow-sm hover:shadow-md transition-shadow duration-200 w-full max-w-2xl mx-auto">
+          <CardContent className="p-5 sm:p-6">
             {/* Title + Price */}
-            <div className="flex items-start justify-between mb-3">
+            <div className="flex items-start justify-between mb-4">
               <h2 className="text-lg sm:text-xl font-bold text-gray-900 leading-tight">{meal.name}</h2>
-              <span className="bg-amber-500 text-white text-sm font-bold px-3 py-1 rounded-full shrink-0 ml-2">
+              <span className="bg-amber-500 text-white text-sm font-bold px-3 py-1.5 rounded-full shrink-0 ml-2 whitespace-nowrap">
                 {formatCost(meal)}
               </span>
             </div>
 
-            {/* Ingredients — one per row with name + amount + arrow */}
-            <div className="space-y-1.5 mb-3">
+            {/* Ingredients — grid: name left, amount near right, arrow far right */}
+            <div className="mb-3">
               {meal.ingredients?.map((ing, j) => (
-                <div key={j} className="flex items-center text-sm">
+                <div
+                  key={j}
+                  className="grid items-center py-1.5 text-sm border-b border-gray-50 last:border-0"
+                  style={{ gridTemplateColumns: "1fr auto auto", gap: "0.5rem" }}
+                >
                   <span className="font-medium text-gray-800">{ing.name}</span>
                   {ing.amount && (
-                    <span className="text-gray-500 text-xs ml-auto mr-1">{ing.amount}</span>
+                    <span className="text-gray-500 text-xs whitespace-nowrap">{ing.amount}</span>
                   )}
-                  {getTrendArrow(ing.trend)}
+                  <span className="flex-shrink-0 w-5 text-center">
+                    {getTrendArrow(ing.trend)}
+                  </span>
                   {ing.optional && (
-                    <span className="text-gray-400 text-[11px] ml-1">optional</span>
+                    <span className="text-gray-400 text-[11px] col-span-full pl-1">optional</span>
                   )}
                 </div>
               ))}
@@ -74,8 +81,8 @@ export function MealCard({ meal, index }: MealCardProps) {
 
             {/* Bakit? */}
             {meal.reason && (
-              <div className="bg-amber-50 rounded-lg p-3">
-                <p className="text-sm text-amber-900 leading-relaxed">
+              <div className="bg-amber-50/70 rounded-lg p-3" style={{ border: "none" }}>
+                <p className="text-sm leading-relaxed" style={{ lineHeight: "1.7" }}>
                   <span className="font-bold text-amber-800">Bakit?</span>{" "}
                   <span className="text-amber-800">{meal.reason}</span>
                 </p>

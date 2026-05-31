@@ -14,7 +14,7 @@ type PriceWithCommodity = Price & { commodities: Commodity };
 const tabCategories = [
   { value: "all", label: "All" },
   { value: "meats", label: "Meats" },
-  { value: "vegetables", label: "Vegetables" },
+  { value: "vegetables", label: "Veggies" },
   { value: "fruits", label: "Fruits" },
   { value: "spices", label: "Spices" },
   { value: "others", label: "Others" },
@@ -281,11 +281,11 @@ export default function PricesPage() {
                 <Card className="overflow-hidden border-gray-200 bg-white shadow-sm hover:shadow transition-shadow duration-150 h-full">
                   <CardContent className="p-3 flex items-center justify-between gap-2">
                     <div className="min-w-0 flex-1">
-                      <h2 className="font-semibold text-gray-800 text-sm truncate">
+                      <h2 className="font-semibold text-gray-800 text-sm line-clamp-2 leading-snug">
                         {getEmojiForItem(price.commodities?.name || "")} {price.commodities?.name || "Unknown"}
                       </h2>
                       {shouldShowSpecification(price.commodities?.specification) && (
-                        <p className="text-xs text-gray-400 truncate">
+                        <p className="text-xs text-gray-400 mt-0.5 line-clamp-1">
                           {price.commodities!.specification}
                         </p>
                       )}
