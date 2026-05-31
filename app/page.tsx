@@ -197,7 +197,7 @@ export default function HomePage() {
       >
         <div className="max-w-2xl mx-auto w-full px-4 pt-12 pb-8 flex flex-col flex-1 items-center text-center">
           <div className="flex-1 flex flex-col items-center justify-center">
-             <h1 className="text-[4.5rem] sm:text-7xl md:text-[10rem] md:leading-none font-black mb-2 tracking-tight leading-none">
+             <h1 className="text-[5rem] sm:text-7xl md:text-[10rem] md:leading-none font-black mb-2 tracking-tight leading-[0.85]">
                ma, Ano ulam?
              </h1>
             <p className="text-lg text-white/90 mb-6">Anong murang ulam ngayon</p>
@@ -209,10 +209,10 @@ export default function HomePage() {
                 {priceTags.map((tag) => (
                   <div
                     key={tag.label}
-                    className={`shrink-0 flex flex-col items-center justify-center px-3 py-2 rounded-2xl min-w-[82px] shadow-sm ${
+                    className={`shrink-0 flex flex-col items-center justify-center px-3.5 py-2.5 rounded-2xl min-w-[84px] shadow-md ring-1 ring-white/20 ${
                       tag.price <= 100
-                        ? "bg-emerald-500"
-                        : "bg-rose-500"
+                        ? "bg-emerald-600"
+                        : "bg-rose-600"
                     }`}
                   >
                     <span className="text-[11px] font-extrabold text-white leading-tight opacity-90">
@@ -227,7 +227,7 @@ export default function HomePage() {
                 <a
                   href="/prices"
                   aria-label="View all commodity prices"
-                  className="shrink-0 flex flex-col items-center justify-center px-4 py-2 rounded-2xl min-w-[82px] bg-white text-amber-700 shadow-sm hover:shadow-md transition-shadow font-extrabold text-sm border border-amber-200"
+                  className="shrink-0 flex flex-col items-center justify-center px-4 py-2.5 rounded-2xl min-w-[84px] bg-white text-amber-700 shadow-md hover:shadow-lg transition-shadow font-extrabold text-sm border border-amber-200"
                 >
                   More Prices →
                 </a>

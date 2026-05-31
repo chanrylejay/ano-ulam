@@ -23,9 +23,9 @@ interface MealCardProps {
 }
 
 function getTrendArrow(trend: string) {
-  if (trend === "down") return <span className="text-green-600 font-bold flex-shrink-0 ml-1">↓</span>;
-  if (trend === "up") return <span className="text-red-600 font-bold flex-shrink-0 ml-1">↑</span>;
-  return <span className="text-gray-300 font-bold flex-shrink-0 ml-1">→</span>;
+  if (trend === "down") return <span className="text-emerald-600 font-bold flex-shrink-0 ml-1">↓</span>;
+  if (trend === "up") return <span className="text-rose-600 font-bold flex-shrink-0 ml-1">↑</span>;
+  return <span className="text-gray-200 font-bold flex-shrink-0 ml-1">→</span>;
 }
 
 function formatCost(meal: Meal): string {
@@ -48,7 +48,7 @@ export function MealCard({ meal, index }: MealCardProps) {
           <CardContent className="p-5 sm:p-6">
             {/* Title + Price */}
             <div className="flex items-start justify-between mb-4">
-              <h2 className="text-lg sm:text-xl font-bold text-gray-900 leading-tight">{meal.name}</h2>
+              <h2 className="text-lg sm:text-xl font-bold text-gray-950 leading-tight">{meal.name}</h2>
               <span className="bg-amber-500 text-white text-sm font-bold px-3 py-1.5 rounded-full shrink-0 ml-2 whitespace-nowrap">
                 {formatCost(meal)}
               </span>
@@ -64,7 +64,7 @@ export function MealCard({ meal, index }: MealCardProps) {
                 >
                   <span className="font-medium text-gray-800">{ing.name}</span>
                   {ing.amount && (
-                    <span className="text-gray-500 text-xs whitespace-nowrap">{ing.amount}</span>
+                    <span className="text-gray-500 text-sm whitespace-nowrap">{ing.amount}</span>
                   )}
                   <span className="flex-shrink-0 w-5 text-center">
                     {getTrendArrow(ing.trend)}
@@ -81,10 +81,10 @@ export function MealCard({ meal, index }: MealCardProps) {
 
             {/* Bakit? */}
             {meal.reason && (
-              <div className="bg-amber-50/70 rounded-lg p-3" style={{ border: "none" }}>
-                <p className="text-sm leading-relaxed" style={{ lineHeight: "1.7" }}>
-                  <span className="font-bold text-amber-800">Bakit?</span>{" "}
-                  <span className="text-amber-800">{meal.reason}</span>
+              <div className="bg-amber-50 rounded-lg p-3" style={{ border: "none" }}>
+                <p className="text-sm leading-relaxed">
+                  <span className="font-bold text-amber-900">Bakit?</span>{" "}
+                  <span className="text-stone-700">{meal.reason}</span>
                 </p>
               </div>
             )}

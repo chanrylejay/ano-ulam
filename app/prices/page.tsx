@@ -40,9 +40,9 @@ function shouldShowSpecification(spec: string | null | undefined): boolean {
 }
 
 function getPriceColor(price: number): string {
-  if (price <= 150) return "text-green-700";
+  if (price <= 150) return "text-emerald-700";
   if (price <= 300) return "text-amber-700";
-  return "text-red-600";
+  return "text-rose-600";
 }
 
 function getEmojiForItem(name: string): string {
@@ -195,9 +195,15 @@ export default function PricesPage() {
           <h1 className="text-[4.5rem] sm:text-7xl md:text-[8rem] md:leading-none font-black mb-3 leading-none tracking-tight">
             Presyo Ngayon
           </h1>
-          <p className="text-base text-white/80 font-medium">
-            {date ? format(new Date(date), "MMMM d, yyyy") : "Loading..."}
-          </p>
+          {date ? (
+            <span className="inline-block bg-white/20 text-white rounded-full px-3 py-1 text-sm">
+              {format(new Date(date), "MMMM d, yyyy")}
+            </span>
+          ) : (
+            <span className="inline-block bg-white/20 text-white rounded-full px-3 py-1 text-sm">
+              Loading...
+            </span>
+          )}
         </div>
       </header>
 
@@ -275,7 +281,7 @@ export default function PricesPage() {
 
         {/* Price List — emojis on items, responsive grid 1-4 cols */}
         {!isLoading && filteredPrices.length > 0 && (
-          <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2" aria-label="Commodity prices">
+          <ul className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-2" aria-label="Commodity prices">
             {filteredPrices.map((price) => (
               <li key={price.id}>
                 <Card className="overflow-hidden border-gray-200 bg-white shadow-sm hover:shadow transition-shadow duration-150 h-full">
