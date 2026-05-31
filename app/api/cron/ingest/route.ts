@@ -5,6 +5,7 @@ import { callDeepSeekAPI } from "@/lib/deepseek";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+export const maxDuration = 60;
 
 async function fetchPDFText(url: string): Promise<string> {
   const response = await fetch(url);
