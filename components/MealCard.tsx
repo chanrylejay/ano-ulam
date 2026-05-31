@@ -23,9 +23,9 @@ interface MealCardProps {
 }
 
 function getTrendArrow(trend: string) {
-  if (trend === "down") return <span className="text-emerald-600 font-bold flex-shrink-0 ml-1">↓</span>;
-  if (trend === "up") return <span className="text-rose-600 font-bold flex-shrink-0 ml-1">↑</span>;
-  return <span className="text-gray-200 font-bold flex-shrink-0 ml-1">→</span>;
+  if (trend === "down") return <span className="text-emerald-600 font-bold flex-shrink-0 ml-1">{"\u2193"}</span>;
+  if (trend === "up") return <span className="text-rose-600 font-bold flex-shrink-0 ml-1">{"\u2191"}</span>;
+  return <span className="text-gray-200 font-bold flex-shrink-0 ml-1">{"\u2192"}</span>;
 }
 
 function formatCost(meal: Meal): string {
@@ -34,6 +34,14 @@ function formatCost(meal: Meal): string {
     return `₱${cost}`;
   }
   return "₱?";
+}
+
+function getCostBadgeColor(cost: number): string {
+  const n = typeof cost === "number" ? cost : parseFloat(String(cost).replace(/[₱,]/g, ""));
+  if (isNaN(n)) return "bg-amber-500";
+  if (n <= 150) return "bg-emerald-500";
+  if (n <= 200) return "bg-amber-500";
+  return "bg-rose-500";
 }
 
 export function MealCard({ meal, index }: MealCardProps) {
@@ -49,7 +57,7 @@ export function MealCard({ meal, index }: MealCardProps) {
             {/* Title + Price */}
             <div className="flex items-start justify-between mb-4">
               <h2 className="text-lg sm:text-xl font-bold text-gray-950 leading-tight">{meal.name}</h2>
-              <span className="bg-amber-500 text-white text-sm font-bold px-3 py-1.5 rounded-full shrink-0 ml-2 whitespace-nowrap">
+              <span className={`${getCostBadgeColor(meal.estimated_cost)} text-white text-sm font-bold px-3 py-1.5 rounded-full shrink-0 ml-2 whitespace-nowrap`}>
                 {formatCost(meal)}
               </span>
             </div>
@@ -77,7 +85,7 @@ export function MealCard({ meal, index }: MealCardProps) {
             </div>
 
             {/* Servings */}
-            <p className="text-xs text-gray-500 mb-3">🍽️ {meal.servings || "2-4 na tao"}</p>
+            <p className="text-xs text-gray-500 mb-3">{"\uD83C\uDF7D\uFE0F"} {meal.servings || "2-4 na tao"}</p>
 
             {/* Bakit? */}
             {meal.reason && (

@@ -48,9 +48,22 @@ function getPriceColor(price: number): string {
 function getEmojiForItem(name: string): string {
   const lower = name.toLowerCase();
   if (lower.includes("itlog") || lower.includes("egg")) return "🥚";
-  if (lower.includes("baboy") || lower.includes("pork") || lower.includes("liempo") || lower.includes("kasim") || lower.includes("pigue")) return "🐖";
+  if (
+    lower.includes("baboy") ||
+    lower.includes("pork") ||
+    lower.includes("liempo") ||
+    lower.includes("kasim") ||
+    lower.includes("pigue")
+  )
+    return "🐖";
   if (lower.includes("manok") || lower.includes("chicken")) return "🐔";
-  if (lower.includes("beef") || lower.includes("baka") || lower.includes("tadyang") || lower.includes("litid")) return "🐄";
+  if (
+    lower.includes("beef") ||
+    lower.includes("baka") ||
+    lower.includes("tadyang") ||
+    lower.includes("litid")
+  )
+    return "🐄";
   if (lower.includes("bangus")) return "🐟";
   if (lower.includes("tilapia")) return "🐟";
   if (lower.includes("galunggong")) return "🐟";
@@ -181,7 +194,7 @@ export default function PricesPage() {
   return (
     <div className="min-h-screen pb-20 bg-gradient-to-b from-amber-50 to-orange-50">
       {/* Header — centered, back top-left */}
-      <header className="bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 text-white pt-10 pb-8 px-4 shadow-lg relative">
+      <header className="bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 text-white pt-10 pb-12 px-4 shadow-lg relative">
         <Button
           variant="ghost"
           className="absolute top-4 left-4 text-sm text-white/80 hover:text-white hover:bg-white/20"
@@ -192,7 +205,7 @@ export default function PricesPage() {
         </Button>
 
         <div className="max-w-2xl mx-auto text-center">
-          <h1 className="text-[4.5rem] sm:text-7xl md:text-[8rem] md:leading-none font-black mb-3 leading-none tracking-tight">
+          <h1 className="text-[4.5rem] sm:text-7xl md:text-[6rem] md:leading-none font-black mb-3 leading-none tracking-tight">
             Presyo Ngayon
           </h1>
           {date ? (
@@ -281,14 +294,18 @@ export default function PricesPage() {
 
         {/* Price List — emojis on items, responsive grid 1-4 cols */}
         {!isLoading && filteredPrices.length > 0 && (
-          <ul className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-2" aria-label="Commodity prices">
+          <ul
+            className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-2"
+            aria-label="Commodity prices"
+          >
             {filteredPrices.map((price) => (
               <li key={price.id}>
                 <Card className="overflow-hidden border-gray-200 bg-white shadow-sm hover:shadow transition-shadow duration-150 h-full">
                   <CardContent className="p-3 flex items-center justify-between gap-2">
                     <div className="min-w-0 flex-1">
                       <h2 className="font-semibold text-gray-800 text-sm line-clamp-2 leading-snug">
-                        {getEmojiForItem(price.commodities?.name || "")} {price.commodities?.name || "Unknown"}
+                        {getEmojiForItem(price.commodities?.name || "")}{" "}
+                        {price.commodities?.name || "Unknown"}
                       </h2>
                       {shouldShowSpecification(price.commodities?.specification) && (
                         <p className="text-xs text-gray-400 mt-0.5 line-clamp-1">

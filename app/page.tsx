@@ -34,8 +34,8 @@ interface PriceItem {
 }
 
 const defaultItemKeys = [
-  { key: "Pork liempo", label: "Baboy" },
-  { key: "Chicken legs", label: "Manok" },
+  { key: "Liempo", label: "Baboy" },
+  { key: "Paa ng manok", label: "Manok" },
   { key: "Beef litid", label: "Beef" },
   { key: "Itlog", label: "Itlog" },
   { key: "Bangus", label: "Bangus" },
@@ -59,21 +59,25 @@ function formatPeso(amount: number): string {
 }
 
 function getPriceTone(price: number): {
-  tileClass: string;
-  arrow: string;
-  arrowLabel: string;
+  arrowChar: string;
+  arrowColor: string;
 } {
   if (price <= 100) {
     return {
-      tileClass: "bg-emerald-600 shadow-emerald-900/20",
-      arrow: "↓",
-      arrowLabel: "mura",
+      arrowChar: "▼",
+      arrowColor: "text-green-300",
     };
   }
 
   return {
-    tileClass: "bg-rose-600 shadow-rose-900/20",
-    arrow: "↑",
+    arrowChar: "▲",
+    arrowColor: "text-red-300",
+  };
+}
+
+  return {
+    tileClass: "bg-rose-900 shadow-rose-950/30",
+    arrow: "\u2191",
     arrowLabel: "mahal",
   };
 }
@@ -152,7 +156,7 @@ export default function HomePage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-amber-50 to-orange-50 px-4">
         <div className="text-center space-y-4 max-w-sm">
-          <div className="text-5xl">😕</div>
+          <div className="text-5xl">{"\uD83D\uDE15"}</div>
           <p className="text-amber-900 font-bold text-xl">{error}</p>
           <button
             onClick={() => {
@@ -233,7 +237,7 @@ export default function HomePage() {
       >
         <div className="max-w-2xl mx-auto w-full px-4 pt-9 pb-5 flex flex-col flex-1 items-center text-center">
           <div className="flex-1 flex flex-col items-center justify-center">
-            <h1 className="text-[4.7rem] sm:text-7xl md:text-[10rem] md:leading-none font-black mb-2 tracking-tight leading-[0.85]">
+            <h1 className="text-[4.7rem] sm:text-7xl md:text-[8rem] md:leading-none font-black mb-2 tracking-tight leading-[0.85]">
               ma, Ano ulam?
             </h1>
 
@@ -253,14 +257,19 @@ export default function HomePage() {
                 return (
                   <div
                     key={tag.label}
-                    className={`shrink-0 flex flex-col items-center justify-center px-3 py-2.5 rounded-2xl min-w-[88px] shadow-md ring-1 ring-white/20 ${tone.tileClass}`}
-                    aria-label={`${tag.label} ${formatPeso(tag.price)} ${tone.arrowLabel}`}
+                    className="shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-2xl min-w-[88px] shadow-md bg-white/15 backdrop-blur-sm ring-1 ring-white/20"
+                    aria-label={`${tag.label} ${formatPeso(tag.price)}`}
                   >
-                    <span className="text-[11px] font-extrabold text-white leading-tight opacity-95">
-                      {tag.label}
-                    </span>
-                    <span className="text-sm font-extrabold text-white leading-tight">
-                      {formatPeso(tag.price)} {tone.arrow}
+                    <div className="flex flex-col">
+                      <span className="text-[11px] font-bold text-white leading-tight opacity-90">
+                        {tag.label}
+                      </span>
+                      <span className="text-sm font-extrabold text-white leading-tight">
+                        {formatPeso(tag.price)}
+                      </span>
+                    </div>
+                    <span className={`text-base font-black ${tone.arrowColor}`}>
+                      {tone.arrowChar}
                     </span>
                   </div>
                 );
@@ -269,10 +278,10 @@ export default function HomePage() {
               <a
                 href="/prices"
                 aria-label="View all commodity prices"
-                className="shrink-0 flex flex-col items-center justify-center px-4 py-2.5 rounded-2xl min-w-[112px] bg-white text-amber-700 shadow-lg hover:shadow-xl transition-shadow font-extrabold text-sm border border-white/80"
+                className="shrink-0 flex flex-col items-center justify-center px-4 py-2.5 rounded-2xl min-w-[112px] bg-white text-amber-700 shadow-lg hover:shadow-xl transition-all font-extrabold text-sm ring-2 ring-amber-200/70 hover:ring-amber-300"
               >
                 <span className="leading-tight">More</span>
-                <span className="leading-tight">Prices →</span>
+                <span className="leading-tight">Prices {"\u2192"}</span>
               </a>
             </div>
           </div>
@@ -288,7 +297,7 @@ export default function HomePage() {
         {meals.length === 0 && !error && (
           <Card className="border-gray-200 bg-gradient-to-br from-amber-50 to-orange-50">
             <CardContent className="text-center p-12">
-              <div className="text-5xl mb-4">🍳</div>
+              <div className="text-5xl mb-4">{"\uD83C\uDF73"}</div>
               <p className="text-amber-900 font-bold text-xl mb-2">Wala pang data ngayon.</p>
               <p className="text-amber-700 text-lg">Babalik kami bukas ng 8AM!</p>
             </CardContent>
@@ -310,7 +319,7 @@ export default function HomePage() {
                 href="/prices"
                 className="flex items-center justify-center gap-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-bold py-4 rounded-xl shadow-sm hover:shadow-md transition-all text-lg"
               >
-                🛒 Tingnan ang Presyo
+                {"\uD83D\uDED2"} Tingnan ang Presyo
               </a>
             )}
 
@@ -319,12 +328,24 @@ export default function HomePage() {
                 href="/about"
                 className="flex items-center justify-center gap-2 bg-white text-amber-700 font-medium py-3 rounded-xl border border-gray-200 hover:bg-amber-50 transition-all text-sm"
               >
-                ℹ️ Tungkol sa Ano Ulam?
+                {"\u2139\uFE0F"} Tungkol sa Ano Ulam?
               </a>
             )}
           </div>
         )}
       </main>
+
+      <p className="text-center text-xs text-gray-400 py-4 px-4">
+        Data mula sa{" "}
+        <a
+          href="https://da.gov.ph/price-monitoring/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline hover:text-amber-600 transition-colors"
+        >
+          DA Bantay Presyo
+        </a>
+      </p>
 
       <Footer />
     </div>

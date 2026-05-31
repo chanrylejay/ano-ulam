@@ -27,17 +27,17 @@ export const commodityNameMap: Record<string, string> = {
   "Beef Rump": "Beef laman",
 
   // Pork
-  "Pork Belly (Liempo)": "Pork liempo",
+  "Pork Belly (Liempo)": "Liempo",
   "Pork Chop": "Pork chop",
-  "Pork Hind Leg (Pigue)": "Pork pigue",
-  "Pork Picnic Shoulder (Kasim)": "Pork kasim",
+  "Pork Hind Leg (Pigue)": "Pigue",
+  "Pork Picnic Shoulder (Kasim)": "Kasim",
 
   // Poultry
-  "Chicken Breast": "Chicken breast",
-  "Chicken Drumstick": "Chicken drumstick",
-  "Chicken Leg Quarter": "Chicken legs",
-  "Chicken Thigh": "Chicken thigh",
-  "Chicken Wing": "Chicken wings",
+  "Chicken Breast": "Dibdib ng manok",
+  "Chicken Drumstick": "Binti ng manok",
+  "Chicken Leg Quarter": "Paa ng manok",
+  "Chicken Thigh": "Hita ng manok",
+  "Chicken Wing": "Pakpak ng manok",
 
   // Lowland Vegetables
   Ampalaya: "Ampalaya",
@@ -61,6 +61,12 @@ export const commodityNameMap: Record<string, string> = {
   "Pechay Baguio": "Pechay Baguio",
   "White Potato Local": "Patatas",
 
+  // Corn
+  "Corn (Yellow)": "Mais (Dilaw)",
+  "Corn (White)": "Mais (Puti)",
+  "Sweet Corn (Yellow)": "Mais (Dilaw)",
+  "Sweet Corn (White)": "Mais (Puti)",
+
   // Fruits
   Avocado: "Avocado",
   "Banana (Lakatan)": "Saging lakatan",
@@ -70,8 +76,8 @@ export const commodityNameMap: Record<string, string> = {
   "Mango (Carabao)": "Mangga kalabaw",
   Melon: "Melon",
   Papaya: "Papaya",
-  Pomelo: "Pomelo",
-  Watermelon: "Watermelon",
+  Pomelo: "Suha",
+  Watermelon: "Pakwan",
 
   // Spices
   "Chilli (Red) Local": "Sili pula",
@@ -131,7 +137,7 @@ export const hiddenCommodities: string[] = [
 // Default items to show in header price tags (13 items)
 export const defaultItems = [
   { key: "Pork Belly (Liempo)", label: "Baboy" },
-  { key: "Chicken Legs", label: "Manok" },
+  { key: "Chicken Leg Quarter", label: "Manok" },
   { key: "Beef Brisket", label: "Beef" },
   { key: "Chicken Egg (White Medium)", label: "Itlog" },
   { key: "Bangus", label: "Bangus" },

@@ -148,6 +148,7 @@ Requirements:
 4. The "reason" field must explain the suggestion in natural Tagalog based on current prices
 5. Use Filipino ingredient names from the price list above
 6. Mix different proteins across the 5 meals (don't repeat the same meat/fish)
+7. IMPORTANT: Always use Filipino ingredient names. For chicken parts: "Paa ng manok" (leg quarter), "Dibdib ng manok" (breast), "Binti ng manok" (drumstick), "Hita ng manok" (thigh), "Pakpak ng manok" (wings). For pork: "Liempo" (belly), "Kasim" (shoulder), "Pigue" (hind leg). Never use English names like "Chicken legs" or "Pork belly" — always use the Filipino names from the price list.
 
 Return as a valid JSON object with a "meals" array.`;
 
