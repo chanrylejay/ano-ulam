@@ -266,8 +266,6 @@ export default function HomePage() {
                         {tone.arrowChar}
                       </span>
                     </span>
-                      {tone.arrowChar}
-                    </span>
                   </div>
                 );
               })}
