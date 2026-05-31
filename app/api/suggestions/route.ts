@@ -15,8 +15,16 @@ export async function GET() {
     `;
 
     if (todaySuggestions.length > 0) {
+      const row = todaySuggestions[0];
       return NextResponse.json({
-        suggestion: todaySuggestions[0],
+        suggestion: {
+          ...row,
+          meals: typeof row.meals === "string" ? JSON.parse(row.meals) : row.meals,
+          cheapest_ingredients:
+            typeof row.cheapest_ingredients === "string"
+              ? JSON.parse(row.cheapest_ingredients)
+              : row.cheapest_ingredients,
+        },
         isToday: true,
       });
     }
@@ -29,8 +37,16 @@ export async function GET() {
     `;
 
     if (latestSuggestions.length > 0) {
+      const row = latestSuggestions[0];
       return NextResponse.json({
-        suggestion: latestSuggestions[0],
+        suggestion: {
+          ...row,
+          meals: typeof row.meals === "string" ? JSON.parse(row.meals) : row.meals,
+          cheapest_ingredients:
+            typeof row.cheapest_ingredients === "string"
+              ? JSON.parse(row.cheapest_ingredients)
+              : row.cheapest_ingredients,
+        },
         isToday: false,
       });
     }
