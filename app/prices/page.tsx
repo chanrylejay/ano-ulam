@@ -32,7 +32,7 @@ function getSimpleCategory(category: string): string {
   return "others";
 }
 
-function shouldShowSpecification(spec: string | undefined): boolean {
+function shouldShowSpecification(spec: string | null | undefined): boolean {
   if (!spec) return false;
   const lower = spec.toLowerCase();
   if (lower === "imported" || lower === "other" || lower === "" || lower === "n/a") return false;
@@ -103,9 +103,7 @@ export default function PricesPage() {
 
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase().trim();
-      filtered = filtered.filter((p) =>
-        (p.commodities?.name || "").toLowerCase().includes(query)
-      );
+      filtered = filtered.filter((p) => (p.commodities?.name || "").toLowerCase().includes(query));
     }
 
     filtered.sort((a, b) => {
