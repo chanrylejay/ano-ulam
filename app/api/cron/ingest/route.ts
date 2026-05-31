@@ -146,15 +146,15 @@ ${pdfText.substring(0, 8000)}`;
     // BATCH INSERT: All commodities in ONE query
     const commoditiesJson = JSON.stringify(uniqueItems);
     await sql`
-      INSERT INTO commodities (name, category, specification)
-      SELECT
-        elem->>'name',
-        elem->>'category',
-        COALESCE(elem->>'specification', '')
-      FROM jsonb_array_elements(${commoditiesJson}::jsonb) AS elem
-      ON CONFLICT (name, category) DO UPDATE
-        SET specification = EXCLUDED.specification
-    `;
+          INSERT INTO commodities (name, category, specification)
+          SELECT DISTINCT ON (name, category)
+            elem->>'name' AS name,
+            elem->>'category' AS category,
+            COALESCE(elem->>'specification', '') AS specification
+          FROM jsonb_array_elements(${commoditiesJson}::jsonb) AS elem
+          ON CONFLICT (name, category) DO UPDATE
+            SET specification = EXCLUDED.specification
+        `;
 
     // BATCH INSERT: All prices in ONE query
     const priceResult = await sql`
