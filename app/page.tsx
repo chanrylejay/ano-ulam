@@ -60,19 +60,18 @@ function formatPeso(amount: number): string {
 
 function getPriceTone(price: number): {
   arrowChar: string;
-  arrowColor: string;
+  badgeClass: string;
 } {
   if (price <= 100) {
     return {
       arrowChar: "▼",
-
-      arrowColor: "text-green-100",
+      badgeClass: "bg-emerald-500",
     };
   }
 
   return {
     arrowChar: "▲",
-    arrowColor: "text-red-200",
+    badgeClass: "bg-rose-500",
   };
 }
 
@@ -262,7 +261,11 @@ export default function HomePage() {
                         {formatPeso(tag.price)}
                       </span>
                     </div>
-                    <span className={`text-xl font-black ${tone.arrowColor}`}>
+                    <span className={`flex items-center justify-center w-6 h-6 rounded-full ${tone.badgeClass}`}>
+                      <span className="text-white text-[10px] font-black">
+                        {tone.arrowChar}
+                      </span>
+                    </span>
                       {tone.arrowChar}
                     </span>
                   </div>
