@@ -33,20 +33,15 @@ interface PriceItem {
   price_prevailing: number;
 }
 
+// Homepage intentionally shows only the key prices.
+// The full commodity list stays on /prices.
 const defaultItemKeys = [
   { key: "Liempo", label: "Baboy" },
   { key: "Paa ng manok", label: "Manok" },
   { key: "Beef litid", label: "Beef" },
   { key: "Itlog", label: "Itlog" },
   { key: "Bangus", label: "Bangus" },
-  { key: "Tilapia", label: "Tilapia" },
   { key: "Bigas pinakamura", label: "Bigas" },
-  { key: "Sibuyas pula", label: "Sibuyas" },
-  { key: "Bawang", label: "Bawang" },
-  { key: "Saging saba", label: "Saging" },
-  { key: "Mantika", label: "Mantika" },
-  { key: "Kalamansi", label: "Kalamansi" },
-  { key: "Sili pula", label: "Sili" },
 ];
 
 function formatPeso(amount: number): string {
@@ -66,14 +61,14 @@ function getPriceTone(price: number): {
   if (price <= 100) {
     return {
       arrowChar: "▼",
-      badgeClass: "bg-emerald-500 shadow-emerald-900/25",
+      badgeClass: "bg-emerald-500 shadow-emerald-950/30",
       label: "mura",
     };
   }
 
   return {
     arrowChar: "▲",
-    badgeClass: "bg-rose-500 shadow-rose-900/25",
+    badgeClass: "bg-rose-500 shadow-rose-950/30",
     label: "mahal",
   };
 }
@@ -83,11 +78,11 @@ function PriceTile({ tag }: { tag: PriceTag }) {
 
   return (
     <div
-      className="flex h-[52px] items-center justify-between gap-2 rounded-2xl bg-white/14 px-3 py-2 shadow-md ring-1 ring-white/20 backdrop-blur-sm transition-transform duration-150 hover:-translate-y-0.5 hover:bg-white/18"
+      className="flex h-[50px] items-center justify-between gap-2 rounded-2xl bg-white/20 px-3 py-2 shadow-md ring-1 ring-white/35 backdrop-blur-sm transition-all duration-150 hover:-translate-y-0.5 hover:bg-white/25 hover:ring-white/45"
       aria-label={`${tag.label} ${formatPeso(tag.price)} ${tone.label}`}
     >
       <div className="min-w-0 text-left">
-        <span className="block truncate text-[11px] font-bold leading-tight text-white/90">
+        <span className="block truncate text-[11px] font-bold leading-tight text-white/95">
           {tag.label}
         </span>
         <span className="block text-sm font-black leading-tight text-white">
@@ -99,7 +94,9 @@ function PriceTile({ tag }: { tag: PriceTag }) {
         className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full shadow-sm ${tone.badgeClass}`}
         aria-hidden="true"
       >
-        <span className="text-[10px] font-black leading-none text-white">{tone.arrowChar}</span>
+        <span className="text-[10px] font-black leading-none text-white">
+          {tone.arrowChar}
+        </span>
       </span>
     </div>
   );
@@ -198,18 +195,21 @@ export default function HomePage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50">
-        <div className="min-h-[500px] bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 shadow-lg sm:min-h-[520px]">
-          <div className="mx-auto flex min-h-[500px] max-w-5xl flex-col items-center px-4 pb-7 pt-9 text-center sm:min-h-[520px]">
+        <div className="min-h-[390px] bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 shadow-lg sm:min-h-[440px] md:min-h-[460px]">
+          <div className="mx-auto flex min-h-[390px] max-w-5xl flex-col items-center justify-between px-4 pb-6 pt-9 text-center sm:min-h-[440px] md:min-h-[460px]">
             <div className="flex flex-1 flex-col items-center justify-center space-y-3">
-              <div className="h-24 w-[620px] max-w-full animate-pulse rounded-lg bg-white/20" />
+              <div className="h-20 w-[620px] max-w-full animate-pulse rounded-lg bg-white/20" />
               <div className="h-5 w-56 max-w-full animate-pulse rounded bg-white/15" />
-              <div className="mt-3 h-4 w-44 max-w-full animate-pulse rounded bg-white/10" />
+              <div className="mt-2 h-4 w-44 max-w-full animate-pulse rounded bg-white/10" />
             </div>
 
-            <div className="w-full max-w-[840px] pt-6">
-              <div className="grid grid-cols-3 gap-2 sm:grid-cols-7">
-                {[...Array(14)].map((_, i) => (
-                  <div key={i} className="h-[52px] animate-pulse rounded-2xl bg-white/15" />
+            <div className="w-full max-w-[760px] pt-4">
+              <div className="grid grid-cols-4 gap-2 sm:grid-cols-7">
+                {[...Array(7)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="h-[50px] animate-pulse rounded-2xl bg-white/20"
+                  />
                 ))}
               </div>
             </div>
@@ -245,23 +245,23 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50">
-      <header className="min-h-[500px] overflow-hidden bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 text-white shadow-lg sm:min-h-[520px]">
-        <div className="mx-auto flex min-h-[500px] w-full max-w-5xl flex-col items-center px-4 pb-7 pt-9 text-center sm:min-h-[520px]">
+      <header className="min-h-[390px] overflow-hidden bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 text-white shadow-lg sm:min-h-[440px] md:min-h-[460px]">
+        <div className="mx-auto flex min-h-[390px] w-full max-w-5xl flex-col items-center justify-between px-4 pb-6 pt-9 text-center sm:min-h-[440px] md:min-h-[460px]">
           <section className="flex flex-1 flex-col items-center justify-center">
-            <h1 className="mb-2 text-[4.7rem] font-black leading-[0.85] tracking-tight sm:text-7xl md:text-[8rem] md:leading-none">
+            <h1 className="mb-2 text-[4.2rem] font-black leading-[0.85] tracking-tight sm:text-7xl md:text-[8rem] md:leading-none">
               ma, Ano ulam?
             </h1>
 
-            <p className="mb-5 text-lg text-white/90 sm:text-xl">Anong murang ulam ngayon</p>
+            <p className="mb-4 text-base text-white/90 sm:text-xl">Anong murang ulam ngayon</p>
 
             <p className="text-sm text-white/75">{formattedDate}</p>
           </section>
 
-          <section className="relative w-full pt-6" aria-label="Pangunahing presyo ngayon">
-            <div className="pointer-events-none absolute bottom-1 left-0 top-6 z-10 w-8 bg-gradient-to-r from-orange-500/80 to-transparent sm:hidden" />
-            <div className="pointer-events-none absolute bottom-1 right-0 top-6 z-10 w-10 bg-gradient-to-l from-red-500/90 to-transparent sm:hidden" />
+          <section className="relative w-full pt-4" aria-label="Pangunahing presyo ngayon">
+            <div className="pointer-events-none absolute bottom-1 left-0 top-4 z-10 w-8 bg-gradient-to-r from-orange-500/80 to-transparent sm:hidden" />
+            <div className="pointer-events-none absolute bottom-1 right-0 top-4 z-10 w-10 bg-gradient-to-l from-red-500/90 to-transparent sm:hidden" />
 
-            <div className="scrollbar-hide -mx-4 flex gap-2.5 overflow-x-auto px-4 pb-2 sm:hidden">
+            <div className="scrollbar-hide -mx-4 flex gap-2.5 overflow-x-auto px-4 pb-1 sm:hidden">
               {priceTags.map((tag) => (
                 <div key={tag.label} className="min-w-[108px] shrink-0">
                   <PriceTile tag={tag} />
@@ -271,14 +271,14 @@ export default function HomePage() {
               <a
                 href="/prices"
                 aria-label="View all commodity prices"
-                className="flex h-[52px] min-w-[112px] shrink-0 flex-col items-center justify-center rounded-2xl bg-white px-3 py-2 text-sm font-extrabold text-amber-700 shadow-lg ring-2 ring-amber-200/70 transition-all hover:shadow-xl hover:ring-amber-300"
+                className="flex h-[50px] min-w-[112px] shrink-0 flex-col items-center justify-center rounded-2xl bg-white px-3 py-2 text-sm font-extrabold text-amber-700 shadow-lg ring-2 ring-amber-200/80 transition-all hover:shadow-xl hover:ring-amber-300"
               >
                 <span className="leading-tight">More</span>
                 <span className="leading-tight">Prices →</span>
               </a>
             </div>
 
-            <div className="mx-auto hidden max-w-[840px] grid-cols-7 gap-2.5 sm:grid">
+            <div className="mx-auto hidden max-w-[760px] grid-cols-7 gap-2.5 sm:grid">
               {priceTags.map((tag) => (
                 <PriceTile key={tag.label} tag={tag} />
               ))}
@@ -286,7 +286,7 @@ export default function HomePage() {
               <a
                 href="/prices"
                 aria-label="View all commodity prices"
-                className="flex h-[52px] flex-col items-center justify-center rounded-2xl bg-white px-3 py-2 text-sm font-extrabold text-amber-700 shadow-lg ring-2 ring-amber-200/70 transition-all hover:-translate-y-0.5 hover:shadow-xl hover:ring-amber-300"
+                className="flex h-[50px] flex-col items-center justify-center rounded-2xl bg-white px-3 py-2 text-sm font-extrabold text-amber-700 shadow-lg ring-2 ring-amber-200/80 transition-all hover:-translate-y-0.5 hover:shadow-xl hover:ring-amber-300"
               >
                 <span className="leading-tight">More</span>
                 <span className="leading-tight">Prices →</span>
