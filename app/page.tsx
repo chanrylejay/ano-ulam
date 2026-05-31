@@ -65,13 +65,14 @@ function getPriceTone(price: number): {
   if (price <= 100) {
     return {
       arrowChar: "▼",
-      arrowColor: "text-emerald-400",
+
+      arrowColor: "text-green-100",
     };
   }
 
   return {
     arrowChar: "▲",
-    arrowColor: "text-rose-400",
+    arrowColor: "text-red-200",
   };
 }
 
@@ -261,7 +262,7 @@ export default function HomePage() {
                         {formatPeso(tag.price)}
                       </span>
                     </div>
-                    <span className={`text-base font-black ${tone.arrowColor}`}>
+                    <span className={`text-xl font-black ${tone.arrowColor}`}>
                       {tone.arrowChar}
                     </span>
                   </div>
