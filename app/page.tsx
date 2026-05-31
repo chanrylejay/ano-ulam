@@ -54,7 +54,7 @@ function formatPeso(amount: number): string {
 }
 
 function getDotColor(price: number): string {
-  return price <= 100 ? "bg-emerald-400" : "bg-rose-400";
+  return price <= 100 ? "bg-green-300" : "bg-red-300";
 }
 
 export default function HomePage() {
@@ -205,9 +205,7 @@ export default function HomePage() {
               ma, Ano ulam?
             </h1>
 
-            <p className="mb-4 text-base text-white/90 sm:text-xl">
-              Anong murang ulam ngayon
-            </p>
+            <p className="mb-4 text-base text-white/90 sm:text-xl">Anong murang ulam ngayon</p>
 
             <p className="text-sm text-white/70">{formattedDate}</p>
           </section>
@@ -223,7 +221,10 @@ export default function HomePage() {
                   className="flex shrink-0 items-center gap-1.5"
                   aria-label={`${tag.label} ${formatPeso(tag.price)}`}
                 >
-                  <span className={`inline-block h-2.5 w-2.5 shrink-0 rounded-full ${getDotColor(tag.price)}`} aria-hidden="true" />
+                  <span
+                    className={`inline-block h-3.5 w-3.5 shrink-0 rounded-full ring-2 ring-white/50 ${getDotColor(tag.price)}`}
+                    aria-hidden="true"
+                  />
                   <span className="whitespace-nowrap text-sm text-white/85">
                     <span className="font-semibold">{tag.label}</span>{" "}
                     <span className="font-black">{formatPeso(tag.price)}</span>
@@ -239,14 +240,17 @@ export default function HomePage() {
               </a>
             </div>
 
-            <div className="hidden flex-wrap items-center justify-center gap-x-5 gap-y-2 sm:flex">
+            <div className="hidden items-center justify-center gap-x-5 gap-y-2 sm:flex">
               {priceTags.map((tag) => (
                 <div
                   key={tag.label}
                   className="flex items-center gap-1.5"
                   aria-label={`${tag.label} ${formatPeso(tag.price)}`}
                 >
-                  <span className={`inline-block h-2.5 w-2.5 shrink-0 rounded-full ${getDotColor(tag.price)}`} aria-hidden="true" />
+                  <span
+                    className={`inline-block h-3.5 w-3.5 shrink-0 rounded-full ring-2 ring-white/50 ${getDotColor(tag.price)}`}
+                    aria-hidden="true"
+                  />
                   <span className="whitespace-nowrap text-sm text-white/85">
                     <span className="font-semibold">{tag.label}</span>{" "}
                     <span className="font-black">{formatPeso(tag.price)}</span>
@@ -275,9 +279,7 @@ export default function HomePage() {
           <Card className="border-gray-200 bg-gradient-to-br from-amber-50 to-orange-50">
             <CardContent className="p-12 text-center">
               <div className="mb-4 text-5xl">🍳</div>
-              <p className="mb-2 text-xl font-bold text-amber-900">
-                Wala pang data ngayon.
-              </p>
+              <p className="mb-2 text-xl font-bold text-amber-900">Wala pang data ngayon.</p>
               <p className="text-lg text-amber-700">Babalik kami bukas ng 8AM!</p>
             </CardContent>
           </Card>
