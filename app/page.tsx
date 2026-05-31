@@ -58,6 +58,26 @@ function formatPeso(amount: number): string {
   }).format(amount);
 }
 
+function getPriceTone(price: number): {
+  tileClass: string;
+  arrow: string;
+  arrowLabel: string;
+} {
+  if (price <= 100) {
+    return {
+      tileClass: "bg-emerald-600 shadow-emerald-900/20",
+      arrow: "↓",
+      arrowLabel: "mura",
+    };
+  }
+
+  return {
+    tileClass: "bg-rose-600 shadow-rose-900/20",
+    arrow: "↑",
+    arrowLabel: "mahal",
+  };
+}
+
 export default function HomePage() {
   const [meals, setMeals] = useState<Meal[]>([]);
   const [priceTags, setPriceTags] = useState<PriceTag[]>([]);
@@ -89,10 +109,19 @@ export default function HomePage() {
         const priceData = await pricesRes.json();
         if (priceData.prices) {
           const tags: PriceTag[] = [];
+
           for (const item of defaultItemKeys) {
-            const found = (priceData.prices as PriceItem[]).find(
-              (p) => p.commodities.name.toLowerCase() === item.key.toLowerCase(),
-            );
+            const found = (priceData.prices as PriceItem[]).find((p) => {
+              const apiName = p.commodities.name.toLowerCase().trim();
+              const targetName = item.key.toLowerCase().trim();
+
+              return (
+                apiName === targetName ||
+                apiName.includes(targetName) ||
+                targetName.includes(apiName)
+              );
+            });
+
             if (found) {
               tags.push({
                 name: item.key,
@@ -101,6 +130,7 @@ export default function HomePage() {
               });
             }
           }
+
           setPriceTags(tags);
         }
       }
@@ -143,45 +173,51 @@ export default function HomePage() {
       <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50">
         <div
           className="bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 shadow-lg"
-          style={{ minHeight: "42vh" }}
+          style={{ minHeight: "40vh" }}
         >
           <div
-            className="max-w-2xl mx-auto px-4 pt-10 pb-8 flex flex-col h-full items-center text-center"
-            style={{ minHeight: "42vh" }}
+            className="max-w-2xl mx-auto px-4 pt-9 pb-6 flex flex-col h-full items-center text-center"
+            style={{ minHeight: "40vh" }}
           >
             <div className="flex-1 flex flex-col items-center justify-center space-y-3">
-              <div className="h-20 w-80 bg-white/20 rounded-lg animate-pulse" />
-              <div className="h-5 w-56 bg-white/15 rounded animate-pulse" />
-              <div className="h-4 w-44 bg-white/10 rounded animate-pulse mt-4" />
+              <div className="h-20 w-80 max-w-full bg-white/20 rounded-lg animate-pulse" />
+              <div className="h-5 w-56 max-w-full bg-white/15 rounded animate-pulse" />
+              <div className="h-4 w-44 max-w-full bg-white/10 rounded animate-pulse mt-4" />
             </div>
-            <div className="flex flex-wrap justify-center gap-1.5 mt-auto">
-              {[...Array(12)].map((_, i) => (
-                <div key={i} className="h-5 w-16 bg-white/15 rounded-full animate-pulse" />
-              ))}
-              <div className="h-6 w-16 bg-white/25 rounded-full animate-pulse" />
+
+            <div className="w-full mt-auto pt-5 overflow-hidden">
+              <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 scrollbar-hide">
+                {[...Array(6)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="h-[58px] min-w-[86px] bg-white/15 rounded-2xl animate-pulse"
+                  />
+                ))}
+              </div>
             </div>
           </div>
         </div>
-        <main className="max-w-2xl mx-auto px-4 py-6 space-y-3">
+
+        <main className="max-w-2xl mx-auto px-4 py-5 space-y-3">
           {[...Array(3)].map((_, i) => (
             <div
               key={i}
-              className="bg-white rounded-xl shadow-sm border border-gray-200 p-3.5 space-y-2.5 animate-pulse"
+              className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 space-y-3 animate-pulse"
             >
               <div className="flex justify-between">
                 <div className="h-6 w-40 bg-gray-100 rounded" />
-                <div className="h-6 w-16 bg-gray-100 rounded-full" />
+                <div className="h-7 w-16 bg-gray-100 rounded-full" />
               </div>
-              <div className="grid grid-cols-2 gap-1.5">
-                {[...Array(4)].map((_, j) => (
-                  <div key={j} className="flex gap-2">
-                    <div className="h-4 w-20 bg-gray-50 rounded" />
-                    <div className="h-4 w-6 bg-gray-50 rounded" />
+              <div className="space-y-2">
+                {[...Array(3)].map((_, j) => (
+                  <div key={j} className="flex justify-between gap-3">
+                    <div className="h-4 w-24 bg-gray-50 rounded" />
+                    <div className="h-4 w-12 bg-gray-50 rounded" />
                   </div>
                 ))}
               </div>
               <div className="h-4 w-32 bg-gray-50 rounded" />
-              <div className="h-12 bg-gray-50 rounded-lg" />
+              <div className="h-14 bg-gray-50 rounded-lg" />
             </div>
           ))}
         </main>
@@ -192,53 +228,60 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50">
       <header
-        className="bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 text-white shadow-lg flex flex-col"
-        style={{ minHeight: "42vh" }}
+        className="bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 text-white shadow-lg flex flex-col overflow-hidden"
+        style={{ minHeight: "40vh" }}
       >
-        <div className="max-w-2xl mx-auto w-full px-4 pt-12 pb-8 flex flex-col flex-1 items-center text-center">
+        <div className="max-w-2xl mx-auto w-full px-4 pt-9 pb-5 flex flex-col flex-1 items-center text-center">
           <div className="flex-1 flex flex-col items-center justify-center">
-             <h1 className="text-[5rem] sm:text-7xl md:text-[10rem] md:leading-none font-black mb-2 tracking-tight leading-[0.85]">
-               ma, Ano ulam?
-             </h1>
-            <p className="text-lg text-white/90 mb-6">Anong murang ulam ngayon</p>
-            <p className="text-sm text-white/70">{formattedDate}</p>
+            <h1 className="text-[4.7rem] sm:text-7xl md:text-[10rem] md:leading-none font-black mb-2 tracking-tight leading-[0.85]">
+              ma, Ano ulam?
+            </h1>
+
+            <p className="text-lg sm:text-xl text-white/90 mb-5">Anong murang ulam ngayon</p>
+
+            <p className="text-sm text-white/75">{formattedDate}</p>
           </div>
 
-            <div className="w-full mt-auto pt-6">
-              <div className="flex gap-2.5 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide justify-start sm:flex-wrap sm:justify-center">
-                {priceTags.map((tag) => (
+          <div className="w-full mt-auto pt-5 relative">
+            <div className="pointer-events-none absolute left-0 top-5 bottom-1 w-8 bg-gradient-to-r from-orange-500/80 to-transparent z-10 sm:hidden" />
+            <div className="pointer-events-none absolute right-0 top-5 bottom-1 w-10 bg-gradient-to-l from-red-500/90 to-transparent z-10 sm:hidden" />
+
+            <div className="flex gap-2.5 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide justify-start sm:flex-wrap sm:justify-center">
+              {priceTags.map((tag) => {
+                const tone = getPriceTone(tag.price);
+
+                return (
                   <div
                     key={tag.label}
-                    className={`shrink-0 flex flex-col items-center justify-center px-3.5 py-2.5 rounded-2xl min-w-[84px] shadow-md ring-1 ring-white/20 ${
-                      tag.price <= 100
-                        ? "bg-emerald-600"
-                        : "bg-rose-600"
-                    }`}
+                    className={`shrink-0 flex flex-col items-center justify-center px-3 py-2.5 rounded-2xl min-w-[88px] shadow-md ring-1 ring-white/20 ${tone.tileClass}`}
+                    aria-label={`${tag.label} ${formatPeso(tag.price)} ${tone.arrowLabel}`}
                   >
-                    <span className="text-[11px] font-extrabold text-white leading-tight opacity-90">
+                    <span className="text-[11px] font-extrabold text-white leading-tight opacity-95">
                       {tag.label}
                     </span>
                     <span className="text-sm font-extrabold text-white leading-tight">
-                      {formatPeso(tag.price)}
-                      {tag.price <= 100 ? " ↓" : " ↑"}
+                      {formatPeso(tag.price)} {tone.arrow}
                     </span>
                   </div>
-                ))}
-                <a
-                  href="/prices"
-                  aria-label="View all commodity prices"
-                  className="shrink-0 flex flex-col items-center justify-center px-4 py-2.5 rounded-2xl min-w-[84px] bg-white text-amber-700 shadow-md hover:shadow-lg transition-shadow font-extrabold text-sm border border-amber-200"
-                >
-                  More Prices →
-                </a>
-              </div>
+                );
+              })}
+
+              <a
+                href="/prices"
+                aria-label="View all commodity prices"
+                className="shrink-0 flex flex-col items-center justify-center px-4 py-2.5 rounded-2xl min-w-[112px] bg-white text-amber-700 shadow-lg hover:shadow-xl transition-shadow font-extrabold text-sm border border-white/80"
+              >
+                <span className="leading-tight">More</span>
+                <span className="leading-tight">Prices →</span>
+              </a>
             </div>
+          </div>
         </div>
       </header>
 
       <main
         id="main-content"
-        className="max-w-2xl mx-auto px-4 py-6 space-y-3"
+        className="max-w-2xl mx-auto px-4 py-5 space-y-3"
         aria-live="polite"
         aria-atomic="false"
       >
@@ -270,6 +313,7 @@ export default function HomePage() {
                 🛒 Tingnan ang Presyo
               </a>
             )}
+
             {pathname !== "/about" && (
               <a
                 href="/about"
