@@ -6,7 +6,6 @@ import { usePathname } from "next/navigation";
 import { MealCard } from "@/components/MealCard";
 import { Footer } from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
-import { defaultItems } from "@/lib/commodity-names";
 
 interface Ingredient {
   name: string;
@@ -33,6 +32,23 @@ interface PriceItem {
   commodities: { name: string };
   price_prevailing: number;
 }
+
+// Keys must match EXACTLY what the API returns (Filipino mapped names)
+const defaultItemKeys = [
+  { key: "Pork liempo", label: "Baboy" },
+  { key: "Chicken legs", label: "Manok" },
+  { key: "Beef litid", label: "Beef" },
+  { key: "Itlog", label: "Itlog" },
+  { key: "Bangus", label: "Bangus" },
+  { key: "Tilapia", label: "Tilapia" },
+  { key: "Bigas pinakamura", label: "Bigas" },
+  { key: "Sibuyas pula", label: "Sibuyas" },
+  { key: "Bawang", label: "Bawang" },
+  { key: "Saging saba", label: "Saging" },
+  { key: "Mantika", label: "Mantika" },
+  { key: "Kalamansi", label: "Kalamansi" },
+  { key: "Sili pula", label: "Sili" },
+];
 
 function formatPeso(amount: number): string {
   return new Intl.NumberFormat("fil-PH", {
@@ -74,7 +90,7 @@ export default function HomePage() {
         const priceData = await pricesRes.json();
         if (priceData.prices) {
           const tags: PriceTag[] = [];
-          for (const item of defaultItems) {
+          for (const item of defaultItemKeys) {
             const found = (priceData.prices as PriceItem[]).find(
               (p) => p.commodities.name.toLowerCase() === item.key.toLowerCase(),
             );
@@ -128,7 +144,7 @@ export default function HomePage() {
         <div className="bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 shadow-lg" style={{ minHeight: "42vh" }}>
           <div className="max-w-2xl mx-auto px-4 pt-10 pb-8 flex flex-col h-full items-center text-center" style={{ minHeight: "42vh" }}>
             <div className="flex-1 flex flex-col items-center justify-center space-y-3">
-              <div className="h-16 w-80 bg-white/20 rounded-lg animate-pulse" />
+              <div className="h-20 w-80 bg-white/20 rounded-lg animate-pulse" />
               <div className="h-5 w-56 bg-white/15 rounded animate-pulse" />
               <div className="h-4 w-44 bg-white/10 rounded animate-pulse mt-4" />
             </div>
@@ -171,7 +187,7 @@ export default function HomePage() {
         <div className="max-w-2xl mx-auto w-full px-4 pt-12 pb-8 flex flex-col flex-1 items-center text-center">
           {/* Hero text */}
           <div className="flex-1 flex flex-col items-center justify-center">
-            <h1 className="text-6xl md:text-8xl font-black mb-2 tracking-tight">
+            <h1 className="text-7xl md:text-[10rem] md:leading-none font-black mb-2 tracking-tight">
               ma, Ano ulam?
             </h1>
             <p className="text-lg text-white/90 mb-6">Anong murang ulam ngayon</p>
