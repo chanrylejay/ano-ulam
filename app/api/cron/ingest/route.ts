@@ -133,13 +133,18 @@ ${pdfText.substring(0, 8000)}`;
         };
       })
       .filter(Boolean);
-
-    if (items.length === 0) {
+    // Deduplicate by name+category (keep last occurrence)
+    const seen = new Map();
+    for (const item of items) {
+      seen.set(`${item.name}||${item.category}`, item);
+    }
+    const uniqueItems = Array.from(seen.values());
+    if (uniqueItems.length === 0) {
       throw new Error("No commodities extracted from PDF");
     }
 
     // BATCH INSERT: All commodities in ONE query
-    const commoditiesJson = JSON.stringify(items);
+    const commoditiesJson = JSON.stringify(uniqueItems);
     await sql`
       INSERT INTO commodities (name, category, specification)
       SELECT
@@ -171,7 +176,7 @@ ${pdfText.substring(0, 8000)}`;
     return NextResponse.json({
       success: true,
       pdfUrl,
-      commoditiesExtracted: items.length,
+      commoditiesExtracted: uniqueItems.length,
       pricesInserted: priceResult.length,
     });
   } catch (error) {
