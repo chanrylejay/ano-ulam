@@ -22,8 +22,7 @@ export async function callDeepSeekAPI(prompt: string, systemPrompt?: string): Pr
     body: JSON.stringify({
       model: "deepseek-chat",
       messages,
-      response_format: { type: "json_object" },
-      max_tokens: 16384,
+      max_tokens: 8192,
       temperature: 0.7,
     }),
   });

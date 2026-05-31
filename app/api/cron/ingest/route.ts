@@ -82,22 +82,56 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Send to DeepSeek for parsing
-    const prompt = `Extract all commodity prices from this DA Daily Price Index document. Return as a JSON object with a "commodities" array. Each object should have:
-    - name (commodity name, keep it short)
-    - category (one of: rice, corn, fish, beef, pork, poultry, eggs, lowland-vegetables, highland-vegetables, spices, fruits, other)
-    - specification (size/grade if mentioned, otherwise empty string)
-    - price_prevailing (numeric price in pesos, or null if n/a)
+    // Send to DeepSeek for CSV parsing
+    const prompt = `Extract all commodity prices from this DA Daily Price Index document.
+Return ONLY a CSV with these columns, no header row:
+name,category,specification,price
 
-    IMPORTANT RULES:
-    - Skip any commodity where the price is n/a or unavailable
-    - Return COMPACT JSON with no extra whitespace or indentation
-    - Only include food commodities (skip cigarettes and tobacco)
+Rules:
+- category must be one of: rice, corn, fish, beef, pork, poultry, eggs, lowland-vegetables, highland-vegetables, spices, fruits, other
+- price is numeric pesos per kg, use 0 if n/a
+- Skip cigarettes and tobacco
+- No quotes unless the value contains a comma
+- One line per commodity
 
-    Document text:
-    ${pdfText.substring(0, 8000)}`;
+Example lines:
+Tilapia,fish,Medium,180
+Galunggong,fish,Medium,200
+Bangus,fish,Large,220
 
-    const systemPrompt = `You are a data extraction specialist for Philippine agricultural price reports. You accurately extract commodity name, category, specification, and prevailing prices from Department of Agriculture Daily Price Index documents. Always return valid JSON.`;
+Document text:
+${pdfText.substring(0, 8000)}`;
+
+    const systemPrompt = `You are a data extraction specialist for Philippine agricultural price reports. Return ONLY CSV data, no markdown, no headers, no explanation.`;
+
+    const responseText = await callDeepSeekAPI(prompt, systemPrompt);
+
+    // Parse CSV into objects
+    const lines = responseText
+      .trim()
+      .split("\n")
+      .filter((line) => line.trim());
+    const parsed = {
+      commodities: lines
+        .map((line) => {
+          const parts = line.split(",");
+          if (parts.length < 4) return null;
+          const price = parseFloat(parts[parts.length - 1]);
+          const category = parts[parts.length - 2]?.trim() || "other";
+          const specification = parts[parts.length - 3]?.trim() || "";
+          const name = parts
+            .slice(0, parts.length - 3)
+            .join(",")
+            .trim();
+          return {
+            name,
+            category,
+            specification,
+            price_prevailing: isNaN(price) || price === 0 ? null : price,
+          };
+        })
+        .filter(Boolean),
+    };
 
     if (!parsed.commodities || !Array.isArray(parsed.commodities)) {
       throw new Error("Invalid response format from AI");
