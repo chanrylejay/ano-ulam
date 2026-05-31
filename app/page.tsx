@@ -314,18 +314,6 @@ export default function HomePage() {
         )}
       </main>
 
-      <p className="px-4 py-4 text-center text-xs text-gray-400">
-        Data mula sa{" "}
-        <a
-          href="https://da.gov.ph/price-monitoring/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="underline transition-colors hover:text-amber-600"
-        >
-          DA Bantay Presyo
-        </a>
-      </p>
-
       <Footer />
     </div>
   );

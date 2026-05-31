@@ -37,20 +37,15 @@ function formatCost(meal: Meal): string {
 }
 
 function getCostBadgeColor(cost: number): string {
-  const n =
-    typeof cost === "number"
-      ? cost
-      : parseFloat(String(cost).replace(/[₱,]/g, ""));
+  const n = typeof cost === "number" ? cost : parseFloat(String(cost).replace(/[₱,]/g, ""));
   if (isNaN(n)) return "bg-amber-500";
   if (n <= 150) return "bg-emerald-500";
   if (n <= 220) return "bg-amber-500";
   return "bg-rose-500";
 }
 
-function getTrendArrow(
-  trend: string,
-): { icon: string; colorClass: string } {
-  if (trend === "down") return { icon: "↓", colorClass: "text-emerald-600" };
+function getTrendArrow(trend: string): { icon: string; colorClass: string } {
+  if (trend === "down") return { icon: "↓", colorClass: "text-emerald-700" };
   if (trend === "up") return { icon: "↑", colorClass: "text-rose-500" };
   return { icon: "→", colorClass: "text-gray-300" };
 }
@@ -135,7 +130,7 @@ export function MealCard({ meal, index }: MealCardProps) {
                     {/* Price */}
                     <span
                       className={`text-sm font-bold shrink-0 tabular-nums ${
-                        isOptional ? "text-rose-400" : "text-emerald-600"
+                        isOptional ? "text-rose-400" : "text-emerald-700"
                       }`}
                     >
                       {formatPeso(ing.cost)}
@@ -146,16 +141,11 @@ export function MealCard({ meal, index }: MealCardProps) {
             </div>
 
             {/* Servings */}
-            <p className="text-xs text-gray-500 mb-3">
-              🍽️ {meal.servings || "1-3 katao"}
-            </p>
+            <p className="text-xs text-gray-500 mb-3">🍽️ {meal.servings || "1-3 katao"}</p>
 
             {/* Bakit? */}
             {meal.reason && (
-              <div
-                className="bg-amber-50 rounded-lg p-3"
-                style={{ border: "none" }}
-              >
+              <div className="bg-amber-50 rounded-lg p-3" style={{ border: "none" }}>
                 <p className="text-sm leading-relaxed">
                   <span className="font-bold text-amber-900">Bakit?</span>{" "}
                   <span className="text-stone-700">{meal.reason}</span>
