@@ -150,40 +150,29 @@ ${pdfText.substring(0, 8000)}`;
       const specification = item.specification || "";
       const category = item.category || "other";
 
-      // Check if commodity exists
-      let commodityResult = await sql`
-        SELECT id FROM commodities
-        WHERE name = ${item.name} AND specification = ${specification}
-        LIMIT 1
-      `;
-
-      let commodityId: string;
-
-      if (commodityResult.length === 0) {
-        // Insert new commodity (skip if duplicate)
-        const insertResult = await sql`
-                  INSERT INTO commodities (name, category, specification)
-                  VALUES (${item.name}, ${category}, ${specification})
-                  ON CONFLICT (name, category) DO UPDATE SET specification = EXCLUDED.specification
-                  RETURNING id
-                `;
-
-        commodityId = insertResult[0].id;
-      } else {
-        commodityId = commodityResult[0].id;
-      }
-
-      // Insert price
       try {
-        await sql`
-          INSERT INTO prices (commodity_id, price_date, price_prevailing)
-          VALUES (${commodityId}, ${today}, ${item.price_prevailing || null})
+        // Single upsert - no SELECT needed
+        const commodityResult = await sql`
+          INSERT INTO commodities (name, category, specification)
+          VALUES (${item.name}, ${category}, ${specification})
+          ON CONFLICT (name, category) DO UPDATE SET specification = EXCLUDED.specification
+          RETURNING id
         `;
-        insertedCount++;
-      } catch (insertError: any) {
-        if (insertError.code !== "23505") {
-          console.error("Error inserting price:", insertError);
+
+        const commodityId = commodityResult[0].id;
+
+        if (item.price_prevailing !== null) {
+          await sql`
+            INSERT INTO prices (commodity_id, price_date, price_prevailing)
+            VALUES (${commodityId}, ${today}, ${item.price_prevailing})
+            ON CONFLICT DO NOTHING
+          `;
+          insertedCount++;
+        } else {
+          skippedCount++;
         }
+      } catch (err: any) {
+        console.error("Error inserting:", item.name, err.message);
         skippedCount++;
       }
     }
