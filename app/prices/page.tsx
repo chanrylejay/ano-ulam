@@ -32,7 +32,7 @@ function getSimpleCategory(category: string): string {
   return "others";
 }
 
-function shouldShowSpecification(spec: string | null | undefined): boolean {
+function shouldShowSpecification(spec: string | undefined): boolean {
   if (!spec) return false;
   const lower = spec.toLowerCase();
   if (lower === "imported" || lower === "other" || lower === "" || lower === "n/a") return false;
@@ -103,7 +103,9 @@ export default function PricesPage() {
 
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase().trim();
-      filtered = filtered.filter((p) => (p.commodities?.name || "").toLowerCase().includes(query));
+      filtered = filtered.filter((p) =>
+        (p.commodities?.name || "").toLowerCase().includes(query)
+      );
     }
 
     filtered.sort((a, b) => {
@@ -171,7 +173,7 @@ export default function PricesPage() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Hanapin ang presyo... (e.g., Bangus, Manok)"
-            className="w-full pl-12 pr-4 py-3 text-base rounded-xl border-2 border-amber-200 bg-white focus:border-amber-500 focus:ring-2 focus:ring-amber-200 focus:outline-none transition-colors"
+            className="w-full pl-12 pr-4 py-3 text-base rounded-xl border-2 border-gray-200 bg-white focus:border-amber-500 focus:ring-2 focus:ring-amber-200 focus:outline-none transition-colors"
             aria-label="Search commodity prices"
           />
         </div>
@@ -185,7 +187,7 @@ export default function PricesPage() {
               className={`shrink-0 px-2.5 py-1 rounded-full text-xs font-semibold transition-colors whitespace-nowrap ${
                 selectedTab === tab.value
                   ? "bg-amber-500 text-white shadow-sm"
-                  : "bg-white text-amber-700 border border-amber-200 hover:bg-amber-50"
+                  : "bg-white text-amber-700 border border-gray-200 hover:bg-amber-50"
               }`}
             >
               {tab.label}
@@ -217,24 +219,24 @@ export default function PricesPage() {
             {[...Array(8)].map((_, i) => (
               <div
                 key={i}
-                className="bg-white rounded-xl border border-amber-100 p-3 animate-pulse flex justify-between items-center"
+                className="bg-white rounded-xl border border-gray-200 p-3 animate-pulse flex justify-between items-center"
               >
                 <div className="space-y-1.5">
-                  <div className="h-4 w-40 bg-amber-100 rounded" />
-                  <div className="h-3 w-20 bg-amber-50 rounded" />
+                  <div className="h-4 w-40 bg-gray-100 rounded" />
+                  <div className="h-3 w-20 bg-gray-50 rounded" />
                 </div>
-                <div className="h-5 w-16 bg-amber-100 rounded" />
+                <div className="h-5 w-16 bg-gray-100 rounded" />
               </div>
             ))}
           </div>
         )}
 
-        {/* Price List — clean: name + spec | price */}
+        {/* Price List — clean: name + spec | price, no emojis */}
         {!isLoading && filteredPrices.length > 0 && (
           <ul className="space-y-1.5" aria-label="Commodity prices">
             {filteredPrices.map((price) => (
               <li key={price.id}>
-                <Card className="overflow-hidden border-amber-100 bg-white shadow-sm hover:shadow transition-shadow duration-150">
+                <Card className="overflow-hidden border-gray-200 bg-white shadow-sm hover:shadow transition-shadow duration-150">
                   <CardContent className="p-3 flex items-center justify-between gap-3">
                     <div className="min-w-0 flex-1">
                       <h2 className="font-medium text-gray-800 text-sm truncate">
@@ -260,7 +262,7 @@ export default function PricesPage() {
 
         {/* No Results */}
         {!isLoading && prices.length === 0 && (
-          <Card className="border-amber-200 bg-gradient-to-br from-amber-50 to-orange-50">
+          <Card className="border-gray-200 bg-gradient-to-br from-amber-50 to-orange-50">
             <CardContent className="text-center p-12">
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-amber-100 mb-4">
                 <ShoppingCart className="w-8 h-8 text-amber-600" />
@@ -276,7 +278,7 @@ export default function PricesPage() {
 
         {/* Filter Empty */}
         {!isLoading && prices.length > 0 && filteredPrices.length === 0 && (
-          <Card className="border-amber-200 bg-amber-50">
+          <Card className="border-gray-200 bg-amber-50">
             <CardContent className="text-center p-8">
               <Search className="w-12 h-12 text-amber-400 mx-auto mb-4" />
               <p className="text-amber-800 font-medium">Walang nahanap na presyo</p>

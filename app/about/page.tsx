@@ -20,7 +20,6 @@ import { Footer } from '@/components/Footer';
 export default function AboutPage() {
   return (
     <div className="min-h-screen pb-20 bg-gradient-to-b from-amber-50 to-orange-50">
-      {/* Header */}
       <header className="bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 text-white py-10 px-4 shadow-lg">
         <div className="max-w-2xl mx-auto">
           <Button
@@ -45,7 +44,7 @@ export default function AboutPage() {
 
       <main id="main-content" className="max-w-2xl mx-auto px-4 py-8">
         {/* Mission Statement */}
-        <Card className="mb-6 border-amber-200 bg-gradient-to-br from-amber-50 to-orange-50">
+        <Card className="mb-6 border-gray-200 bg-gradient-to-br from-amber-50 to-orange-50">
           <CardContent className="p-8">
             <div className="flex items-center gap-3 mb-4">
               <Heart className="w-6 h-6 text-red-500" aria-hidden="true" />
@@ -65,7 +64,7 @@ export default function AboutPage() {
         </Card>
 
         {/* Data Source */}
-        <Card className="mb-6 border-amber-200 bg-white">
+        <Card className="mb-6 border-gray-200 bg-white">
           <CardContent className="p-8">
             <div className="flex items-center gap-3 mb-4">
               <Database className="w-6 h-6 text-green-600" aria-hidden="true" />
@@ -96,7 +95,7 @@ export default function AboutPage() {
         </Card>
 
         {/* How It Works */}
-        <Card className="mb-6 border-amber-200 bg-white">
+        <Card className="mb-6 border-gray-200 bg-white">
           <CardContent className="p-8">
             <div className="flex items-center gap-3 mb-4">
               <Bot className="w-6 h-6 text-blue-600" aria-hidden="true" />
@@ -144,7 +143,7 @@ export default function AboutPage() {
         </Card>
 
         {/* Tech Stack */}
-        <Card className="mb-6 border-amber-200 bg-white">
+        <Card className="mb-6 border-gray-200 bg-white">
           <CardContent className="p-8">
             <div className="flex items-center gap-3 mb-4">
               <Code className="w-6 h-6 text-purple-600" aria-hidden="true" />
@@ -174,7 +173,7 @@ export default function AboutPage() {
         </Card>
 
         {/* Creator */}
-        <Card className="mb-6 border-amber-200 bg-gradient-to-br from-yellow-50 to-amber-50">
+        <Card className="mb-6 border-gray-200 bg-gradient-to-br from-yellow-50 to-amber-50">
           <CardContent className="p-8">
             <div className="flex items-center gap-3 mb-4">
               <Sparkles className="w-6 h-6 text-amber-600" aria-hidden="true" />
@@ -198,7 +197,7 @@ export default function AboutPage() {
                 href="https://chanryle-cagara.vercel.app"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-sm font-medium text-amber-700 bg-white border border-amber-200 rounded-lg px-4 py-2 hover:bg-amber-50 transition-colors"
+                className="inline-flex items-center gap-2 text-sm font-medium text-amber-700 bg-white border border-gray-200 rounded-lg px-4 py-2 hover:bg-amber-50 transition-colors"
               >
                 <Globe className="w-4 h-4" />
                 chanryle-cagara.vercel.app
@@ -208,7 +207,7 @@ export default function AboutPage() {
         </Card>
 
         {/* Important Notes */}
-        <Card className="mb-6 border-amber-200 bg-gray-50">
+        <Card className="mb-6 border-gray-200 bg-gray-50">
           <CardContent className="p-6">
             <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
               <Clock className="w-5 h-5 text-gray-600" aria-hidden="true" />

@@ -30,7 +30,7 @@ export function MealCard({ meal, index }: MealCardProps) {
         style={{ animationDelay: `${index * 80}ms` }}
         className="animate-card-enter"
       >
-        <Card className="overflow-hidden border-amber-200 bg-white shadow-sm hover:shadow-md transition-shadow duration-200">
+        <Card className="overflow-hidden border-gray-200 bg-white shadow-sm hover:shadow-md transition-shadow duration-200">
           <CardContent className="p-3.5">
             {/* Title + Price */}
             <div className="flex items-start justify-between mb-2.5">
@@ -64,7 +64,7 @@ export function MealCard({ meal, index }: MealCardProps) {
 
             {/* Bakit? */}
             {meal.reason && (
-              <div className="bg-amber-50 rounded-lg p-3">
+              <div className="bg-amber-50 rounded-lg p-3 border-transparent">
                 <p className="text-sm text-amber-900">
                   <span className="font-bold text-amber-800">Bakit?</span>{" "}
                   <span className="text-amber-800">{meal.reason}</span>
