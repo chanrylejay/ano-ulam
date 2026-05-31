@@ -50,7 +50,7 @@ function getCategoryEmoji(category: string | undefined): string {
   return map[category || ""] || "🧂";
 }
 
-function shouldShowSpecification(spec: string | undefined): boolean {
+function shouldShowSpecification(spec: string | null | undefined): boolean {
   if (!spec) return false;
   const lower = spec.toLowerCase();
   if (lower === "imported" || lower === "other" || lower === "" || lower === "n/a") return false;
@@ -88,9 +88,17 @@ export default function PricesPage() {
       setIsLoading(true);
       setError(null);
       const response = await fetch("/api/prices");
-      if (!response.ok) { setPrices([]); return; }
+      if (!response.ok) {
+        setPrices([]);
+        return;
+      }
       let data;
-      try { data = await response.json(); } catch { setPrices([]); return; }
+      try {
+        data = await response.json();
+      } catch {
+        setPrices([]);
+        return;
+      }
       setPrices(data.prices || []);
       setDate(data.date || "");
     } catch {
@@ -115,9 +123,7 @@ export default function PricesPage() {
     // Apply search filter
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase().trim();
-      filtered = filtered.filter((p) =>
-        (p.commodities?.name || "").toLowerCase().includes(query)
-      );
+      filtered = filtered.filter((p) => (p.commodities?.name || "").toLowerCase().includes(query));
     }
 
     // Apply sort
@@ -137,7 +143,10 @@ export default function PricesPage() {
           <div className="text-5xl">😕</div>
           <p className="text-amber-900 font-bold text-xl">{error}</p>
           <button
-            onClick={() => { setError(null); fetchPrices(); }}
+            onClick={() => {
+              setError(null);
+              fetchPrices();
+            }}
             className="inline-flex items-center gap-2 bg-amber-600 text-white font-semibold px-6 py-3 rounded-xl hover:bg-amber-700 transition-colors"
           >
             Subukan Muli
@@ -173,7 +182,12 @@ export default function PricesPage() {
         </div>
       </header>
 
-      <main id="main-content" className="max-w-2xl mx-auto px-4 py-6" aria-live="polite" aria-atomic="false">
+      <main
+        id="main-content"
+        className="max-w-2xl mx-auto px-4 py-6"
+        aria-live="polite"
+        aria-atomic="false"
+      >
         {/* Search Bar */}
         <div className="relative mb-4">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -226,7 +240,10 @@ export default function PricesPage() {
         {isLoading && (
           <div className="space-y-2">
             {[...Array(8)].map((_, i) => (
-              <div key={i} className="bg-white rounded-xl border border-amber-100 p-3 animate-pulse flex justify-between items-center">
+              <div
+                key={i}
+                className="bg-white rounded-xl border border-amber-100 p-3 animate-pulse flex justify-between items-center"
+              >
                 <div className="space-y-1.5">
                   <div className="h-4 w-36 bg-amber-100 rounded" />
                   <div className="h-3 w-16 bg-amber-50 rounded" />
@@ -253,11 +270,15 @@ export default function PricesPage() {
                           {price.commodities?.name || "Unknown"}
                         </h2>
                         {shouldShowSpecification(price.commodities?.specification) && (
-                          <p className="text-xs text-gray-400 truncate">{price.commodities!.specification}</p>
+                          <p className="text-xs text-gray-400 truncate">
+                            {price.commodities!.specification}
+                          </p>
                         )}
                       </div>
                     </div>
-                    <p className={`text-base font-bold shrink-0 ml-3 ${getPriceColor(price.price_prevailing || 0)}`}>
+                    <p
+                      className={`text-base font-bold shrink-0 ml-3 ${getPriceColor(price.price_prevailing || 0)}`}
+                    >
                       ₱{price.price_prevailing?.toFixed(2) || "N/A"}
                     </p>
                   </CardContent>
@@ -289,7 +310,9 @@ export default function PricesPage() {
             <CardContent className="text-center p-8">
               <Search className="w-12 h-12 text-amber-400 mx-auto mb-4" />
               <p className="text-amber-800 font-medium">Walang nahanap na presyo</p>
-              <p className="text-sm text-amber-600 mt-1">Subukan ang ibang kategorya o hanapin muli</p>
+              <p className="text-sm text-amber-600 mt-1">
+                Subukan ang ibang kategorya o hanapin muli
+              </p>
             </CardContent>
           </Card>
         )}
