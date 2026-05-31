@@ -112,77 +112,67 @@ ${pdfText.substring(0, 8000)}`;
       .trim()
       .split("\n")
       .filter((line) => line.trim());
-    const parsed = {
-      commodities: lines
-        .map((line) => {
-          const parts = line.split(",");
-          if (parts.length < 4) return null;
-          const price = parseFloat(parts[parts.length - 1]);
-          const specification = parts[parts.length - 2]?.trim() || "";
-          const category = parts[parts.length - 3]?.trim() || "other";
-          const name = parts
-            .slice(0, parts.length - 3)
-            .join(",")
-            .trim();
-          return {
-            name,
-            category,
-            specification,
-            price_prevailing: isNaN(price) || price === 0 ? null : price,
-          };
-        })
-        .filter(Boolean),
-    };
 
-    if (!parsed.commodities || !Array.isArray(parsed.commodities)) {
-      throw new Error("Invalid response format from AI");
+    const items = lines
+      .map((line) => {
+        const parts = line.split(",");
+        if (parts.length < 4) return null;
+        const price = parseFloat(parts[parts.length - 1]);
+        const specification = parts[parts.length - 2]?.trim() || "";
+        const category = parts[parts.length - 3]?.trim() || "other";
+        const name = parts
+          .slice(0, parts.length - 3)
+          .join(",")
+          .trim();
+        if (!name) return null;
+        return {
+          name,
+          category,
+          specification,
+          price: isNaN(price) || price === 0 ? null : price,
+        };
+      })
+      .filter(Boolean);
+
+    if (items.length === 0) {
+      throw new Error("No commodities extracted from PDF");
     }
 
-    let insertedCount = 0;
-    let skippedCount = 0;
+    // BATCH INSERT: All commodities in ONE query
+    const commoditiesJson = JSON.stringify(items);
+    await sql`
+      INSERT INTO commodities (name, category, specification)
+      SELECT
+        elem->>'name',
+        elem->>'category',
+        COALESCE(elem->>'specification', '')
+      FROM jsonb_array_elements(${commoditiesJson}::jsonb) AS elem
+      ON CONFLICT (name, category) DO UPDATE
+        SET specification = EXCLUDED.specification
+    `;
 
-    for (const item of parsed.commodities) {
-      if (!item || !item.name) {
-        skippedCount++;
-        continue;
-      }
-
-      const specification = item.specification || "";
-      const category = item.category || "other";
-
-      try {
-        // Single upsert - no SELECT needed
-        const commodityResult = await sql`
-          INSERT INTO commodities (name, category, specification)
-          VALUES (${item.name}, ${category}, ${specification})
-          ON CONFLICT (name, category) DO UPDATE SET specification = EXCLUDED.specification
-          RETURNING id
-        `;
-
-        const commodityId = commodityResult[0].id;
-
-        if (item.price_prevailing !== null) {
-          await sql`
-            INSERT INTO prices (commodity_id, price_date, price_prevailing)
-            VALUES (${commodityId}, ${today}, ${item.price_prevailing})
-            ON CONFLICT DO NOTHING
-          `;
-          insertedCount++;
-        } else {
-          skippedCount++;
-        }
-      } catch (err: any) {
-        console.error("Error inserting:", item.name, err.message);
-        skippedCount++;
-      }
-    }
+    // BATCH INSERT: All prices in ONE query
+    const priceResult = await sql`
+      INSERT INTO prices (commodity_id, price_date, price_prevailing)
+      SELECT
+        c.id,
+        ${today}::date,
+        (elem->>'price')::numeric
+      FROM jsonb_array_elements(${commoditiesJson}::jsonb) AS elem
+      JOIN commodities c
+        ON c.name = elem->>'name'
+        AND c.category = elem->>'category'
+      WHERE elem->>'price' IS NOT NULL
+        AND (elem->>'price')::numeric > 0
+      ON CONFLICT DO NOTHING
+      RETURNING id
+    `;
 
     return NextResponse.json({
       success: true,
       pdfUrl,
-      commoditiesExtracted: parsed.commodities.length,
-      pricesInserted: insertedCount,
-      pricesSkipped: skippedCount,
+      commoditiesExtracted: items.length,
+      pricesInserted: priceResult.length,
     });
   } catch (error) {
     console.error("Error in cron ingest:", error);
