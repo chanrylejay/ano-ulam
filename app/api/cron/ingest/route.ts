@@ -188,22 +188,6 @@ ${pdfText.substring(0, 8000)}`;
       }
     }
 
-    // Trigger meal suggestion generation
-    const baseUrl = process.env.VERCEL_URL
-      ? `https://${process.env.VERCEL_URL}`
-      : "http://localhost:3000";
-
-    try {
-      await fetch(`${baseUrl}/api/cron/suggest`, {
-        method: "POST",
-        headers: {
-          "x-cron-secret": process.env.CRON_SECRET || "",
-        },
-      });
-    } catch (suggestError) {
-      console.error("Error triggering suggestions:", suggestError);
-    }
-
     return NextResponse.json({
       success: true,
       pdfUrl,
