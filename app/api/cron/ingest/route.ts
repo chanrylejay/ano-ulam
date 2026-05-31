@@ -84,13 +84,18 @@ export async function POST(request: NextRequest) {
 
     // Send to DeepSeek for parsing
     const prompt = `Extract all commodity prices from this DA Daily Price Index document. Return as a JSON object with a "commodities" array. Each object should have:
-- name (commodity name)
-- category (one of: rice, corn, fish, beef, pork, poultry, eggs, lowland-vegetables, highland-vegetables, spices, fruits, other)
-- specification (size/grade if mentioned, otherwise empty string)
-- price_prevailing (numeric price in pesos per kg, or null if marked as n/a or unavailable)
+    - name (commodity name, keep it short)
+    - category (one of: rice, corn, fish, beef, pork, poultry, eggs, lowland-vegetables, highland-vegetables, spices, fruits, other)
+    - specification (size/grade if mentioned, otherwise empty string)
+    - price_prevailing (numeric price in pesos, or null if n/a)
 
-Document text:
-${pdfText.substring(0, 8000)}`;
+    IMPORTANT RULES:
+    - Skip any commodity where the price is n/a or unavailable
+    - Return COMPACT JSON with no extra whitespace or indentation
+    - Only include food commodities (skip cigarettes and tobacco)
+
+    Document text:
+    ${pdfText.substring(0, 8000)}`;
 
     const systemPrompt = `You are a data extraction specialist for Philippine agricultural price reports. You accurately extract commodity name, category, specification, and prevailing prices from Department of Agriculture Daily Price Index documents. Always return valid JSON.`;
 
