@@ -142,7 +142,7 @@ ${pdfText.substring(0, 8000)}`;
     let skippedCount = 0;
 
     for (const item of parsed.commodities) {
-      if (!item.name) {
+      if (!item || !item.name) {
         skippedCount++;
         continue;
       }
@@ -160,12 +160,14 @@ ${pdfText.substring(0, 8000)}`;
       let commodityId: string;
 
       if (commodityResult.length === 0) {
-        // Insert new commodity
+        // Insert new commodity (skip if duplicate)
         const insertResult = await sql`
-          INSERT INTO commodities (name, category, specification)
-          VALUES (${item.name}, ${category}, ${specification})
-          RETURNING id
-        `;
+                  INSERT INTO commodities (name, category, specification)
+                  VALUES (${item.name}, ${category}, ${specification})
+                  ON CONFLICT (name, category) DO UPDATE SET specification = EXCLUDED.specification
+                  RETURNING id
+                `;
+
         commodityId = insertResult[0].id;
       } else {
         commodityId = commodityResult[0].id;
