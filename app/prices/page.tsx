@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { format } from "date-fns";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -13,6 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ArrowUpDown, Calendar, Home, ShoppingCart } from "lucide-react";
+import { Footer } from "@/components/Footer";
 import type { Price, Commodity } from "@/lib/db";
 
 type PriceWithCommodity = Price & { commodities: Commodity };
@@ -39,6 +41,9 @@ export default function PricesPage() {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [date, setDate] = useState<string>("");
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const pathname = usePathname();
 
   useEffect(() => {
     fetchPrices();
@@ -51,6 +56,7 @@ export default function PricesPage() {
   async function fetchPrices() {
     try {
       setIsLoading(true);
+      setError(null);
       const response = await fetch("/api/prices");
 
       if (!response.ok) {
@@ -69,6 +75,7 @@ export default function PricesPage() {
       setPrices(data.prices || []);
       setDate(data.date || "");
     } catch {
+      setError("Hindi maka-connect sa server. Subukan muli.");
       setPrices([]);
     } finally {
       setIsLoading(false);
@@ -106,10 +113,31 @@ export default function PricesPage() {
     {} as Record<string, { count: number; min: number; max: number }>,
   );
 
+  // Error state
+  if (error && prices.length === 0) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-amber-50 to-orange-50 px-4">
+        <div className="text-center space-y-4 max-w-sm">
+          <div className="text-5xl">😕</div>
+          <p className="text-amber-900 font-bold text-xl">{error}</p>
+          <button
+            onClick={() => {
+              setError(null);
+              fetchPrices();
+            }}
+            className="inline-flex items-center gap-2 bg-amber-600 text-white font-semibold px-6 py-3 rounded-xl hover:bg-amber-700 transition-colors"
+          >
+            Subukan Muli
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen pb-20 bg-gradient-to-b from-amber-50 to-orange-50">
-      {/* Header */}
-      <header className="bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500 text-white py-10 px-4 shadow-lg">
+      {/* Header — unified gradient */}
+      <header className="bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 text-white py-10 px-4 shadow-lg">
         <div className="max-w-2xl mx-auto">
           <Button
             variant="ghost"
@@ -125,14 +153,14 @@ export default function PricesPage() {
             <h1 className="text-3xl font-bold">Price Dashboard</h1>
           </div>
 
-          <p className="text-green-100 text-sm">
+          <p className="text-amber-100 text-sm">
             <Calendar className="w-4 h-4 inline mr-1" />
             {date ? `Data as of ${format(new Date(date), "MMMM d, yyyy")}` : "Loading..."}
           </p>
         </div>
       </header>
 
-      <main className="max-w-2xl mx-auto px-4 py-6">
+      <main id="main-content" className="max-w-2xl mx-auto px-4 py-6" aria-live="polite" aria-atomic="false">
         {/* Stats Cards */}
         <div className="grid grid-cols-2 gap-3 mb-6">
           <Card className="bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-200">
@@ -181,7 +209,10 @@ export default function PricesPage() {
           <CardContent className="p-4">
             <div className="flex flex-col gap-3">
               <div className="w-full">
-                <Select value={category} onValueChange={setCategory}>
+                <label id="category-label" className="sr-only">
+                  Filter by category
+                </label>
+                <Select value={category} onValueChange={setCategory} aria-labelledby="category-label">
                   <SelectTrigger>
                     <SelectValue placeholder="Select category" />
                   </SelectTrigger>
@@ -200,6 +231,8 @@ export default function PricesPage() {
                   variant="outline"
                   size="sm"
                   onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
+                  aria-pressed={sortOrder === "asc"}
+                  aria-label={`Sort prices ${sortOrder === "asc" ? "high to low" : "low to high"}`}
                   className="gap-1"
                 >
                   <ArrowUpDown className="w-4 h-4" />
@@ -212,45 +245,65 @@ export default function PricesPage() {
           </CardContent>
         </Card>
 
-        {/* Loading */}
+        {/* Loading — skeleton */}
         {isLoading && (
-          <div className="text-center py-12">
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-green-100 animate-pulse mb-4">
-              <ShoppingCart className="w-6 h-6 text-green-600" />
-            </div>
-            <p className="text-green-700">Loading prices...</p>
+          <div className="space-y-3">
+            {[...Array(5)].map((_, i) => (
+              <div
+                key={i}
+                className="bg-white rounded-xl border border-amber-200 p-4 animate-pulse"
+              >
+                <div className="flex justify-between items-start mb-2">
+                  <div className="space-y-2">
+                    <div className="h-5 w-44 bg-amber-100 rounded" />
+                    <div className="h-3 w-24 bg-amber-50 rounded" />
+                  </div>
+                  <div className="space-y-1 text-right">
+                    <div className="h-6 w-20 bg-amber-100 rounded ml-auto" />
+                    <div className="h-3 w-12 bg-amber-50 rounded ml-auto" />
+                  </div>
+                </div>
+                <div className="h-5 w-24 bg-amber-50 rounded-full" />
+              </div>
+            ))}
           </div>
         )}
 
-        {/* Price Cards — single column only */}
+        {/* Price Cards — single column, semantic list */}
         {!isLoading && filteredPrices.length > 0 && (
-          <div className="grid grid-cols-1 gap-3">
+          <ul className="space-y-3" aria-label="Commodity prices">
             {filteredPrices.map((price) => (
-              <Card key={price.id} className="overflow-hidden border-amber-200 bg-white">
-                <CardContent className="p-4">
-                  <div className="flex justify-between items-start mb-2">
-                    <div>
-                      <h3 className="font-semibold text-gray-800">
-                        {price.commodities?.name || "Unknown"}
-                      </h3>
-                      {price.commodities?.specification && (
-                        <p className="text-xs text-gray-500">{price.commodities.specification}</p>
-                      )}
-                    </div>
-                    <div className="text-right">
-                      <p className="text-xl font-bold text-green-700">
-                        ₱{price.price_prevailing?.toFixed(2) || "N/A"}
-                      </p>
-                      <p className="text-xs text-gray-500">per kg</p>
-                    </div>
-                  </div>
-                  <Badge variant="outline" className="text-xs capitalize">
-                    {price.commodities?.category?.replace("-", " ") || "other"}
-                  </Badge>
-                </CardContent>
-              </Card>
+              <li key={price.id}>
+                <article
+                  aria-label={`${price.commodities?.name}: ₱${price.price_prevailing?.toFixed(2)} per kilogram`}
+                >
+                  <Card className="overflow-hidden border-amber-200 bg-white shadow-sm hover:shadow-md transition-shadow duration-200">
+                    <CardContent className="p-4">
+                      <div className="flex justify-between items-start mb-2">
+                        <div>
+                          <h2 className="font-semibold text-gray-800">
+                            {price.commodities?.name || "Unknown"}
+                          </h2>
+                          {price.commodities?.specification && (
+                            <p className="text-xs text-gray-500">{price.commodities.specification}</p>
+                          )}
+                        </div>
+                        <div className="text-right">
+                          <p className="text-xl font-bold text-green-700">
+                            ₱{price.price_prevailing?.toFixed(2) || "N/A"}
+                          </p>
+                          <p className="text-xs text-gray-500">per kg</p>
+                        </div>
+                      </div>
+                      <Badge variant="outline" className="text-xs capitalize">
+                        {price.commodities?.category?.replace("-", " ") || "other"}
+                      </Badge>
+                    </CardContent>
+                  </Card>
+                </article>
+              </li>
             ))}
-          </div>
+          </ul>
         )}
 
         {/* No Results */}
@@ -269,6 +322,7 @@ export default function PricesPage() {
           </Card>
         )}
 
+        {/* Filter Empty */}
         {!isLoading && prices.length > 0 && filteredPrices.length === 0 && (
           <Card className="border-blue-200 bg-blue-50">
             <CardContent className="text-center p-8">
@@ -278,24 +332,21 @@ export default function PricesPage() {
             </CardContent>
           </Card>
         )}
+
+        {/* Home nav button — only if not already on home */}
+        {pathname !== "/" && prices.length > 0 && (
+          <div className="pt-6">
+            <a
+              href="/"
+              className="flex items-center justify-center gap-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-bold py-4 rounded-xl shadow-sm hover:shadow-md transition-all text-lg"
+            >
+              🏠 Back to Meal Suggestions
+            </a>
+          </div>
+        )}
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-amber-200 bg-white/80 py-4">
-        <div className="max-w-2xl mx-auto px-4">
-          <p className="text-center text-xs text-amber-600">
-            Data mula sa{" "}
-            <a
-              href="https://www.da.gov.ph/price-monitoring/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-semibold hover:underline"
-            >
-              Department of Agriculture Bantay Presyo
-            </a>
-          </p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

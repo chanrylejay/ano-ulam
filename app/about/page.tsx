@@ -1,5 +1,6 @@
 'use client';
 
+import { usePathname } from "next/navigation";
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -13,11 +14,14 @@ import {
   Home,
   Code,
 } from 'lucide-react';
+import { Footer } from '@/components/Footer';
 
 export default function AboutPage() {
+  const pathname = usePathname();
+
   return (
     <div className="min-h-screen pb-20 bg-gradient-to-b from-amber-50 to-orange-50">
-      {/* Header */}
+      {/* Header — unified amber gradient */}
       <header className="bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 text-white py-10 px-4 shadow-lg">
         <div className="max-w-2xl mx-auto">
           <Button
@@ -40,12 +44,12 @@ export default function AboutPage() {
         </div>
       </header>
 
-      <main className="max-w-2xl mx-auto px-4 py-8">
+      <main id="main-content" className="max-w-2xl mx-auto px-4 py-8">
         {/* Mission Statement */}
         <Card className="mb-6 border-amber-200 bg-gradient-to-br from-amber-50 to-orange-50">
           <CardContent className="p-8">
             <div className="flex items-center gap-3 mb-4">
-              <Heart className="w-6 h-6 text-red-500" />
+              <Heart className="w-6 h-6 text-red-500" aria-hidden="true" />
               <h2 className="text-2xl font-bold text-amber-900">Our Mission</h2>
             </div>
             <p className="text-gray-700 leading-relaxed mb-4">
@@ -65,7 +69,7 @@ export default function AboutPage() {
         <Card className="mb-6 border-green-200 bg-white">
           <CardContent className="p-8">
             <div className="flex items-center gap-3 mb-4">
-              <Database className="w-6 h-6 text-green-600" />
+              <Database className="w-6 h-6 text-green-600" aria-hidden="true" />
               <h2 className="text-2xl font-bold text-green-900">Data Source</h2>
             </div>
             <p className="text-gray-700 leading-relaxed mb-4">
@@ -75,9 +79,10 @@ export default function AboutPage() {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="font-semibold text-green-700 hover:underline inline-flex items-center gap-1"
+                aria-label="Department of Agriculture Bantay Presyo Daily Price Index (opens in new tab)"
               >
                 Department of Agriculture Bantay Presyo Daily Price Index
-                <ExternalLink className="w-4 h-4" />
+                <ExternalLink className="w-4 h-4" aria-hidden="true" />
               </a>
             </p>
             <p className="text-gray-700 leading-relaxed mb-4">
@@ -95,12 +100,12 @@ export default function AboutPage() {
         <Card className="mb-6 border-blue-200 bg-white">
           <CardContent className="p-8">
             <div className="flex items-center gap-3 mb-4">
-              <Bot className="w-6 h-6 text-blue-600" />
+              <Bot className="w-6 h-6 text-blue-600" aria-hidden="true" />
               <h2 className="text-2xl font-bold text-blue-900">How It Works</h2>
             </div>
             <div className="space-y-4">
               <div className="flex gap-4">
-                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center font-bold text-blue-700">
+                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center font-bold text-blue-700" aria-hidden="true">
                   1
                 </div>
                 <div>
@@ -112,7 +117,7 @@ export default function AboutPage() {
                 </div>
               </div>
               <div className="flex gap-4">
-                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center font-bold text-blue-700">
+                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center font-bold text-blue-700" aria-hidden="true">
                   2
                 </div>
                 <div>
@@ -124,7 +129,7 @@ export default function AboutPage() {
                 </div>
               </div>
               <div className="flex gap-4">
-                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center font-bold text-blue-700">
+                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center font-bold text-blue-700" aria-hidden="true">
                   3
                 </div>
                 <div>
@@ -143,7 +148,7 @@ export default function AboutPage() {
         <Card className="mb-6 border-purple-200 bg-white">
           <CardContent className="p-8">
             <div className="flex items-center gap-3 mb-4">
-              <Code className="w-6 h-6 text-purple-600" />
+              <Code className="w-6 h-6 text-purple-600" aria-hidden="true" />
               <h2 className="text-2xl font-bold text-purple-900">Built With</h2>
             </div>
             <div className="grid grid-cols-2 gap-3">
@@ -173,10 +178,10 @@ export default function AboutPage() {
         <Card className="mb-6 border-amber-200 bg-gradient-to-br from-yellow-50 to-amber-50">
           <CardContent className="p-8">
             <div className="flex items-center gap-3 mb-4">
-              <Sparkles className="w-6 h-6 text-amber-600" />
+              <Sparkles className="w-6 h-6 text-amber-600" aria-hidden="true" />
               <h2 className="text-2xl font-bold text-amber-900">Created By</h2>
             </div>
-            <p className="text-gray-700 leading-relaxed mb-4">
+            <p className="text-gray-700 leading-relaxed">
               Built by <strong>Chanryle Jay Cagara</strong> — a Filipino developer passionate
               about creating tools that make everyday life easier for Filipino families.
             </p>
@@ -187,24 +192,24 @@ export default function AboutPage() {
         <Card className="mb-6 border-gray-200 bg-gray-50">
           <CardContent className="p-6">
             <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
-              <Clock className="w-5 h-5 text-gray-600" />
+              <Clock className="w-5 h-5 text-gray-600" aria-hidden="true" />
               Important Notes
             </h3>
             <ul className="space-y-2 text-sm text-gray-700">
               <li className="flex gap-2">
-                <span className="text-gray-500">•</span>
+                <span className="text-gray-500" aria-hidden="true">•</span>
                 <span>Prices are updated daily and may vary by location and market</span>
               </li>
               <li className="flex gap-2">
-                <span className="text-gray-500">•</span>
+                <span className="text-gray-500" aria-hidden="true">•</span>
                 <span>Meal suggestions assume basic pantry staples are available</span>
               </li>
               <li className="flex gap-2">
-                <span className="text-gray-500">•</span>
-                <span>AI-generated suggestions are for inspiration - adjust to your taste!</span>
+                <span className="text-gray-500" aria-hidden="true">•</span>
+                <span>AI-generated suggestions are for inspiration — adjust to your taste!</span>
               </li>
               <li className="flex gap-2">
-                <span className="text-gray-500">•</span>
+                <span className="text-gray-500" aria-hidden="true">•</span>
                 <span>Always verify prices at your local market before purchasing</span>
               </li>
             </ul>
@@ -212,22 +217,7 @@ export default function AboutPage() {
         </Card>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-amber-200 bg-white/80 py-4">
-        <div className="max-w-2xl mx-auto px-4">
-          <p className="text-center text-xs text-amber-600">
-            Data mula sa{' '}
-            <a
-              href="https://www.da.gov.ph/price-monitoring/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-semibold hover:underline"
-            >
-              Department of Agriculture Bantay Presyo
-            </a>
-          </p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

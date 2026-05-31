@@ -1,65 +1,78 @@
 'use client';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Utensils, Clock, DollarSign } from 'lucide-react';
-import type { MealSuggestion } from '@/lib/db';
+import { Card, CardContent } from '@/components/ui/card';
+import { TrendingDown, TrendingUp, Minus } from 'lucide-react';
 
-interface MealCardProps {
-  meal: MealSuggestion;
+interface Ingredient {
+  name: string;
+  trend: "down" | "up" | "stable";
+  optional?: boolean;
 }
 
-export function MealCard({ meal }: MealCardProps) {
-  return (
-    <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 border-amber-200 bg-white/90 backdrop-blur-sm">
-      <CardHeader className="pb-3 bg-gradient-to-r from-amber-100 to-orange-100">
-        <div className="flex items-start justify-between gap-2">
-          <CardTitle className="text-xl font-bold text-amber-900">{meal.name}</CardTitle>
-          <Badge className="bg-green-600 text-white shrink-0 flex items-center gap-1">
-            <DollarSign className="w-3 h-3" />
-            ₱{meal.estimated_cost}
-          </Badge>
-        </div>
-        <CardDescription className="text-amber-700 text-sm">{meal.description}</CardDescription>
-        <p className="text-xs text-amber-600 flex items-center gap-1">
-          <Utensils className="w-3 h-3" /> Good for 4 servings
-        </p>
-      </CardHeader>
-      <CardContent className="pt-4">
-        <div className="space-y-4">
-          <div>
-            <h4 className="font-semibold text-sm text-amber-900 mb-2 flex items-center gap-1">
-              Key Ingredients:
-            </h4>
-            <div className="flex flex-wrap gap-1.5">
-              {meal.ingredients.slice(0, 5).map((ing, i) => (
-                <Badge key={i} variant="outline" className="text-xs bg-amber-50 border-amber-300 text-amber-800">
-                  {ing.name} <span className="text-amber-600 ml-1">₱{ing.current_price}</span>
-                </Badge>
-              ))}
-              {meal.ingredients.length > 5 && (
-                <Badge variant="outline" className="text-xs bg-orange-50 border-orange-300 text-orange-700">
-                  +{meal.ingredients.length - 5} more
-                </Badge>
-              )}
-            </div>
-          </div>
+interface Meal {
+  name: string;
+  estimated_cost: number;
+  servings: string;
+  ingredients: Ingredient[];
+  reason: string;
+}
 
-          <div>
-            <h4 className="font-semibold text-sm text-amber-900 mb-2 flex items-center gap-1">
-              <Clock className="w-3.5 h-3.5" /> Instructions:
-            </h4>
-            <ol className="text-sm text-gray-700 space-y-1.5">
-              {meal.steps.map((step, i) => (
-                <li key={i} className="flex gap-2">
-                  <span className="text-amber-600 font-semibold shrink-0">{i + 1}.</span>
-                  <span>{step}</span>
-                </li>
+interface MealCardProps {
+  meal: Meal;
+  index: number;
+}
+
+export function MealCard({ meal, index }: MealCardProps) {
+  return (
+    <li>
+      <article
+        aria-label={`${meal.name}, estimated cost ₱${meal.estimated_cost}, serves ${meal.servings}`}
+        style={{ animationDelay: `${index * 80}ms` }}
+        className="animate-card-enter"
+      >
+        <Card className="overflow-hidden border-amber-200 bg-white shadow-sm hover:shadow-md transition-shadow duration-200">
+          <CardContent className="p-4">
+            {/* Title + Price */}
+            <div className="flex items-start justify-between mb-3">
+              <h2 className="text-lg font-bold text-gray-900">{meal.name}</h2>
+              <span className="bg-amber-600 text-white text-sm font-bold px-3 py-1 rounded-full shrink-0 ml-2 transition-transform duration-150 hover:scale-105">
+                ₱{meal.estimated_cost}
+              </span>
+            </div>
+
+            {/* Ingredients Grid — 2 columns */}
+            <div className="grid grid-cols-2 gap-2 mb-3">
+              {meal.ingredients?.map((ing, j) => (
+                <div key={j} className="flex items-center gap-1.5 text-sm">
+                  <span className="font-medium text-gray-800">{ing.name}</span>
+                  {ing.trend === "down" && (
+                    <TrendingDown className="w-3.5 h-3.5 text-green-700" aria-label="Price trending down" />
+                  )}
+                  {ing.trend === "up" && (
+                    <TrendingUp className="w-3.5 h-3.5 text-red-600" aria-label="Price trending up" />
+                  )}
+                  {ing.trend === "stable" && (
+                    <Minus className="w-3.5 h-3.5 text-gray-400" aria-label="Price stable" />
+                  )}
+                  {ing.optional && <span className="text-gray-400 text-xs">(optional)</span>}
+                </div>
               ))}
-            </ol>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+            </div>
+
+            {/* Servings */}
+            <p className="text-xs text-gray-500 mb-3">🍽️ {meal.servings || "2-4 na tao"}</p>
+
+            {/* Bakit? */}
+            {meal.reason && (
+              <div className="bg-amber-50 rounded-lg p-3 border border-amber-100">
+                <p className="text-sm text-amber-900">
+                  <span className="font-bold">Bakit?</span> {meal.reason}
+                </p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </article>
+    </li>
   );
 }

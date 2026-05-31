@@ -40,4 +40,70 @@
   body {
     @apply bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 text-foreground min-h-screen;
   }
+
+  /* Smooth scrolling for skip-link and anchor navigation */
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 1rem;
+  }
+
+  #main-content {
+    scroll-margin-top: 1rem;
+  }
+
+  /* Focus-visible ring for keyboard users — WCAG 2.4.7 */
+  *:focus-visible {
+    outline-style: solid;
+    @apply outline-2 outline-offset-2 outline-amber-500;
+  }
+
+  a:focus-visible {
+    @apply rounded outline-2 outline-offset-2 outline-amber-500;
+  }
+
+  button:focus-visible {
+    @apply outline-2 outline-offset-2 outline-amber-500;
+  }
+}
+
+/* Card entry animation */
+@keyframes card-enter {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-card-enter {
+  animation: card-enter 0.35s ease-out both;
+}
+
+/* Respect reduced-motion preference — WCAG 2.3.3 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .animate-pulse,
+  .animate-bounce {
+    animation: none !important;
+  }
+
+  .animate-card-enter {
+    animation: none !important;
+    opacity: 1;
+    transform: none;
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
 }
