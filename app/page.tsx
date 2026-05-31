@@ -158,17 +158,17 @@ export default function HomePage() {
           </div>
         </div>
         {/* Skeleton Cards */}
-        <main className="max-w-2xl mx-auto px-4 py-6 space-y-4">
+        <main className="max-w-2xl mx-auto px-4 py-6 space-y-3">
           {[...Array(3)].map((_, i) => (
             <div
               key={i}
-              className="bg-white rounded-xl shadow-sm border border-amber-200 p-4 space-y-3 animate-pulse"
+              className="bg-white rounded-xl shadow-sm border border-amber-200 p-3.5 space-y-2.5 animate-pulse"
             >
               <div className="flex justify-between">
                 <div className="h-6 w-40 bg-amber-100 rounded" />
-                <div className="h-6 w-16 bg-amber-100 rounded-full" />
+                <div className="h-6 w-16 bg-amber-100 rounded" />
               </div>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-2 gap-1.5">
                 {[...Array(4)].map((_, j) => (
                   <div key={j} className="flex gap-2">
                     <div className="h-4 w-20 bg-amber-50 rounded" />
@@ -177,7 +177,7 @@ export default function HomePage() {
                 ))}
               </div>
               <div className="h-4 w-32 bg-amber-50 rounded" />
-              <div className="h-16 bg-amber-50/60 rounded-lg" />
+              <div className="h-12 bg-amber-50/60 rounded-lg" />
             </div>
           ))}
         </main>
@@ -187,30 +187,24 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50">
-      {/* Header — ~35-40% of mobile screen height */}
+      {/* Header — left-aligned, ~35-40% of mobile screen height */}
       <header
         className="bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 text-white px-4 pt-10 pb-8 shadow-lg"
         style={{ minHeight: "38vh" }}
       >
         <div className="max-w-2xl mx-auto flex flex-col h-full">
           <div className="flex-1 flex flex-col justify-center">
-            <h1 className="text-5xl font-extrabold mb-1 tracking-tight">ma, Ano Ulam?</h1>
-            <p className="text-lg text-white/95 mb-1">Anong murang ulam ngayon</p>
-            <p className="text-xs text-white/85 mb-5">{formattedDate}</p>
+            <h1 className="text-5xl font-black mb-1 tracking-tight">ma, Ano Ulam?</h1>
+            <p className="text-lg text-white/90 mb-1">Anong murang ulam ngayon</p>
+            <p className="text-xs text-white/70 mb-5">{formattedDate}</p>
           </div>
 
-          {/* Price Tags */}
+          {/* Price Tags — all uniform semi-transparent white, left-aligned */}
           <div className="flex flex-wrap gap-1.5">
             {priceTags.map((tag) => (
               <span
                 key={tag.label}
-                role="status"
-                aria-label={`${tag.label}: ${formatPeso(tag.price)} per kilogram. ${tag.price <= 150 ? "Affordable" : "Expensive"}.`}
-                className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-150 ${
-                  tag.price <= 150
-                    ? "bg-green-100 text-green-800 border border-green-300 hover:bg-green-200"
-                    : "bg-red-100 text-red-800 border border-red-300 hover:bg-red-200"
-                }`}
+                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold bg-white/15 text-white hover:bg-white/25 transition-colors"
               >
                 {tag.label} {formatPeso(tag.price)}
               </span>
@@ -218,7 +212,7 @@ export default function HomePage() {
             <a
               href="/prices"
               aria-label="View all commodity prices"
-              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold bg-white/15 text-white hover:bg-white/25 transition-colors"
+              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold border border-white/30 text-white hover:bg-white/25 transition-colors"
             >
               More →
             </a>
@@ -226,8 +220,8 @@ export default function HomePage() {
         </div>
       </header>
 
-      {/* Meal Cards — no section title */}
-      <main id="main-content" className="max-w-2xl mx-auto px-4 py-6 space-y-4" aria-live="polite" aria-atomic="false">
+      {/* Meal Cards */}
+      <main id="main-content" className="max-w-2xl mx-auto px-4 py-6 space-y-3" aria-live="polite" aria-atomic="false">
         {/* Empty state */}
         {meals.length === 0 && !error && (
           <Card className="border-amber-200 bg-gradient-to-br from-amber-50 to-orange-50">
@@ -241,14 +235,14 @@ export default function HomePage() {
 
         {/* Meal cards */}
         {meals.length > 0 && (
-          <ul className="space-y-4" aria-label="Meal suggestions">
+          <ul className="space-y-3" aria-label="Meal suggestions">
             {meals.map((meal, i) => (
               <MealCard key={i} meal={meal} index={i} />
             ))}
           </ul>
         )}
 
-        {/* Bottom Buttons — conditionally hidden based on current page */}
+        {/* Bottom Buttons */}
         {meals.length > 0 && (
           <div className="flex flex-col gap-3 pt-4 pb-8">
             {pathname !== "/prices" && (
@@ -264,7 +258,7 @@ export default function HomePage() {
                 href="/about"
                 className="flex items-center justify-center gap-2 bg-white text-amber-700 font-medium py-3 rounded-xl border border-amber-200 hover:bg-amber-50 transition-all text-sm"
               >
-                ℹ️ About Ano Ulam?
+                ℹ️ Tungkol sa Ano Ulam?
               </a>
             )}
           </div>

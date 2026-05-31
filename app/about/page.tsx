@@ -1,6 +1,5 @@
 'use client';
 
-import { usePathname } from "next/navigation";
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -13,15 +12,15 @@ import {
   Sparkles,
   Home,
   Code,
+  Github,
+  Globe,
 } from 'lucide-react';
 import { Footer } from '@/components/Footer';
 
 export default function AboutPage() {
-  const pathname = usePathname();
-
   return (
     <div className="min-h-screen pb-20 bg-gradient-to-b from-amber-50 to-orange-50">
-      {/* Header — unified amber gradient */}
+      {/* Header */}
       <header className="bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 text-white py-10 px-4 shadow-lg">
         <div className="max-w-2xl mx-auto">
           <Button
@@ -30,7 +29,7 @@ export default function AboutPage() {
             onClick={() => window.location.href = '/'}
           >
             <Home className="w-4 h-4 mr-2" />
-            Back to Home
+            🏠 Bumalik sa Home
           </Button>
 
           <div className="flex items-center gap-3 mb-2">
@@ -66,7 +65,7 @@ export default function AboutPage() {
         </Card>
 
         {/* Data Source */}
-        <Card className="mb-6 border-green-200 bg-white">
+        <Card className="mb-6 border-amber-200 bg-white">
           <CardContent className="p-8">
             <div className="flex items-center gap-3 mb-4">
               <Database className="w-6 h-6 text-green-600" aria-hidden="true" />
@@ -97,7 +96,7 @@ export default function AboutPage() {
         </Card>
 
         {/* How It Works */}
-        <Card className="mb-6 border-blue-200 bg-white">
+        <Card className="mb-6 border-amber-200 bg-white">
           <CardContent className="p-8">
             <div className="flex items-center gap-3 mb-4">
               <Bot className="w-6 h-6 text-blue-600" aria-hidden="true" />
@@ -135,8 +134,8 @@ export default function AboutPage() {
                 <div>
                   <h3 className="font-semibold text-gray-800">Meal Suggestions</h3>
                   <p className="text-gray-600 text-sm">
-                    The AI generates budget-friendly Filipino meal suggestions with recipes,
-                    ingredient costs, and cooking instructions.
+                    The AI generates budget-friendly Filipino meal suggestions with ingredients, estimated
+                    costs, and explains why each dish was chosen based on today's prices.
                   </p>
                 </div>
               </div>
@@ -145,7 +144,7 @@ export default function AboutPage() {
         </Card>
 
         {/* Tech Stack */}
-        <Card className="mb-6 border-purple-200 bg-white">
+        <Card className="mb-6 border-amber-200 bg-white">
           <CardContent className="p-8">
             <div className="flex items-center gap-3 mb-4">
               <Code className="w-6 h-6 text-purple-600" aria-hidden="true" />
@@ -181,15 +180,35 @@ export default function AboutPage() {
               <Sparkles className="w-6 h-6 text-amber-600" aria-hidden="true" />
               <h2 className="text-2xl font-bold text-amber-900">Created By</h2>
             </div>
-            <p className="text-gray-700 leading-relaxed">
+            <p className="text-gray-700 leading-relaxed mb-4">
               Built by <strong>Chanryle Jay Cagara</strong> — a Filipino developer passionate
               about creating tools that make everyday life easier for Filipino families.
             </p>
+            <div className="flex flex-wrap gap-3">
+              <a
+                href="https://github.com/chanrylejay/ano-ulam"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg px-4 py-2 hover:bg-gray-50 transition-colors"
+              >
+                <Github className="w-4 h-4" />
+                github.com/chanrylejay/ano-ulam
+              </a>
+              <a
+                href="https://chanryle-cagara.vercel.app"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 text-sm font-medium text-amber-700 bg-white border border-amber-200 rounded-lg px-4 py-2 hover:bg-amber-50 transition-colors"
+              >
+                <Globe className="w-4 h-4" />
+                chanryle-cagara.vercel.app
+              </a>
+            </div>
           </CardContent>
         </Card>
 
         {/* Important Notes */}
-        <Card className="mb-6 border-gray-200 bg-gray-50">
+        <Card className="mb-6 border-amber-200 bg-gray-50">
           <CardContent className="p-6">
             <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
               <Clock className="w-5 h-5 text-gray-600" aria-hidden="true" />

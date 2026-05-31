@@ -34,6 +34,36 @@ const categories = [
   { value: "corn", label: "Corn", icon: "🌽" },
 ];
 
+function getCategoryEmoji(category: string | undefined): string {
+  const map: Record<string, string> = {
+    rice: "🍚",
+    fish: "🐟",
+    beef: "🥩",
+    pork: "🐷",
+    poultry: "🍗",
+    eggs: "🥚",
+    "lowland-vegetables": "🥬",
+    "highland-vegetables": "🥗",
+    fruits: "🍎",
+    spices: "🌶️",
+    corn: "🌽",
+  };
+  return map[category || ""] || "🧂";
+}
+
+function shouldShowSpecification(spec: string | undefined): boolean {
+  if (!spec) return false;
+  const lower = spec.toLowerCase();
+  if (lower === "imported" || lower === "other" || lower === "" || lower === "n/a") return false;
+  return true;
+}
+
+function getPriceColor(price: number): string {
+  if (price <= 150) return "text-green-700";
+  if (price <= 300) return "text-amber-700";
+  return "text-red-600";
+}
+
 export default function PricesPage() {
   const [prices, setPrices] = useState<PriceWithCommodity[]>([]);
   const [filteredPrices, setFilteredPrices] = useState<PriceWithCommodity[]>([]);
@@ -136,7 +166,7 @@ export default function PricesPage() {
 
   return (
     <div className="min-h-screen pb-20 bg-gradient-to-b from-amber-50 to-orange-50">
-      {/* Header — unified gradient */}
+      {/* Header */}
       <header className="bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 text-white py-10 px-4 shadow-lg">
         <div className="max-w-2xl mx-auto">
           <Button
@@ -161,16 +191,16 @@ export default function PricesPage() {
       </header>
 
       <main id="main-content" className="max-w-2xl mx-auto px-4 py-6" aria-live="polite" aria-atomic="false">
-        {/* Stats Cards */}
+        {/* Stats Cards — unified subtle borders */}
         <div className="grid grid-cols-2 gap-3 mb-6">
-          <Card className="bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-200">
+          <Card className="bg-gradient-to-br from-blue-50 to-cyan-50 border-amber-200">
             <CardContent className="p-4">
               <p className="text-xs text-blue-600 font-medium">Total Items</p>
               <p className="text-2xl font-bold text-blue-800">{prices.length}</p>
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-green-50 to-emerald-50 border-green-200">
+          <Card className="bg-gradient-to-br from-green-50 to-emerald-50 border-amber-200">
             <CardContent className="p-4">
               <p className="text-xs text-green-600 font-medium">Cheapest</p>
               <p className="text-2xl font-bold text-green-800">
@@ -182,7 +212,7 @@ export default function PricesPage() {
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-orange-50 to-red-50 border-orange-200">
+          <Card className="bg-gradient-to-br from-orange-50 to-amber-50 border-amber-200">
             <CardContent className="p-4">
               <p className="text-xs text-orange-600 font-medium">Most Expensive</p>
               <p className="text-2xl font-bold text-orange-800">
@@ -194,7 +224,7 @@ export default function PricesPage() {
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-purple-50 to-pink-50 border-purple-200">
+          <Card className="bg-gradient-to-br from-purple-50 to-pink-50 border-amber-200">
             <CardContent className="p-4">
               <p className="text-xs text-purple-600 font-medium">Categories</p>
               <p className="text-2xl font-bold text-purple-800">
@@ -251,7 +281,7 @@ export default function PricesPage() {
             {[...Array(5)].map((_, i) => (
               <div
                 key={i}
-                className="bg-white rounded-xl border border-amber-200 p-4 animate-pulse"
+                className="bg-white rounded-xl border border-amber-100 p-4 animate-pulse"
               >
                 <div className="flex justify-between items-start mb-2">
                   <div className="space-y-2">
@@ -269,7 +299,7 @@ export default function PricesPage() {
           </div>
         )}
 
-        {/* Price Cards — single column, semantic list */}
+        {/* Price Cards */}
         {!isLoading && filteredPrices.length > 0 && (
           <ul className="space-y-3" aria-label="Commodity prices">
             {filteredPrices.map((price) => (
@@ -277,25 +307,26 @@ export default function PricesPage() {
                 <article
                   aria-label={`${price.commodities?.name}: ₱${price.price_prevailing?.toFixed(2)} per kilogram`}
                 >
-                  <Card className="overflow-hidden border-amber-200 bg-white shadow-sm hover:shadow-md transition-shadow duration-200">
+                  <Card className="overflow-hidden border-amber-100 bg-white shadow-sm hover:shadow-md transition-shadow duration-200">
                     <CardContent className="p-4">
                       <div className="flex justify-between items-start mb-2">
                         <div>
                           <h2 className="font-semibold text-gray-800">
                             {price.commodities?.name || "Unknown"}
                           </h2>
-                          {price.commodities?.specification && (
-                            <p className="text-xs text-gray-500">{price.commodities.specification}</p>
+                          {shouldShowSpecification(price.commodities?.specification) && (
+                            <p className="text-xs text-gray-500">{price.commodities!.specification}</p>
                           )}
                         </div>
                         <div className="text-right">
-                          <p className="text-xl font-bold text-green-700">
+                          <p className={`text-xl font-bold ${getPriceColor(price.price_prevailing || 0)}`}>
                             ₱{price.price_prevailing?.toFixed(2) || "N/A"}
                           </p>
                           <p className="text-xs text-gray-500">per kg</p>
                         </div>
                       </div>
-                      <Badge variant="outline" className="text-xs capitalize">
+                      <Badge variant="outline" className="text-xs capitalize border-amber-200">
+                        {getCategoryEmoji(price.commodities?.category)}{" "}
                         {price.commodities?.category?.replace("-", " ") || "other"}
                       </Badge>
                     </CardContent>
@@ -308,7 +339,7 @@ export default function PricesPage() {
 
         {/* No Results */}
         {!isLoading && prices.length === 0 && (
-          <Card className="border-amber-300 bg-gradient-to-br from-amber-50 to-orange-50">
+          <Card className="border-amber-200 bg-gradient-to-br from-amber-50 to-orange-50">
             <CardContent className="text-center p-12">
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-amber-100 mb-4">
                 <ShoppingCart className="w-8 h-8 text-amber-600" />
@@ -333,14 +364,14 @@ export default function PricesPage() {
           </Card>
         )}
 
-        {/* Home nav button — only if not already on home */}
+        {/* Home nav button */}
         {pathname !== "/" && prices.length > 0 && (
           <div className="pt-6">
             <a
               href="/"
               className="flex items-center justify-center gap-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-bold py-4 rounded-xl shadow-sm hover:shadow-md transition-all text-lg"
             >
-              🏠 Back to Meal Suggestions
+              🏠 Bumalik sa Ulam
             </a>
           </div>
         )}
