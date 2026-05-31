@@ -194,7 +194,7 @@ export default function PricesPage() {
   return (
     <div className="min-h-screen pb-20 bg-gradient-to-b from-amber-50 to-orange-50">
       {/* Header — centered, back top-left */}
-      <header className="bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 text-white pt-10 pb-12 px-4 shadow-lg relative">
+      <header className="bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 text-white pt-10 pb-14 px-4 shadow-lg relative">
         <Button
           variant="ghost"
           className="absolute top-4 left-4 text-sm text-white/80 hover:text-white hover:bg-white/20"

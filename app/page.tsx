@@ -65,13 +65,13 @@ function getPriceTone(price: number): {
   if (price <= 100) {
     return {
       arrowChar: "▼",
-      arrowColor: "text-green-300",
+      arrowColor: "text-emerald-400",
     };
   }
 
   return {
     arrowChar: "▲",
-    arrowColor: "text-red-300",
+    arrowColor: "text-rose-400",
   };
 }
 
