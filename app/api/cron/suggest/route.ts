@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
     });
 
     // ── Run cost engine — find cheapest 5 meals ──────────
-    const cheapest5: CostResult[] = findCheapestMeals(RECIPES, todayPriceMap, lastPriceMap, 5);
+    const cheapest5: CostResult[] = findCheapestMeals(RECIPES, todayPriceMap, lastPriceMap, 8);
 
     // ── Build summary for DeepSeek "Bakit?" prompt ───────
     const mealSummaries = cheapest5
