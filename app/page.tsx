@@ -195,7 +195,7 @@ export default function HomePage() {
               href="/prices"
               className="flex items-center justify-center gap-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white font-bold py-4 rounded-xl shadow-sm hover:shadow-md transition-all text-lg"
             >
-              🛒 Tingnan ang Presyo
+              🛒 Tin gnan ang Presyo
             </a>
             <a
               href="/about"
