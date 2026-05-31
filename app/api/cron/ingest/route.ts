@@ -143,6 +143,7 @@ ${pdfText.substring(0, 8000)}`;
     if (uniqueItems.length === 0) {
       throw new Error("No commodities extracted from PDF");
     }
+    const commoditiesJson = JSON.stringify(uniqueItems);
 
     // BATCH INSERT: All commodities in ONE query (skip existing)
     await sql`
