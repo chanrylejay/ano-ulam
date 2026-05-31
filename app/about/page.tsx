@@ -5,7 +5,6 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import {
   Heart,
-  Github,
   ExternalLink,
   Database,
   Bot,
@@ -13,18 +12,17 @@ import {
   Sparkles,
   Home,
   Code,
-  Mail
 } from 'lucide-react';
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen pb-20">
+    <div className="min-h-screen pb-20 bg-gradient-to-b from-amber-50 to-orange-50">
       {/* Header */}
-      <header className="bg-gradient-to-r from-teal-500 via-cyan-500 to-blue-500 text-white py-10 px-4 shadow-lg">
-        <div className="max-w-4xl mx-auto">
+      <header className="bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 text-white py-10 px-4 shadow-lg">
+        <div className="max-w-2xl mx-auto">
           <Button
             variant="ghost"
-            className="text-white hover:bg-white/20 mb-4"
+            className="text-white hover:bg-white/20 mb-4 -ml-2"
             onClick={() => window.location.href = '/'}
           >
             <Home className="w-4 h-4 mr-2" />
@@ -33,16 +31,16 @@ export default function AboutPage() {
 
           <div className="flex items-center gap-3 mb-2">
             <Sparkles className="w-8 h-8" />
-            <h1 className="text-3xl md:text-4xl font-bold">About Ano Ulam?</h1>
+            <h1 className="text-3xl font-bold">About Ano Ulam?</h1>
           </div>
 
-          <p className="text-teal-100 text-sm md:text-base">
+          <p className="text-amber-100 text-sm">
             Free, open-source meal planning for Filipino families
           </p>
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-4 py-8">
+      <main className="max-w-2xl mx-auto px-4 py-8">
         {/* Mission Statement */}
         <Card className="mb-6 border-amber-200 bg-gradient-to-br from-amber-50 to-orange-50">
           <CardContent className="p-8">
@@ -132,7 +130,7 @@ export default function AboutPage() {
                 <div>
                   <h3 className="font-semibold text-gray-800">Meal Suggestions</h3>
                   <p className="text-gray-600 text-sm">
-                    The AI generates 5 budget-friendly Filipino meal suggestions with recipes,
+                    The AI generates budget-friendly Filipino meal suggestions with recipes,
                     ingredient costs, and cooking instructions.
                   </p>
                 </div>
@@ -148,7 +146,7 @@ export default function AboutPage() {
               <Code className="w-6 h-6 text-purple-600" />
               <h2 className="text-2xl font-bold text-purple-900">Built With</h2>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 gap-3">
               <Badge variant="outline" className="justify-center py-2 border-purple-200 bg-purple-50 text-purple-700">
                 Next.js 14
               </Badge>
@@ -179,20 +177,9 @@ export default function AboutPage() {
               <h2 className="text-2xl font-bold text-amber-900">Created By</h2>
             </div>
             <p className="text-gray-700 leading-relaxed mb-4">
-              Built with love by <strong>Chanryle Jay Cagara</strong> - a Filipino developer passionate
+              Built by <strong>Chanryle Jay Cagara</strong> — a Filipino developer passionate
               about creating tools that make everyday life easier for Filipino families.
             </p>
-            <div className="flex flex-wrap gap-3">
-              <Button
-                variant="outline"
-                size="sm"
-                className="gap-2"
-                onClick={() => window.open('https://github.com', '_blank')}
-              >
-                <Github className="w-4 h-4" />
-                GitHub
-              </Button>
-            </div>
           </CardContent>
         </Card>
 
@@ -223,32 +210,12 @@ export default function AboutPage() {
             </ul>
           </CardContent>
         </Card>
-
-        {/* Action Buttons */}
-        <div className="flex flex-wrap justify-center gap-4 mt-8">
-          <Button
-            variant="default"
-            className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600"
-            onClick={() => window.location.href = '/'}
-          >
-            <Home className="w-4 h-4 mr-2" />
-            Back to Home
-          </Button>
-          <Button
-            variant="outline"
-            className="border-gray-300"
-            onClick={() => window.open('https://www.da.gov.ph/price-monitoring/', '_blank')}
-          >
-            <ExternalLink className="w-4 h-4 mr-2" />
-            View DA Price Monitoring
-          </Button>
-        </div>
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-amber-200 bg-white/80 backdrop-blur-sm mt-16">
-        <div className="max-w-4xl mx-auto px-4 py-6">
-          <p className="text-center text-sm text-amber-700">
+      <footer className="border-t border-amber-200 bg-white/80 py-4">
+        <div className="max-w-2xl mx-auto px-4">
+          <p className="text-center text-xs text-amber-600">
             Data mula sa{' '}
             <a
               href="https://www.da.gov.ph/price-monitoring/"

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ArrowUpDown, Calendar, Home, ShoppingCart, TrendingDown, TrendingUp } from "lucide-react";
+import { ArrowUpDown, Calendar, Home, ShoppingCart } from "lucide-react";
 import type { Price, Commodity } from "@/lib/db";
 
 type PriceWithCommodity = Price & { commodities: Commodity };
@@ -53,9 +53,7 @@ export default function PricesPage() {
       setIsLoading(true);
       const response = await fetch("/api/prices");
 
-      // Check if response is OK and has valid JSON
       if (!response.ok) {
-        // Silently fail and show empty state
         setPrices([]);
         return;
       }
@@ -64,7 +62,6 @@ export default function PricesPage() {
       try {
         data = await response.json();
       } catch {
-        // Invalid JSON - show empty state
         setPrices([]);
         return;
       }
@@ -72,7 +69,6 @@ export default function PricesPage() {
       setPrices(data.prices || []);
       setDate(data.date || "");
     } catch {
-      // Any error - show empty state instead of error
       setPrices([]);
     } finally {
       setIsLoading(false);
@@ -111,36 +107,34 @@ export default function PricesPage() {
   );
 
   return (
-    <div className="min-h-screen pb-20">
+    <div className="min-h-screen pb-20 bg-gradient-to-b from-amber-50 to-orange-50">
       {/* Header */}
       <header className="bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500 text-white py-10 px-4 shadow-lg">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex items-center justify-between mb-4">
-            <Button
-              variant="ghost"
-              className="text-white hover:bg-white/20"
-              onClick={() => (window.location.href = "/")}
-            >
-              <Home className="w-4 h-4 mr-2" />
-              Back
-            </Button>
-          </div>
+        <div className="max-w-2xl mx-auto">
+          <Button
+            variant="ghost"
+            className="text-white hover:bg-white/20 mb-4 -ml-2"
+            onClick={() => (window.location.href = "/")}
+          >
+            <Home className="w-4 h-4 mr-2" />
+            Back
+          </Button>
 
           <div className="flex items-center gap-3 mb-2">
             <ShoppingCart className="w-8 h-8" />
-            <h1 className="text-3xl md:text-4xl font-bold">Price Dashboard</h1>
+            <h1 className="text-3xl font-bold">Price Dashboard</h1>
           </div>
 
-          <p className="text-green-100 text-sm md:text-base">
+          <p className="text-green-100 text-sm">
             <Calendar className="w-4 h-4 inline mr-1" />
             {date ? `Data as of ${format(new Date(date), "MMMM d, yyyy")}` : "Loading..."}
           </p>
         </div>
       </header>
 
-      <main className="max-w-6xl mx-auto px-4 py-6">
+      <main className="max-w-2xl mx-auto px-4 py-6">
         {/* Stats Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+        <div className="grid grid-cols-2 gap-3 mb-6">
           <Card className="bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-200">
             <CardContent className="p-4">
               <p className="text-xs text-blue-600 font-medium">Total Items</p>
@@ -185,23 +179,23 @@ export default function PricesPage() {
         {/* Filters */}
         <Card className="mb-6 border-amber-200 bg-white/90">
           <CardContent className="p-4">
-            <div className="flex flex-wrap gap-3 items-center justify-between">
-              <div className="flex flex-wrap gap-3 items-center">
-                <div className="w-64">
-                  <Select value={category} onValueChange={setCategory}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {categories.map((cat) => (
-                        <SelectItem key={cat.value} value={cat.value}>
-                          {cat.icon} {cat.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+            <div className="flex flex-col gap-3">
+              <div className="w-full">
+                <Select value={category} onValueChange={setCategory}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categories.map((cat) => (
+                      <SelectItem key={cat.value} value={cat.value}>
+                        {cat.icon} {cat.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
+              <div className="flex items-center justify-between">
                 <Button
                   variant="outline"
                   size="sm"
@@ -211,14 +205,12 @@ export default function PricesPage() {
                   <ArrowUpDown className="w-4 h-4" />
                   {sortOrder === "asc" ? "Low to High" : "High to Low"}
                 </Button>
-              </div>
 
-              <div className="text-sm text-gray-600">Showing {filteredPrices.length} items</div>
+                <div className="text-sm text-gray-600">Showing {filteredPrices.length} items</div>
+              </div>
             </div>
           </CardContent>
         </Card>
-
-        {/* Error - removed, now showing friendly empty state */}
 
         {/* Loading */}
         {isLoading && (
@@ -230,86 +222,35 @@ export default function PricesPage() {
           </div>
         )}
 
-        {/* Price Table - Desktop */}
+        {/* Price Cards — single column only */}
         {!isLoading && filteredPrices.length > 0 && (
-          <>
-            <div className="hidden md:block">
-              <Card className="overflow-hidden border-amber-200">
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="bg-amber-100 border-b border-amber-200">
-                        <th className="text-left p-4 font-semibold text-amber-900">Commodity</th>
-                        <th className="text-left p-4 font-semibold text-amber-900">Category</th>
-                        <th className="text-left p-4 font-semibold text-amber-900">
-                          Specification
-                        </th>
-                        <th className="text-right p-4 font-semibold text-amber-900">
-                          Price (₱/kg)
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filteredPrices.map((price, i) => (
-                        <tr
-                          key={price.id}
-                          className={`border-b border-gray-100 hover:bg-amber-50 transition-colors ${
-                            i % 2 === 0 ? "bg-white" : "bg-gray-50/50"
-                          }`}
-                        >
-                          <td className="p-4 font-medium text-gray-800">
-                            {price.commodities?.name || "Unknown"}
-                          </td>
-                          <td className="p-4">
-                            <Badge variant="outline" className="capitalize text-xs">
-                              {price.commodities?.category?.replace("-", " ") || "other"}
-                            </Badge>
-                          </td>
-                          <td className="p-4 text-gray-600 text-sm">
-                            {price.commodities?.specification || "-"}
-                          </td>
-                          <td className="p-4 text-right">
-                            <span className="font-bold text-lg text-green-700">
-                              ₱{price.price_prevailing?.toFixed(2) || "N/A"}
-                            </span>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </Card>
-            </div>
-
-            {/* Price Cards - Mobile */}
-            <div className="md:hidden grid grid-cols-1 gap-3">
-              {filteredPrices.map((price) => (
-                <Card key={price.id} className="overflow-hidden border-amber-200 bg-white">
-                  <CardContent className="p-4">
-                    <div className="flex justify-between items-start mb-2">
-                      <div>
-                        <h3 className="font-semibold text-gray-800">
-                          {price.commodities?.name || "Unknown"}
-                        </h3>
-                        {price.commodities?.specification && (
-                          <p className="text-xs text-gray-500">{price.commodities.specification}</p>
-                        )}
-                      </div>
-                      <div className="text-right">
-                        <p className="text-xl font-bold text-green-700">
-                          ₱{price.price_prevailing?.toFixed(2) || "N/A"}
-                        </p>
-                        <p className="text-xs text-gray-500">per kg</p>
-                      </div>
+          <div className="grid grid-cols-1 gap-3">
+            {filteredPrices.map((price) => (
+              <Card key={price.id} className="overflow-hidden border-amber-200 bg-white">
+                <CardContent className="p-4">
+                  <div className="flex justify-between items-start mb-2">
+                    <div>
+                      <h3 className="font-semibold text-gray-800">
+                        {price.commodities?.name || "Unknown"}
+                      </h3>
+                      {price.commodities?.specification && (
+                        <p className="text-xs text-gray-500">{price.commodities.specification}</p>
+                      )}
                     </div>
-                    <Badge variant="outline" className="text-xs capitalize">
-                      {price.commodities?.category?.replace("-", " ") || "other"}
-                    </Badge>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </>
+                    <div className="text-right">
+                      <p className="text-xl font-bold text-green-700">
+                        ₱{price.price_prevailing?.toFixed(2) || "N/A"}
+                      </p>
+                      <p className="text-xs text-gray-500">per kg</p>
+                    </div>
+                  </div>
+                  <Badge variant="outline" className="text-xs capitalize">
+                    {price.commodities?.category?.replace("-", " ") || "other"}
+                  </Badge>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         )}
 
         {/* No Results */}
@@ -340,9 +281,9 @@ export default function PricesPage() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-amber-200 bg-white/80 backdrop-blur-sm mt-16">
-        <div className="max-w-6xl mx-auto px-4 py-6">
-          <p className="text-center text-sm text-amber-700">
+      <footer className="border-t border-amber-200 bg-white/80 py-4">
+        <div className="max-w-2xl mx-auto px-4">
+          <p className="text-center text-xs text-amber-600">
             Data mula sa{" "}
             <a
               href="https://www.da.gov.ph/price-monitoring/"

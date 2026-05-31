@@ -106,20 +106,25 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50">
-      {/* Header */}
-      <header className="bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 text-white px-4 pt-8 pb-6 shadow-lg">
-        <div className="max-w-2xl mx-auto">
-          <h1 className="text-4xl md:text-5xl font-extrabold mb-1">ma, Ano Ulam?</h1>
-          <p className="text-lg text-white/90 mb-1">Anong murang ulam ngayon</p>
-          <p className="text-xs text-white/70 mb-4">{formattedDate}</p>
+      {/* Header — ~35-40% of mobile screen height */}
+      <header
+        className="bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 text-white px-4 pt-10 pb-8 shadow-lg"
+        style={{ minHeight: "38vh" }}
+      >
+        <div className="max-w-2xl mx-auto flex flex-col h-full">
+          <div className="flex-1 flex flex-col justify-center">
+            <h1 className="text-5xl font-extrabold mb-1 tracking-tight">ma, Ano Ulam?</h1>
+            <p className="text-lg text-white/80 mb-1">Anong murang ulam ngayon</p>
+            <p className="text-xs text-white/60 mb-5">{formattedDate}</p>
+          </div>
 
           {/* Price Tags */}
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-1.5">
             {priceTags.map((tag) => (
               <span
                 key={tag.label}
                 className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold ${
-                  tag.price <= 100 ? "bg-green-500/90 text-white" : "bg-red-500/90 text-white"
+                  tag.price <= 150 ? "bg-green-500/90 text-white" : "bg-red-500/90 text-white"
                 }`}
               >
                 {tag.label} ₱{Math.round(tag.price)}
@@ -127,7 +132,7 @@ export default function HomePage() {
             ))}
             <a
               href="/prices"
-              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-white/20 text-white hover:bg-white/30 transition-colors"
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-white/15 text-white hover:bg-white/25 transition-colors"
             >
               More →
             </a>
@@ -135,9 +140,8 @@ export default function HomePage() {
         </div>
       </header>
 
-      {/* Meal Cards */}
+      {/* Meal Cards — no section title */}
       <main className="max-w-2xl mx-auto px-4 py-6 space-y-4">
-        {/* No Data State */}
         {meals.length === 0 && (
           <div className="text-center py-12">
             <div className="text-5xl mb-4">🍳</div>
@@ -146,7 +150,6 @@ export default function HomePage() {
           </div>
         )}
 
-        {/* Meal Cards */}
         {meals.map((meal, i) => (
           <div
             key={i}
@@ -161,7 +164,7 @@ export default function HomePage() {
                 </span>
               </div>
 
-              {/* Ingredients Grid */}
+              {/* Ingredients Grid — 2 columns */}
               <div className="grid grid-cols-2 gap-2 mb-3">
                 {meal.ingredients?.map((ing, j) => (
                   <div key={j} className="flex items-center gap-1.5 text-sm">
@@ -195,7 +198,7 @@ export default function HomePage() {
               href="/prices"
               className="flex items-center justify-center gap-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white font-bold py-4 rounded-xl shadow-sm hover:shadow-md transition-all text-lg"
             >
-              🛒 Tin gnan ang Presyo
+              🛒 Tingnan ang Presyo
             </a>
             <a
               href="/about"
