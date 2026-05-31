@@ -53,8 +53,8 @@ function formatPeso(amount: number): string {
   }).format(amount);
 }
 
-function getDotColor(price: number): string {
-  return price <= 100 ? "bg-green-300" : "bg-red-300";
+function getDotEmoji(price: number): string {
+  return price <= 100 ? "🟢" : "🔴";
 }
 
 export default function HomePage() {
@@ -221,10 +221,9 @@ export default function HomePage() {
                   className="flex shrink-0 items-center gap-1.5"
                   aria-label={`${tag.label} ${formatPeso(tag.price)}`}
                 >
-                  <span
-                    className={`inline-block h-3.5 w-3.5 shrink-0 rounded-full ring-2 ring-white/50 ${getDotColor(tag.price)}`}
-                    aria-hidden="true"
-                  />
+                  <span className="text-sm shrink-0" aria-hidden="true">
+                    {getDotEmoji(tag.price)}
+                  </span>
                   <span className="whitespace-nowrap text-sm text-white/85">
                     <span className="font-semibold">{tag.label}</span>{" "}
                     <span className="font-black">{formatPeso(tag.price)}</span>
@@ -247,10 +246,9 @@ export default function HomePage() {
                   className="flex items-center gap-1.5"
                   aria-label={`${tag.label} ${formatPeso(tag.price)}`}
                 >
-                  <span
-                    className={`inline-block h-3.5 w-3.5 shrink-0 rounded-full ring-2 ring-white/50 ${getDotColor(tag.price)}`}
-                    aria-hidden="true"
-                  />
+                  <span className="text-sm shrink-0" aria-hidden="true">
+                    {getDotEmoji(tag.price)}
+                  </span>
                   <span className="whitespace-nowrap text-sm text-white/85">
                     <span className="font-semibold">{tag.label}</span>{" "}
                     <span className="font-black">{formatPeso(tag.price)}</span>
