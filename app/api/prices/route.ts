@@ -99,8 +99,8 @@ export async function GET(request: NextRequest) {
         commodity_id: p.commodity_id,
         commodities: {
           name: p.name,
-          category: p.category,
-          specification: p.specification,
+          category: p.specification,
+          specification: p.category,
         },
       }));
 
