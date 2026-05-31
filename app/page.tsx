@@ -33,8 +33,8 @@ interface PriceItem {
   price_prevailing: number;
 }
 
-// Homepage intentionally shows only the key prices.
-// The full commodity list stays on /prices.
+// Homepage shows only key prices at a glance.
+// Full list is on /prices.
 const defaultItemKeys = [
   { key: "Liempo", label: "Baboy" },
   { key: "Paa ng manok", label: "Manok" },
@@ -53,53 +53,8 @@ function formatPeso(amount: number): string {
   }).format(amount);
 }
 
-function getPriceTone(price: number): {
-  arrowChar: string;
-  badgeClass: string;
-  label: string;
-} {
-  if (price <= 100) {
-    return {
-      arrowChar: "▼",
-      badgeClass: "bg-emerald-500 shadow-emerald-950/30",
-      label: "mura",
-    };
-  }
-
-  return {
-    arrowChar: "▲",
-    badgeClass: "bg-rose-500 shadow-rose-950/30",
-    label: "mahal",
-  };
-}
-
-function PriceTile({ tag }: { tag: PriceTag }) {
-  const tone = getPriceTone(tag.price);
-
-  return (
-    <div
-      className="flex h-[50px] items-center justify-between gap-2 rounded-2xl bg-white/20 px-3 py-2 shadow-md ring-1 ring-white/35 backdrop-blur-sm transition-all duration-150 hover:-translate-y-0.5 hover:bg-white/25 hover:ring-white/45"
-      aria-label={`${tag.label} ${formatPeso(tag.price)} ${tone.label}`}
-    >
-      <div className="min-w-0 text-left">
-        <span className="block truncate text-[11px] font-bold leading-tight text-white/95">
-          {tag.label}
-        </span>
-        <span className="block text-sm font-black leading-tight text-white">
-          {formatPeso(tag.price)}
-        </span>
-      </div>
-
-      <span
-        className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full shadow-sm ${tone.badgeClass}`}
-        aria-hidden="true"
-      >
-        <span className="text-[10px] font-black leading-none text-white">
-          {tone.arrowChar}
-        </span>
-      </span>
-    </div>
-  );
+function getDotColor(price: number): string {
+  return price <= 100 ? "bg-emerald-400" : "bg-rose-400";
 }
 
 export default function HomePage() {
@@ -195,23 +150,21 @@ export default function HomePage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50">
-        <div className="min-h-[390px] bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 shadow-lg sm:min-h-[440px] md:min-h-[460px]">
-          <div className="mx-auto flex min-h-[390px] max-w-5xl flex-col items-center justify-between px-4 pb-6 pt-9 text-center sm:min-h-[440px] md:min-h-[460px]">
+        <div className="min-h-[340px] bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 shadow-lg sm:min-h-[380px] md:min-h-[400px]">
+          <div className="mx-auto flex min-h-[340px] max-w-3xl flex-col items-center justify-between px-4 pb-6 pt-9 text-center sm:min-h-[380px] md:min-h-[400px]">
             <div className="flex flex-1 flex-col items-center justify-center space-y-3">
-              <div className="h-20 w-[620px] max-w-full animate-pulse rounded-lg bg-white/20" />
+              <div className="h-20 w-[520px] max-w-full animate-pulse rounded-lg bg-white/20" />
               <div className="h-5 w-56 max-w-full animate-pulse rounded bg-white/15" />
               <div className="mt-2 h-4 w-44 max-w-full animate-pulse rounded bg-white/10" />
             </div>
 
-            <div className="w-full max-w-[760px] pt-4">
-              <div className="grid grid-cols-4 gap-2 sm:grid-cols-7">
-                {[...Array(7)].map((_, i) => (
-                  <div
-                    key={i}
-                    className="h-[50px] animate-pulse rounded-2xl bg-white/20"
-                  />
-                ))}
-              </div>
+            <div className="flex w-full items-center justify-center gap-5 pt-4">
+              {[...Array(6)].map((_, i) => (
+                <div key={i} className="flex items-center gap-1.5">
+                  <div className="h-2.5 w-2.5 animate-pulse rounded-full bg-white/30" />
+                  <div className="h-4 w-20 animate-pulse rounded bg-white/15" />
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -245,54 +198,70 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50">
-      <header className="min-h-[390px] overflow-hidden bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 text-white shadow-lg sm:min-h-[440px] md:min-h-[460px]">
-        <div className="mx-auto flex min-h-[390px] w-full max-w-5xl flex-col items-center justify-between px-4 pb-6 pt-9 text-center sm:min-h-[440px] md:min-h-[460px]">
+      <header className="min-h-[340px] overflow-hidden bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 text-white shadow-lg sm:min-h-[380px] md:min-h-[400px]">
+        <div className="mx-auto flex min-h-[340px] w-full max-w-3xl flex-col items-center justify-between px-4 pb-6 pt-9 text-center sm:min-h-[380px] md:min-h-[400px]">
           <section className="flex flex-1 flex-col items-center justify-center">
             <h1 className="mb-2 text-[4.2rem] font-black leading-[0.85] tracking-tight sm:text-7xl md:text-[8rem] md:leading-none">
               ma, Ano ulam?
             </h1>
 
-            <p className="mb-4 text-base text-white/90 sm:text-xl">Anong murang ulam ngayon</p>
+            <p className="mb-4 text-base text-white/90 sm:text-xl">
+              Anong murang ulam ngayon
+            </p>
 
-            <p className="text-sm text-white/75">{formattedDate}</p>
+            <p className="text-sm text-white/70">{formattedDate}</p>
           </section>
 
-          <section className="relative w-full pt-4" aria-label="Pangunahing presyo ngayon">
-            <div className="pointer-events-none absolute bottom-1 left-0 top-4 z-10 w-8 bg-gradient-to-r from-orange-500/80 to-transparent sm:hidden" />
-            <div className="pointer-events-none absolute bottom-1 right-0 top-4 z-10 w-10 bg-gradient-to-l from-red-500/90 to-transparent sm:hidden" />
+          <nav className="relative w-full pt-5" aria-label="Pangunahing presyo ngayon">
+            <div className="pointer-events-none absolute bottom-0 left-0 top-5 z-10 w-6 bg-gradient-to-r from-orange-500/90 to-transparent sm:hidden" />
+            <div className="pointer-events-none absolute bottom-0 right-0 top-5 z-10 w-6 bg-gradient-to-l from-red-500/90 to-transparent sm:hidden" />
 
-            <div className="scrollbar-hide -mx-4 flex gap-2.5 overflow-x-auto px-4 pb-1 sm:hidden">
+            <div className="scrollbar-hide -mx-4 flex items-center gap-4 overflow-x-auto px-4 pb-1 sm:hidden">
               {priceTags.map((tag) => (
-                <div key={tag.label} className="min-w-[108px] shrink-0">
-                  <PriceTile tag={tag} />
+                <div
+                  key={tag.label}
+                  className="flex shrink-0 items-center gap-1.5"
+                  aria-label={`${tag.label} ${formatPeso(tag.price)}`}
+                >
+                  <span className={`inline-block h-2.5 w-2.5 shrink-0 rounded-full ${getDotColor(tag.price)}`} aria-hidden="true" />
+                  <span className="whitespace-nowrap text-sm text-white/85">
+                    <span className="font-semibold">{tag.label}</span>{" "}
+                    <span className="font-black">{formatPeso(tag.price)}</span>
+                  </span>
                 </div>
               ))}
 
               <a
                 href="/prices"
-                aria-label="View all commodity prices"
-                className="flex h-[50px] min-w-[112px] shrink-0 flex-col items-center justify-center rounded-2xl bg-white px-3 py-2 text-sm font-extrabold text-amber-700 shadow-lg ring-2 ring-amber-200/80 transition-all hover:shadow-xl hover:ring-amber-300"
+                className="shrink-0 whitespace-nowrap text-sm font-bold text-white underline decoration-white/40 underline-offset-2 transition-colors hover:decoration-white/80"
               >
-                <span className="leading-tight">More</span>
-                <span className="leading-tight">Prices →</span>
+                More Prices →
               </a>
             </div>
 
-            <div className="mx-auto hidden max-w-[760px] grid-cols-7 gap-2.5 sm:grid">
+            <div className="hidden flex-wrap items-center justify-center gap-x-5 gap-y-2 sm:flex">
               {priceTags.map((tag) => (
-                <PriceTile key={tag.label} tag={tag} />
+                <div
+                  key={tag.label}
+                  className="flex items-center gap-1.5"
+                  aria-label={`${tag.label} ${formatPeso(tag.price)}`}
+                >
+                  <span className={`inline-block h-2.5 w-2.5 shrink-0 rounded-full ${getDotColor(tag.price)}`} aria-hidden="true" />
+                  <span className="whitespace-nowrap text-sm text-white/85">
+                    <span className="font-semibold">{tag.label}</span>{" "}
+                    <span className="font-black">{formatPeso(tag.price)}</span>
+                  </span>
+                </div>
               ))}
 
               <a
                 href="/prices"
-                aria-label="View all commodity prices"
-                className="flex h-[50px] flex-col items-center justify-center rounded-2xl bg-white px-3 py-2 text-sm font-extrabold text-amber-700 shadow-lg ring-2 ring-amber-200/80 transition-all hover:-translate-y-0.5 hover:shadow-xl hover:ring-amber-300"
+                className="whitespace-nowrap text-sm font-bold text-white underline decoration-white/40 underline-offset-2 transition-colors hover:decoration-white/80"
               >
-                <span className="leading-tight">More</span>
-                <span className="leading-tight">Prices →</span>
+                More Prices →
               </a>
             </div>
-          </section>
+          </nav>
         </div>
       </header>
 
@@ -306,7 +275,9 @@ export default function HomePage() {
           <Card className="border-gray-200 bg-gradient-to-br from-amber-50 to-orange-50">
             <CardContent className="p-12 text-center">
               <div className="mb-4 text-5xl">🍳</div>
-              <p className="mb-2 text-xl font-bold text-amber-900">Wala pang data ngayon.</p>
+              <p className="mb-2 text-xl font-bold text-amber-900">
+                Wala pang data ngayon.
+              </p>
               <p className="text-lg text-amber-700">Babalik kami bukas ng 8AM!</p>
             </CardContent>
           </Card>
