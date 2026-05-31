@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 
 import { NextResponse } from "next/server";
 import { sql } from "@/lib/db";
+import { getDisplayName, isHidden } from "@/lib/commodity-names";
 
 export async function GET() {
   try {
@@ -16,14 +17,22 @@ export async function GET() {
 
     if (todaySuggestions.length > 0) {
       const row = todaySuggestions[0];
+      const meals = typeof row.meals === "string" ? JSON.parse(row.meals) : row.meals;
+      const cheapest =
+        typeof row.cheapest_ingredients === "string"
+          ? JSON.parse(row.cheapest_ingredients)
+          : row.cheapest_ingredients;
+
       return NextResponse.json({
         suggestion: {
           ...row,
-          meals: typeof row.meals === "string" ? JSON.parse(row.meals) : row.meals,
-          cheapest_ingredients:
-            typeof row.cheapest_ingredients === "string"
-              ? JSON.parse(row.cheapest_ingredients)
-              : row.cheapest_ingredients,
+          meals,
+          cheapest_ingredients: cheapest
+            .filter((item: any) => !isHidden(item.name))
+            .map((item: any) => ({
+              ...item,
+              name: getDisplayName(item.name),
+            })),
         },
         isToday: true,
       });
@@ -38,14 +47,22 @@ export async function GET() {
 
     if (latestSuggestions.length > 0) {
       const row = latestSuggestions[0];
+      const meals = typeof row.meals === "string" ? JSON.parse(row.meals) : row.meals;
+      const cheapest =
+        typeof row.cheapest_ingredients === "string"
+          ? JSON.parse(row.cheapest_ingredients)
+          : row.cheapest_ingredients;
+
       return NextResponse.json({
         suggestion: {
           ...row,
-          meals: typeof row.meals === "string" ? JSON.parse(row.meals) : row.meals,
-          cheapest_ingredients:
-            typeof row.cheapest_ingredients === "string"
-              ? JSON.parse(row.cheapest_ingredients)
-              : row.cheapest_ingredients,
+          meals,
+          cheapest_ingredients: cheapest
+            .filter((item: any) => !isHidden(item.name))
+            .map((item: any) => ({
+              ...item,
+              name: getDisplayName(item.name),
+            })),
         },
         isToday: false,
       });
