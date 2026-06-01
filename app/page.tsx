@@ -298,7 +298,7 @@ export default function HomePage() {
                 href="/prices"
                 className="flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-green-600 to-emerald-600 py-4 text-lg font-bold text-white shadow-sm transition-all hover:shadow-md"
               >
-                🛒 Tingnan ang Presyo
+                🛒 See All Prices
               </a>
             )}
 
@@ -307,7 +307,7 @@ export default function HomePage() {
                 href="/about"
                 className="flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white py-3 text-sm font-medium text-amber-700 transition-all hover:bg-amber-50"
               >
-                ℹ️ Tungkol sa Ano Ulam?
+                ℹ️ About Ma, Ano Ulam?
               </a>
             )}
           </div>
