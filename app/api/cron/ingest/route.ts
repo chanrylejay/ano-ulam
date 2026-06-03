@@ -189,7 +189,3 @@ ${pdfText.substring(0, 16000)}`;
     );
   }
 }
-
-export async function GET(request: NextRequest) {
-  return POST(request);
-}
