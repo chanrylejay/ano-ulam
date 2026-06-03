@@ -12,11 +12,11 @@ Every morning, Ano Ulam? checks today's palengke prices from the Department of A
 
 | Homepage | Price Dashboard |
 |----------|----------------|
-| ![Homepage](docs/screenshots/homepage.png) | ![Prices](docs/screenshots/prices.png) |
+| ![Homepage](screenshots/homepage.png) | ![Prices](screenshots/prices.png) |
 
 | Meal Card Detail | Mobile View |
 |------------------|-------------|
-| ![MealCard](docs/screenshots/mealcard.png) | ![Mobile](docs/screenshots/mobile.png) |
+| ![MealCard](screenshots/mealcard.png) | ![Mobile](screenshots/mobile.png) |
 
 > 💡 *Screenshots show actual production data from DA Bantay Presyo NCR prices.*
 
