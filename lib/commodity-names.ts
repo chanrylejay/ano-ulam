@@ -1,5 +1,10 @@
-// Filipino-friendly name mapping for DA commodities
-// Maps DA official names → palengke-friendly Filipino names
+// ═══════════════════════════════════════════════════════════
+// Ano Ulam? — Commodity Name Mapping & Visibility
+// V2 — English meat cuts, expanded show/hide list
+// ═══════════════════════════════════════════════════════════
+
+// Maps DA official commodity names → user-friendly display names
+// Rule: meat cuts → English, vegetables/spices → Filipino, fish → Filipino
 
 export const commodityNameMap: Record<string, string> = {
   // Rice
@@ -18,26 +23,34 @@ export const commodityNameMap: Record<string, string> = {
   Tilapia: "Tilapia",
   "Sardines (Tamban)": "Tamban",
   Squid: "Pusit",
-  "Tambakol (Yellow-Fin Tuna) Local": "Yellow Fin Tambakol",
-  "Alumahan (Indian Mackerel)": "Alumahan",
+  "Tambakol (Yellow-Fin Tuna)": "Tambakol",
+  "Salmon Belly": "Salmon Belly",
+  "Salmon Head": "Salmon Head",
 
-  // Beef
-  "Beef Brisket": "Beef litid",
-  "Beef Rib Set": "Beef tadyang",
-  "Beef Rump": "Beef laman",
+  // Beef — simple English
+  "Beef Brisket": "Beef",
+  "Beef Rib Set": "Beef Ribs",
+  "Beef Rump": "Beef Rump",
+  "Beef Short Ribs": "Beef Short Ribs",
+  "Beef Sirloin": "Beef Sirloin",
 
-  // Pork
+  // Pork — Filipino where universal
   "Pork Belly (Liempo)": "Liempo",
-  "Pork Chop": "Pork chop",
+  "Pork Chop": "Pork Chop",
   "Pork Hind Leg (Pigue)": "Pigue",
   "Pork Picnic Shoulder (Kasim)": "Kasim",
+  "Pork Spare Ribs": "Pork Spare Ribs",
 
-  // Poultry
-  "Chicken Breast": "Dibdib ng manok",
-  "Chicken Drumstick": "Binti ng manok",
-  "Chicken Leg Quarter": "Paa ng manok",
-  "Chicken Thigh": "Hita ng manok",
-  "Chicken Wing": "Pakpak ng manok",
+  // Poultry — English
+  "Whole Chicken": "Whole Chicken",
+  "Chicken Breast": "Chicken Breast",
+  "Chicken Drumstick": "Chicken Drumstick",
+  "Chicken Leg Quarter": "Chicken Leg Quarter",
+  "Chicken Thigh": "Chicken Thigh",
+  "Chicken Wing": "Chicken Wings",
+  "Chicken Liver": "Chicken Liver",
+  "Chicken Feet": "Chicken Feet",
+  "Chicken Neck": "Chicken Neck",
 
   // Lowland Vegetables
   Ampalaya: "Ampalaya",
@@ -95,38 +108,86 @@ export const commodityNameMap: Record<string, string> = {
   "Sugar (Washed)": "Asukal washed",
 };
 
-// Items to REMOVE (not common in palengke)
+// ═══════════════════════════════════════════════════════════
+// HIDDEN COMMODITIES — not shown on price dashboard
+// ═══════════════════════════════════════════════════════════
+
 export const hiddenCommodities: string[] = [
+  // Rice — imported/specialty
   "Jasponica/Japonica Rice",
   "Basmati Rice",
+
+  // Corn — feed/grits
   "Corn Grits (White Food Grade)",
   "Corn Grits (Yellow Food Grade)",
   "Corn Cracked (Yellow Feed Grade)",
   "Corn Grits (Feed Grade)",
+
+  // Fish — imported/premium/uncommon
+  "Alumahan (Indian Mackerel)",
+  "Bonito (Frigate Tuna)",
+  "Mackerel",
   "Pampano",
   "Pampano Imported",
-  "Salmon Belly",
-  "Salmon Belly Imported",
-  "Salmon Head",
-  "Salmon Head Imported",
   "Squid (Pusit Bisaya)",
   "Tanigue",
+
+  // Beef — obscure imported cuts
+  "Beef Chuck",
+  "Beef Flank",
+  "Beef Fore Limb",
+  "Beef Forequarter",
+  "Beef Loin",
+  "Beef Plate",
+  "Beef Rib Eye",
+  "Beef Striploin",
+  "Beef Tenderloin",
+  "Beef Tongue",
+
+  // Carabeef / Lamb
+  "Carabeef Forequarter",
+  "Carabeef Meat",
+  "Carabeef Rump Steak",
+  "Carabeef Trimmings",
+  "Lamb Meat",
+
+  // Pork — obscure cuts
+  "Pork Boston Shoulder",
   "Pork Fore Shank",
   "Pork Hind Shank",
+  "Pork Head",
   "Pork Loin",
   "Pork Offals",
-  "Pork Spare Ribs",
+  "Pork Rind/Skin",
+
+  // Poultry — obscure
+  "Chicken Rind/Skin",
+  "Duck Meat",
+  "Peckin Duck",
+
+  // Vegetables — imported duplicates
   "Bell Pepper (Green) Local",
+  "Bell Pepper (Green) Imported",
+  "Bell Pepper (Red) Imported",
   "Broccoli Imported",
   "Cabbage (Rare Ball)",
   "Cabbage (Wonder Ball)",
+  "Cabbage Imported",
   "Carrots Imported",
+  "Cauliflower Imported",
   "Lettuce (Iceberg)",
   "Lettuce (Romaine)",
+  "Lettuce Imported",
+  "White Potato Imported",
+
+  // Spices — imported duplicates
   "Garlic Imported",
   "Ginger Imported",
   "Red Onion Imported",
   "White Onion Imported",
+  "Tiger Chillies Imported",
+
+  // Other — brand duplicates
   "Cooking Oil (Coconut)",
   "Cooking Oil (Minola)",
   "Cooking Oil (Palm Olein Jolly Brand)",
@@ -134,7 +195,10 @@ export const hiddenCommodities: string[] = [
   "Salt (Iodized)",
 ];
 
-// Default items to show in header price tags (13 items)
+// ═══════════════════════════════════════════════════════════
+// DEFAULT HOMEPAGE PRICE TAGS
+// ═══════════════════════════════════════════════════════════
+
 export const defaultItems = [
   { key: "Pork Belly (Liempo)", label: "Baboy" },
   { key: "Chicken Leg Quarter", label: "Manok" },
@@ -151,11 +215,16 @@ export const defaultItems = [
   { key: "Chilli (Red) Local", label: "Sili" },
 ];
 
-// Helper function
+// ═══════════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════════
+
 export function getDisplayName(daName: string): string {
   return commodityNameMap[daName] || daName;
 }
 
 export function isHidden(daName: string): boolean {
-  return hiddenCommodities.some((hidden) => daName.toLowerCase().includes(hidden.toLowerCase()));
+  return hiddenCommodities.some((hidden) =>
+    daName.toLowerCase().includes(hidden.toLowerCase())
+  );
 }

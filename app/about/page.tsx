@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import {
   Heart,
   ExternalLink,
@@ -14,8 +14,8 @@ import {
   Code,
   Github,
   Globe,
-} from 'lucide-react';
-import { Footer } from '@/components/Footer';
+} from "lucide-react";
+import { Footer } from "@/components/Footer";
 
 export default function AboutPage() {
   return (
@@ -25,15 +25,15 @@ export default function AboutPage() {
           <Button
             variant="ghost"
             className="text-white hover:bg-white/20 mb-4 -ml-2"
-            onClick={() => window.location.href = '/'}
+            onClick={() => (window.location.href = "/")}
           >
             <Home className="w-4 h-4 mr-2" />
-            🏠 Bumalik sa Home
+            Back to Home
           </Button>
 
           <div className="flex items-center gap-3 mb-2">
             <Sparkles className="w-8 h-8" />
-            <h1 className="text-3xl font-bold">About Ano Ulam?</h1>
+            <h1 className="text-3xl font-bold">About Ma, Ano Ulam?</h1>
           </div>
 
           <p className="text-amber-100 text-sm">
@@ -56,9 +56,9 @@ export default function AboutPage() {
               challenging, especially when trying to balance nutrition, taste, and cost.
             </p>
             <p className="text-gray-700 leading-relaxed">
-              By providing daily AI-generated meal suggestions based on current market prices from the
-              Department of Agriculture, we aim to make it easier for families to prepare delicious,
-              nutritious, and affordable meals every day.
+              By combining real government price data with a database of 47 authentic Filipino
+              recipes, we calculate the cheapest meals your family can cook today — with full
+              ingredient cost breakdowns and daily price trends.
             </p>
           </CardContent>
         </Card>
@@ -71,7 +71,7 @@ export default function AboutPage() {
               <h2 className="text-2xl font-bold text-green-900">Data Source</h2>
             </div>
             <p className="text-gray-700 leading-relaxed mb-4">
-              All market price data is sourced from the{' '}
+              All market price data is sourced from the{" "}
               <a
                 href="https://www.da.gov.ph/price-monitoring/"
                 target="_blank"
@@ -84,9 +84,9 @@ export default function AboutPage() {
               </a>
             </p>
             <p className="text-gray-700 leading-relaxed mb-4">
-              The Department of Agriculture monitors and publishes daily commodity prices from various
-              markets across the Philippines. This data helps consumers make informed decisions about
-              their purchases and promotes transparency in market pricing.
+              The Department of Agriculture monitors and publishes daily commodity prices from
+              various markets across the Philippines. This data helps consumers make informed
+              decisions about their purchases and promotes transparency in market pricing.
             </p>
             <Badge variant="outline" className="bg-green-50 border-green-300 text-green-700">
               Data updated daily at 8:00 AM Manila time
@@ -103,38 +103,47 @@ export default function AboutPage() {
             </div>
             <div className="space-y-4">
               <div className="flex gap-4">
-                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center font-bold text-blue-700" aria-hidden="true">
+                <div
+                  className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center font-bold text-blue-700"
+                  aria-hidden="true"
+                >
                   1
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-800">Daily Data Collection</h3>
                   <p className="text-gray-600 text-sm">
-                    Every morning, our system fetches the latest Daily Price Index PDF from the DA website
-                    and extracts commodity prices using AI.
+                    Every morning, our system fetches the latest Daily Price Index PDF from the DA
+                    website and extracts commodity prices using AI.
                   </p>
                 </div>
               </div>
               <div className="flex gap-4">
-                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center font-bold text-blue-700" aria-hidden="true">
+                <div
+                  className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center font-bold text-blue-700"
+                  aria-hidden="true"
+                >
                   2
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-800">Smart Analysis</h3>
+                  <h3 className="font-semibold text-gray-800">Smart Cost Calculation</h3>
                   <p className="text-gray-600 text-sm">
-                    DeepSeek AI analyzes the prices and identifies the cheapest ingredients across all
-                    categories while considering nutritional balance.
+                    Our recipe engine calculates the real cost of 47 Filipino dishes using
+                    today&#39;s market prices, then picks the cheapest meals with protein variety.
                   </p>
                 </div>
               </div>
               <div className="flex gap-4">
-                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center font-bold text-blue-700" aria-hidden="true">
+                <div
+                  className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center font-bold text-blue-700"
+                  aria-hidden="true"
+                >
                   3
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-800">Meal Suggestions</h3>
                   <p className="text-gray-600 text-sm">
-                    The AI generates budget-friendly Filipino meal suggestions with ingredients, estimated
-                    costs, and explains why each dish was chosen based on today's prices.
+                    Each dish shows a full ingredient cost breakdown with per-item prices, and AI
+                    explains why it was chosen based on today&#39;s price trends.
                   </p>
                 </div>
               </div>
@@ -150,23 +159,41 @@ export default function AboutPage() {
               <h2 className="text-2xl font-bold text-purple-900">Built With</h2>
             </div>
             <div className="grid grid-cols-2 gap-3">
-              <Badge variant="outline" className="justify-center py-2 border-purple-200 bg-purple-50 text-purple-700">
+              <Badge
+                variant="outline"
+                className="justify-center py-2 border-purple-200 bg-purple-50 text-purple-700"
+              >
                 Next.js 14
               </Badge>
-              <Badge variant="outline" className="justify-center py-2 border-blue-200 bg-blue-50 text-blue-700">
+              <Badge
+                variant="outline"
+                className="justify-center py-2 border-blue-200 bg-blue-50 text-blue-700"
+              >
                 TypeScript
               </Badge>
-              <Badge variant="outline" className="justify-center py-2 border-cyan-200 bg-cyan-50 text-cyan-700">
+              <Badge
+                variant="outline"
+                className="justify-center py-2 border-cyan-200 bg-cyan-50 text-cyan-700"
+              >
                 Tailwind CSS
               </Badge>
-              <Badge variant="outline" className="justify-center py-2 border-green-200 bg-green-50 text-green-700">
+              <Badge
+                variant="outline"
+                className="justify-center py-2 border-green-200 bg-green-50 text-green-700"
+              >
                 Neon PostgreSQL
               </Badge>
-              <Badge variant="outline" className="justify-center py-2 border-orange-200 bg-orange-50 text-orange-700">
+              <Badge
+                variant="outline"
+                className="justify-center py-2 border-orange-200 bg-orange-50 text-orange-700"
+              >
                 DeepSeek AI
               </Badge>
-              <Badge variant="outline" className="justify-center py-2 border-pink-200 bg-pink-50 text-pink-700">
-                Vercel Cron
+              <Badge
+                variant="outline"
+                className="justify-center py-2 border-pink-200 bg-pink-50 text-pink-700"
+              >
+                Vercel
               </Badge>
             </div>
           </CardContent>
@@ -180,8 +207,8 @@ export default function AboutPage() {
               <h2 className="text-2xl font-bold text-amber-900">Created By</h2>
             </div>
             <p className="text-gray-700 leading-relaxed mb-4">
-              Built by <strong>Chanryle Jay Cagara</strong> — a Filipino developer passionate
-              about creating tools that make everyday life easier for Filipino families.
+              Built by <strong>Chanryle Jay Cagara</strong> — a Filipino developer passionate about
+              creating tools that make everyday life easier for Filipino families.
             </p>
             <div className="flex flex-wrap gap-3">
               <a
@@ -215,24 +242,44 @@ export default function AboutPage() {
             </h3>
             <ul className="space-y-2 text-sm text-gray-700">
               <li className="flex gap-2">
-                <span className="text-gray-500" aria-hidden="true">•</span>
+                <span className="text-gray-500" aria-hidden="true">
+                  •
+                </span>
                 <span>Prices are updated daily and may vary by location and market</span>
               </li>
               <li className="flex gap-2">
-                <span className="text-gray-500" aria-hidden="true">•</span>
+                <span className="text-gray-500" aria-hidden="true">
+                  •
+                </span>
                 <span>Meal suggestions assume basic pantry staples are available</span>
               </li>
               <li className="flex gap-2">
-                <span className="text-gray-500" aria-hidden="true">•</span>
-                <span>AI-generated suggestions are for inspiration — adjust to your taste!</span>
+                <span className="text-gray-500" aria-hidden="true">
+                  •
+                </span>
+                <span>
+                  AI-generated suggestions are for inspiration — adjust to your taste!
+                </span>
               </li>
               <li className="flex gap-2">
-                <span className="text-gray-500" aria-hidden="true">•</span>
+                <span className="text-gray-500" aria-hidden="true">
+                  •
+                </span>
                 <span>Always verify prices at your local market before purchasing</span>
               </li>
             </ul>
           </CardContent>
         </Card>
+
+        {/* Bottom Back to Home */}
+        <div className="pt-2">
+          <a
+            href="/"
+            className="flex items-center justify-center gap-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-bold py-3.5 rounded-xl shadow-sm hover:shadow-md transition-all text-lg"
+          >
+            🏠 Back to Home
+          </a>
+        </div>
       </main>
 
       <Footer />

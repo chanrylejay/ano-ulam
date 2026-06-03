@@ -5,17 +5,33 @@ import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@/lib/db";
 import { callDeepSeekAPI } from "@/lib/deepseek";
 import { isHidden } from "@/lib/commodity-names";
-import { RECIPES, findCheapestMeals, type PriceMap, type CostResult } from "@/lib/recipes";
+import {
+  RECIPES,
+  findCheapestMeals,
+  type PriceMap,
+  type CostResult,
+} from "@/lib/recipes";
+
+// ═══════════════════════════════════════════════════════════
+// POST /api/cron/suggest
+// Recipe DB + Cost Engine + DeepSeek "Bakit?" only
+// Supports both manual (x-cron-secret) and Vercel Cron (Bearer)
+// ═══════════════════════════════════════════════════════════
 
 export async function POST(request: NextRequest) {
   try {
-    const cronSecret = request.headers.get("x-cron-secret");
+    // ── Auth: support both manual and Vercel Cron ────────
+    const cronSecret =
+      request.headers.get("x-cron-secret") ||
+      request.headers.get("authorization")?.replace("Bearer ", "");
+
     if (cronSecret !== process.env.CRON_SECRET) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const today = new Date().toISOString().split("T")[0];
 
+    // ── Duplicate check ──────────────────────────────────
     const existing = await sql`
       SELECT id FROM daily_suggestions
       WHERE suggestion_date = ${today}
@@ -23,9 +39,12 @@ export async function POST(request: NextRequest) {
     `;
 
     if (existing.length > 0) {
-      return NextResponse.json({ message: "Suggestions already exist for today" });
+      return NextResponse.json({
+        message: "Suggestions already exist for today",
+      });
     }
 
+    // ── Fetch today's prices ─────────────────────────────
     const prices = await sql`
       SELECT
         p.price_prevailing,
@@ -39,9 +58,13 @@ export async function POST(request: NextRequest) {
     `;
 
     if (prices.length === 0) {
-      return NextResponse.json({ error: "No price data available for today" }, { status: 400 });
+      return NextResponse.json(
+        { error: "No price data available for today" },
+        { status: 400 },
+      );
     }
 
+    // ── Fetch last available date's prices ────────────────
     const lastPrices = await sql`
       SELECT
         c.name,
@@ -57,6 +80,7 @@ export async function POST(request: NextRequest) {
       AND p.price_prevailing IS NOT NULL
     `;
 
+    // ── Build price maps ─────────────────────────────────
     const todayPriceMap: PriceMap = {};
     prices.forEach((p: any) => {
       todayPriceMap[p.name] = parseFloat(p.price_prevailing);
@@ -67,8 +91,15 @@ export async function POST(request: NextRequest) {
       lastPriceMap[p.name] = parseFloat(p.price_prevailing);
     });
 
-    const cheapestMeals: CostResult[] = findCheapestMeals(RECIPES, todayPriceMap, lastPriceMap, 8);
+    // ── Run cost engine — find cheapest 8 meals ──────────
+    const cheapestMeals: CostResult[] = findCheapestMeals(
+      RECIPES,
+      todayPriceMap,
+      lastPriceMap,
+      8,
+    );
 
+    // ── Build summary for DeepSeek "Bakit?" prompt ───────
     const mealSummaries = cheapestMeals
       .map((result, i) => {
         const ingDetails = result.ingredientCosts
@@ -100,6 +131,7 @@ Recipe IDs: ${cheapestMeals.map((r) => r.recipe.id).join(", ")}`;
     const systemPrompt =
       "Ikaw ay isang Filipino nanay na mahilig magtipid sa palengke. Laging sumagot ng valid JSON.";
 
+    // ── Call DeepSeek for "Bakit?" reasons only ──────────
     let reasonMap: Record<string, string> = {};
     const fallbackReason = "Abot-kayang ulam para sa pamilya ngayon.";
 
@@ -124,6 +156,7 @@ Recipe IDs: ${cheapestMeals.map((r) => r.recipe.id).join(", ")}`;
       console.error("DeepSeek reason generation failed:", aiError);
     }
 
+    // ── Build final meals array for frontend ─────────────
     const meals = cheapestMeals.map((result) => ({
       name: result.recipe.name,
       estimated_cost: result.totalCost,
@@ -138,6 +171,7 @@ Recipe IDs: ${cheapestMeals.map((r) => r.recipe.id).join(", ")}`;
       reason: reasonMap[result.recipe.id] || fallbackReason,
     }));
 
+    // ── Build cheapest ingredients for DB column ─────────
     const filteredPrices = prices.filter((p: any) => !isHidden(p.name));
     const categorizedPrices: Record<string, any[]> = {};
     filteredPrices.forEach((p: any) => {
@@ -149,7 +183,9 @@ Recipe IDs: ${cheapestMeals.map((r) => r.recipe.id).join(", ")}`;
     const cheapestIngredients: any[] = [];
     Object.entries(categorizedPrices).forEach(([category, items]) => {
       const sorted = [...items].sort(
-        (a, b) => (parseFloat(a.price_prevailing) || 0) - (parseFloat(b.price_prevailing) || 0),
+        (a, b) =>
+          (parseFloat(a.price_prevailing) || 0) -
+          (parseFloat(b.price_prevailing) || 0),
       );
       sorted.slice(0, 3).forEach((item) => {
         cheapestIngredients.push({
@@ -160,6 +196,7 @@ Recipe IDs: ${cheapestMeals.map((r) => r.recipe.id).join(", ")}`;
       });
     });
 
+    // ── Save to database ─────────────────────────────────
     await sql`
       INSERT INTO daily_suggestions (suggestion_date, meals, cheapest_ingredients)
       VALUES (
