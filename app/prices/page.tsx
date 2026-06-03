@@ -48,26 +48,9 @@ function getPriceUnit(category: string, name: string): string {
 function getEmojiForItem(name: string): string {
   const lower = name.toLowerCase();
   if (lower.includes("itlog") || lower.includes("egg")) return "🥚";
-  if (
-    lower.includes("baboy") ||
-    lower.includes("pork") ||
-    lower.includes("liempo") ||
-    lower.includes("kasim") ||
-    lower.includes("pigue") ||
-    lower.includes("spare rib")
-  )
-    return "🐖";
-  if (lower.includes("manok") || lower.includes("chicken") || lower.includes("whole chicken"))
-    return "🐔";
-  if (
-    lower.includes("beef") ||
-    lower.includes("baka") ||
-    lower.includes("tadyang") ||
-    lower.includes("litid") ||
-    lower.includes("sirloin") ||
-    lower.includes("short rib")
-  )
-    return "🐄";
+  if (lower.includes("baboy") || lower.includes("pork") || lower.includes("liempo") || lower.includes("kasim") || lower.includes("pigue") || lower.includes("spare rib")) return "🐖";
+  if (lower.includes("manok") || lower.includes("chicken") || lower.includes("whole chicken")) return "🐔";
+  if (lower.includes("beef") || lower.includes("baka") || lower.includes("tadyang") || lower.includes("litid") || lower.includes("sirloin") || lower.includes("short rib")) return "🐄";
   if (lower.includes("bangus")) return "🐟";
   if (lower.includes("tilapia")) return "🐟";
   if (lower.includes("galunggong")) return "🐟";
@@ -205,7 +188,7 @@ export default function PricesPage() {
   return (
     <div className="min-h-screen pb-20 bg-gradient-to-b from-amber-50 to-orange-50">
       {/* Header */}
-      <header className="bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 text-white pt-10 pb-14 px-4 shadow-lg relative">
+      <header className="bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 text-white pt-10 pb-16 px-4 shadow-lg relative">
         <Button
           variant="ghost"
           className="absolute top-4 left-4 text-sm text-white/80 hover:text-white hover:bg-white/20"
@@ -216,15 +199,15 @@ export default function PricesPage() {
         </Button>
 
         <div className="max-w-2xl mx-auto text-center">
-          <h1 className="text-5xl sm:text-7xl md:text-[6rem] md:leading-none font-black mb-3 leading-none tracking-tight">
+          <h1 className="text-5xl sm:text-6xl md:text-[4rem] md:leading-none font-black mb-4 leading-none tracking-tight">
             Presyo Ngayon
           </h1>
           {date ? (
-            <span className="inline-block bg-white/20 text-white rounded-full px-3 py-1 text-sm">
+            <span className="inline-block bg-white/20 text-white rounded-full px-4 py-1.5 text-sm">
               {format(new Date(date), "MMMM d, yyyy")}
             </span>
           ) : (
-            <span className="inline-block bg-white/20 text-white rounded-full px-3 py-1 text-sm">
+            <span className="inline-block bg-white/20 text-white rounded-full px-4 py-1.5 text-sm">
               Loading...
             </span>
           )}
@@ -287,25 +270,23 @@ export default function PricesPage() {
 
         {/* Loading */}
         {isLoading && (
-          <div className="space-y-1.5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             {[...Array(8)].map((_, i) => (
               <div
                 key={i}
-                className="bg-white rounded-xl border border-gray-200 p-2.5 animate-pulse flex justify-between items-center"
+                className="bg-white rounded-xl border border-gray-200 p-3 animate-pulse"
               >
-                <div className="space-y-1.5">
-                  <div className="h-4 w-40 bg-gray-100 rounded" />
-                </div>
-                <div className="h-5 w-20 bg-gray-100 rounded" />
+                <div className="h-4 w-32 bg-gray-100 rounded mb-2" />
+                <div className="h-6 w-24 bg-gray-100 rounded" />
               </div>
             ))}
           </div>
         )}
 
-        {/* Price List */}
+        {/* Price List — stacked card layout */}
         {!isLoading && filteredPrices.length > 0 && (
           <ul
-            className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-2"
+            className="grid grid-cols-1 sm:grid-cols-2 gap-2"
             aria-label="Commodity prices"
           >
             {filteredPrices.map((price) => {
@@ -317,14 +298,12 @@ export default function PricesPage() {
               return (
                 <li key={price.id}>
                   <Card className="overflow-hidden border-gray-200 bg-white shadow-sm hover:shadow transition-shadow duration-150 h-full">
-                    <CardContent className="p-2.5 flex items-center justify-between gap-2">
-                      <div className="min-w-0 flex-1">
-                        <h2 className="font-semibold text-gray-800 text-sm line-clamp-2 leading-snug">
-                          {getEmojiForItem(name)} {name}
-                        </h2>
-                      </div>
+                    <CardContent className="p-3">
+                      <h2 className="font-semibold text-gray-800 text-sm leading-snug mb-1">
+                        {getEmojiForItem(name)} {name}
+                      </h2>
                       <p
-                        className={`text-sm font-bold shrink-0 ${getPriceColor(priceValue)}`}
+                        className={`text-lg font-bold ${getPriceColor(priceValue)}`}
                       >
                         ₱{priceValue.toFixed(2)}{unit}
                       </p>

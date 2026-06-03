@@ -9,7 +9,6 @@ import {
   Database,
   Bot,
   Clock,
-  Sparkles,
   Home,
   Code,
   Github,
@@ -24,17 +23,17 @@ export default function AboutPage() {
         <div className="max-w-2xl mx-auto">
           <Button
             variant="ghost"
-            className="text-white hover:bg-white/20 mb-4 -ml-2"
+            className="text-white hover:bg-white/20 mb-6 -ml-2"
             onClick={() => (window.location.href = "/")}
           >
             <Home className="w-4 h-4 mr-2" />
             Back to Home
           </Button>
 
-          <div className="flex items-center gap-3 mb-2">
-            <Sparkles className="w-8 h-8" />
-            <h1 className="text-3xl font-bold">About Ma, Ano Ulam?</h1>
-          </div>
+          <p className="text-lg font-medium text-white/80 mb-1">About</p>
+          <h1 className="text-4xl sm:text-5xl font-black tracking-tight leading-tight mb-2">
+            ma, Ano Ulam?
+          </h1>
 
           <p className="text-amber-100 text-sm">
             Free, open-source meal planning for Filipino families
@@ -128,7 +127,7 @@ export default function AboutPage() {
                   <h3 className="font-semibold text-gray-800">Smart Cost Calculation</h3>
                   <p className="text-gray-600 text-sm">
                     Our recipe engine calculates the real cost of 47 Filipino dishes using
-                    today&#39;s market prices, then picks the cheapest meals with protein variety.
+                    today's market prices, then picks the cheapest meals with protein variety.
                   </p>
                 </div>
               </div>
@@ -143,7 +142,7 @@ export default function AboutPage() {
                   <h3 className="font-semibold text-gray-800">Meal Suggestions</h3>
                   <p className="text-gray-600 text-sm">
                     Each dish shows a full ingredient cost breakdown with per-item prices, and AI
-                    explains why it was chosen based on today&#39;s price trends.
+                    explains why it was chosen based on today's price trends.
                   </p>
                 </div>
               </div>
@@ -203,7 +202,7 @@ export default function AboutPage() {
         <Card className="mb-6 border-gray-200 bg-gradient-to-br from-yellow-50 to-amber-50">
           <CardContent className="p-8">
             <div className="flex items-center gap-3 mb-4">
-              <Sparkles className="w-6 h-6 text-amber-600" aria-hidden="true" />
+              <Heart className="w-6 h-6 text-amber-600" aria-hidden="true" />
               <h2 className="text-2xl font-bold text-amber-900">Created By</h2>
             </div>
             <p className="text-gray-700 leading-relaxed mb-4">

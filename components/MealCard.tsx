@@ -60,6 +60,13 @@ function sortIngredients(ingredients: Ingredient[] = []): Ingredient[] {
 export function MealCard({ meal, index }: MealCardProps) {
   const sortedIngredients = sortIngredients(meal.ingredients);
 
+  // Hide optional ingredients with no price data (₱0 or undefined)
+  // These are items where the DA price is missing — showing ₱0 is misleading
+  const visibleIngredients = sortedIngredients.filter((ing) => {
+    if (ing.optional && (!ing.cost || ing.cost === 0)) return false;
+    return true;
+  });
+
   return (
     <li>
       <article
@@ -83,7 +90,7 @@ export function MealCard({ meal, index }: MealCardProps) {
 
             {/* Ingredient rows — compact single-line each */}
             <div className="mb-3 space-y-0">
-              {sortedIngredients.map((ing, j) => {
+              {visibleIngredients.map((ing, j) => {
                 const isOptional = !!ing.optional;
                 const trend = getTrendArrow(ing.trend);
 
