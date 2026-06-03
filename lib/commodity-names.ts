@@ -1,17 +1,17 @@
 // ═══════════════════════════════════════════════════════════
 // Ano Ulam? — Commodity Name Mapping & Visibility
-// V2 — English meat cuts, expanded show/hide list
+// V3 — Smart variant handling, brand hiding, clean display names
 // ═══════════════════════════════════════════════════════════
 
-// Maps DA official commodity names → user-friendly display names
+// Maps DA base commodity names → user-friendly display names
 // Rule: meat cuts → English, vegetables/spices → Filipino, fish → Filipino
 
 export const commodityNameMap: Record<string, string> = {
   // Rice
   "Regular Milled 20-40% bran streak": "Bigas pinakamura",
   "Well Milled 1-19% bran streak": "Bigas maalsa",
-  "Premium 5% broken": "Bigas premium Long Grain",
-  "Other Special Rice White Rice": "Bigas Dinorado/Sinandomeng",
+  "Premium 5% broken": "Bigas premium",
+  "Other Special Rice White Rice": "Bigas Dinorado",
   "Glutinous Rice": "Malagkit",
 
   // Eggs
@@ -19,16 +19,19 @@ export const commodityNameMap: Record<string, string> = {
 
   // Fish
   Bangus: "Bangus",
+  "Bangus Medium": "Bangus (Medium)",
+  "Bangus Large": "Bangus (Large)",
   Galunggong: "Galunggong",
   Tilapia: "Tilapia",
   "Sardines (Tamban)": "Tamban",
   Squid: "Pusit",
   "Tambakol (Yellow-Fin Tuna)": "Tambakol",
+  "Tambakol (Yellow-Fin Tuna) Local": "Tambakol",
   "Salmon Belly": "Salmon Belly",
   "Salmon Head": "Salmon Head",
 
   // Beef — simple English
-  "Beef Brisket": "Beef",
+  "Beef Brisket": "Beef Brisket",
   "Beef Rib Set": "Beef Ribs",
   "Beef Rump": "Beef Rump",
   "Beef Short Ribs": "Beef Short Ribs",
@@ -62,9 +65,9 @@ export const commodityNameMap: Record<string, string> = {
   Tomato: "Kamatis",
 
   // Highland Vegetables
-  "Bell Pepper (Red) Local": "Bell pepper",
+  "Bell Pepper (Red) Local": "Bell Pepper",
   "Broccoli Local": "Broccoli",
-  "Cabbage (Scorpio)": "Repolyo (Baguio)",
+  "Cabbage (Scorpio)": "Repolyo",
   "Carrots Local": "Carrots",
   "Cauliflower Local": "Cauliflower",
   Celery: "Kintsay",
@@ -99,8 +102,10 @@ export const commodityNameMap: Record<string, string> = {
   "Red Onion Local": "Sibuyas pula",
   "White Onion Local": "Sibuyas puti",
 
-  // Other
+  // Other — with size variants
   "Cooking Oil (Palm)": "Mantika",
+  "Cooking Oil (Palm) 350 ml": "Mantika (350ml)",
+  "Cooking Oil (Palm) 1 Liter": "Mantika (1L)",
   Mungbean: "Munggo",
   "Salt (Rock)": "Asin",
   "Sugar (Brown)": "Asukal brown",
@@ -196,6 +201,23 @@ export const hiddenCommodities: string[] = [
 ];
 
 // ═══════════════════════════════════════════════════════════
+// BRAND PATTERNS — auto-hidden (any item containing these)
+// ═══════════════════════════════════════════════════════════
+
+const BRAND_PATTERNS = [
+  "Magnolia",
+  "Bounty Fresh",
+  "Unbranded Fresh",
+  "Fully Dressed",
+];
+
+// Suffixes to strip from DA names for cleaner display
+const STRIP_SUFFIXES = [
+  " Imported",
+  " Local",
+];
+
+// ═══════════════════════════════════════════════════════════
 // DEFAULT HOMEPAGE PRICE TAGS
 // ═══════════════════════════════════════════════════════════
 
@@ -216,15 +238,51 @@ export const defaultItems = [
 ];
 
 // ═══════════════════════════════════════════════════════════
-// HELPERS
+// SMART HELPERS
 // ═══════════════════════════════════════════════════════════
 
+/**
+ * Get a clean, user-friendly display name for a DA commodity.
+ * 1. Check explicit map first (exact match)
+ * 2. Strip "Imported"/"Local" suffixes, check map again
+ * 3. If still not found, return the cleaned name
+ */
 export function getDisplayName(daName: string): string {
-  return commodityNameMap[daName] || daName;
+  // Direct map hit
+  if (commodityNameMap[daName]) return commodityNameMap[daName];
+
+  // Strip suffixes and try again
+  let cleaned = daName;
+  for (const suffix of STRIP_SUFFIXES) {
+    if (cleaned.endsWith(suffix)) {
+      cleaned = cleaned.slice(0, -suffix.length).trim();
+      break;
+    }
+  }
+
+  // Check map with cleaned name
+  if (commodityNameMap[cleaned]) return commodityNameMap[cleaned];
+
+  // Return cleaned name as-is (no "Imported"/"Local" suffix)
+  return cleaned;
 }
 
+/**
+ * Check if a commodity should be hidden from the price dashboard.
+ * Hides: explicit list items + brand variant patterns
+ */
 export function isHidden(daName: string): boolean {
-  return hiddenCommodities.some((hidden) =>
-    daName.toLowerCase().includes(hidden.toLowerCase())
-  );
+  const lower = daName.toLowerCase();
+
+  // Brand variant check (Magnolia, Bounty Fresh, Unbranded Fresh, Fully Dressed)
+  for (const brand of BRAND_PATTERNS) {
+    if (lower.includes(brand.toLowerCase())) return true;
+  }
+
+  // Explicit hidden list check
+  for (const hidden of hiddenCommodities) {
+    if (lower.includes(hidden.toLowerCase())) return true;
+  }
+
+  return false;
 }

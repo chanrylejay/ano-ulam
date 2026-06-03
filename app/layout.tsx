@@ -1,26 +1,23 @@
-import './globals.css';
-import type { Metadata } from 'next';
+import "./globals.css";
+import type { Metadata } from "next";
+import { Analytics } from "@vercel/analytics/next";
 
 export const metadata: Metadata = {
-  title: 'Ano Ulam? — Murang Ulam Suggestions Araw-Araw',
+  title: "Ano Ulam? — Murang Ulam Suggestions Araw-Araw",
   description:
-    'Araw-araw na Filipino meal suggestions base sa current market prices. Tipid sa ulam, masarap pa!',
-  themeColor: '#f59e0b',
+    "Araw-araw na Filipino meal suggestions base sa current market prices. Tipid sa ulam, masarap pa!",
+  themeColor: "#f59e0b",
   icons: {
-    icon: '/favicon.ico',
+    icon: "/favicon.ico",
   },
   openGraph: {
-    title: 'Ano Ulam? — Filipino Meal Planner',
-    description: 'Daily budget-friendly Filipino meal suggestions from DA price data.',
-    type: 'website',
+    title: "Ano Ulam? — Filipino Meal Planner",
+    description: "Daily budget-friendly Filipino meal suggestions from DA price data.",
+    type: "website",
   },
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="fil">
       <body className="font-sans antialiased">
@@ -31,6 +28,7 @@ export default function RootLayout({
           Skip to main content
         </a>
         {children}
+        <Analytics />
       </body>
     </html>
   );

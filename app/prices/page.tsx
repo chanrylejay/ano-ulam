@@ -270,49 +270,46 @@ export default function PricesPage() {
 
         {/* Loading */}
         {isLoading && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            {[...Array(8)].map((_, i) => (
-              <div
-                key={i}
-                className="bg-white rounded-xl border border-gray-200 p-3 animate-pulse"
-              >
-                <div className="h-4 w-32 bg-gray-100 rounded mb-2" />
-                <div className="h-6 w-24 bg-gray-100 rounded" />
-              </div>
-            ))}
-          </div>
+          <Card className="border-gray-200 bg-white shadow-sm">
+            <CardContent className="p-0 divide-y divide-gray-100">
+              {[...Array(10)].map((_, i) => (
+                <div key={i} className="flex items-center justify-between px-3 py-2.5 animate-pulse">
+                  <div className="h-4 w-36 bg-gray-100 rounded" />
+                  <div className="h-4 w-20 bg-gray-100 rounded" />
+                </div>
+              ))}
+            </CardContent>
+          </Card>
         )}
 
-        {/* Price List — stacked card layout */}
+        {/* Price List — receipt style */}
         {!isLoading && filteredPrices.length > 0 && (
-          <ul
-            className="grid grid-cols-1 sm:grid-cols-2 gap-2"
-            aria-label="Commodity prices"
-          >
-            {filteredPrices.map((price) => {
-              const category = price.commodities?.category || "";
-              const name = price.commodities?.name || "Unknown";
-              const unit = getPriceUnit(category, name);
-              const priceValue = price.price_prevailing || 0;
+          <Card className="border-gray-200 bg-white shadow-sm overflow-hidden">
+            <CardContent className="p-0">
+              <ul className="divide-y divide-gray-100" aria-label="Commodity prices">
+                {filteredPrices.map((price) => {
+                  const category = price.commodities?.category || "";
+                  const name = price.commodities?.name || "Unknown";
+                  const unit = getPriceUnit(category, name);
+                  const priceValue = price.price_prevailing || 0;
 
-              return (
-                <li key={price.id}>
-                  <Card className="overflow-hidden border-gray-200 bg-white shadow-sm hover:shadow transition-shadow duration-150 h-full">
-                    <CardContent className="p-3">
-                      <h2 className="font-semibold text-gray-800 text-sm leading-snug mb-1">
+                  return (
+                    <li
+                      key={price.id}
+                      className="flex items-center justify-between gap-3 px-3 py-2.5 hover:bg-amber-50/50 transition-colors"
+                    >
+                      <span className="text-sm font-medium text-gray-800 truncate min-w-0">
                         {getEmojiForItem(name)} {name}
-                      </h2>
-                      <p
-                        className={`text-lg font-bold ${getPriceColor(priceValue)}`}
-                      >
+                      </span>
+                      <span className={`text-sm font-bold shrink-0 tabular-nums ${getPriceColor(priceValue)}`}>
                         ₱{priceValue.toFixed(2)}{unit}
-                      </p>
-                    </CardContent>
-                  </Card>
-                </li>
-              );
-            })}
-          </ul>
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
+            </CardContent>
+          </Card>
         )}
 
         {/* No Data */}
