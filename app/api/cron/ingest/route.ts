@@ -47,12 +47,15 @@ async function findLatestPDFUrl(): Promise<string | null> {
   }
 }
 
+export async function GET(request: NextRequest) {
+  return POST(request);
+}
+
 export async function POST(request: NextRequest) {
   try {
-    const cronSecret = request.headers.get("x-cron-secret");
-    if (cronSecret !== process.env.CRON_SECRET) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const cronSecret =
+      request.headers.get("x-cron-secret") ||
+      request.headers.get("authorization")?.replace("Bearer ", "");
 
     const today = new Date().toISOString().split("T")[0];
 

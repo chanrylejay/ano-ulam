@@ -5,18 +5,16 @@ import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@/lib/db";
 import { callDeepSeekAPI } from "@/lib/deepseek";
 import { isHidden } from "@/lib/commodity-names";
-import {
-  RECIPES,
-  findCheapestMeals,
-  type PriceMap,
-  type CostResult,
-} from "@/lib/recipes";
+import { RECIPES, findCheapestMeals, type PriceMap, type CostResult } from "@/lib/recipes";
 
 // ═══════════════════════════════════════════════════════════
 // POST /api/cron/suggest
 // Recipe DB + Cost Engine + DeepSeek "Bakit?" only
 // Supports both manual (x-cron-secret) and Vercel Cron (Bearer)
 // ═══════════════════════════════════════════════════════════
+export async function GET(request: NextRequest) {
+  return POST(request);
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -58,10 +56,7 @@ export async function POST(request: NextRequest) {
     `;
 
     if (prices.length === 0) {
-      return NextResponse.json(
-        { error: "No price data available for today" },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: "No price data available for today" }, { status: 400 });
     }
 
     // ── Fetch last available date's prices ────────────────
@@ -92,12 +87,7 @@ export async function POST(request: NextRequest) {
     });
 
     // ── Run cost engine — find cheapest 8 meals ──────────
-    const cheapestMeals: CostResult[] = findCheapestMeals(
-      RECIPES,
-      todayPriceMap,
-      lastPriceMap,
-      8,
-    );
+    const cheapestMeals: CostResult[] = findCheapestMeals(RECIPES, todayPriceMap, lastPriceMap, 8);
 
     // ── Build summary for DeepSeek "Bakit?" prompt ───────
     const mealSummaries = cheapestMeals
@@ -183,9 +173,7 @@ Recipe IDs: ${cheapestMeals.map((r) => r.recipe.id).join(", ")}`;
     const cheapestIngredients: any[] = [];
     Object.entries(categorizedPrices).forEach(([category, items]) => {
       const sorted = [...items].sort(
-        (a, b) =>
-          (parseFloat(a.price_prevailing) || 0) -
-          (parseFloat(b.price_prevailing) || 0),
+        (a, b) => (parseFloat(a.price_prevailing) || 0) - (parseFloat(b.price_prevailing) || 0),
       );
       sorted.slice(0, 3).forEach((item) => {
         cheapestIngredients.push({
