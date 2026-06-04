@@ -883,6 +883,7 @@ function chooseBalancedMeals(allResults: CostResult[], count: number): CostResul
   const proteinCount: Record<string, number> = {};
   const mainIngredientUsed = new Set<string>();
 
+  // Pass 1: strict — respect caps + no duplicate main ingredients
   for (const result of allResults) {
     if (selected.length >= count) break;
 
@@ -899,6 +900,7 @@ function chooseBalancedMeals(allResults: CostResult[], count: number): CostResul
     mainIngredientUsed.add(mainKey);
   }
 
+  // Pass 2: relax ingredient dups, still respect caps
   if (selected.length < count) {
     for (const result of allResults) {
       if (selected.length >= count) break;
@@ -915,11 +917,20 @@ function chooseBalancedMeals(allResults: CostResult[], count: number): CostResul
     }
   }
 
+  // Pass 3: relax caps with double limits, still controlled
   if (selected.length < count) {
     for (const result of allResults) {
       if (selected.length >= count) break;
       if (selected.some((x) => x.recipe.id === result.recipe.id)) continue;
+
+      const protein = getProteinType(result.recipe);
+      const doubleLimit = getProteinLimit(protein) * 2;
+      const current = proteinCount[protein] || 0;
+
+      if (current >= doubleLimit) continue;
+
       selected.push(result);
+      proteinCount[protein] = current + 1;
     }
   }
 
