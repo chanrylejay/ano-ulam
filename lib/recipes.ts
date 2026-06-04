@@ -67,392 +67,580 @@ function ings(...items: IngTuple[]): RecipeIngredient[] {
 // ═══════════════════════════════════════════════════════════
 
 export const RECIPES: Recipe[] = [
-  recipe("adobong-manok", "Adobong Manok", ings(
-    ["Chicken", "Chicken Leg Quarter", 0.625, "kg", "1/2 kg"],
-    ["Bawang", "Garlic Native/Local", 0.06, "kg", "1 ulo"],
-    ["Sibuyas", "Red Onion Local", 0.15, "kg", "1-2 pcs"],
-    ["Patatas", "White Potato Local", 0.3, "kg", "1-2 pcs", true],
-    ["Itlog", "Chicken Egg (White Medium)", 2, "pcs", "2 pcs", true],
-  )),
+  recipe(
+    "adobong-manok",
+    "Adobong Manok",
+    ings(
+      ["Chicken", "Chicken Leg Quarter", 0.625, "kg", "1/2 kg"],
+      ["Bawang", "Garlic Native/Local", 0.06, "kg", "1 ulo"],
+      ["Sibuyas", "Red Onion Local", 0.15, "kg", "1-2 pcs"],
+      ["Patatas", "White Potato Local", 0.3, "kg", "1-2 pcs", true],
+      ["Itlog", "Chicken Egg (White Medium)", 2, "pcs", "2 pcs", true],
+    ),
+  ),
 
-  recipe("sinigang-na-baboy", "Sinigang na Baboy", ings(
-    ["Pork", "Pork Picnic Shoulder (Kasim)", 0.5, "kg", "1/2 kg"],
-    ["Kamatis", "Tomato", 0.2, "kg", "2 pcs"],
-    ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
-    ["Gabi", null, 0.25, "kg", "1 pc", false, 50],
-    ["Kangkong", null, 0.175, "kg", "1 tali", false, 100],
-    ["Sitaw", "Pole Sitao", 0.125, "kg", "5-8 pcs", true],
-    ["Talong", "Eggplant", 0.2, "kg", "1 pc", true],
-    ["Okra", null, 0.1, "kg", "4-6 pcs", true, 90],
-    ["Siling haba", "Chilli (Green) Local", 0.02, "kg", "1-2 pcs", true],
-  )),
+  recipe(
+    "sinigang-na-baboy",
+    "Sinigang na Baboy",
+    ings(
+      ["Pork", "Pork Picnic Shoulder (Kasim)", 0.5, "kg", "1/2 kg"],
+      ["Kamatis", "Tomato", 0.2, "kg", "2 pcs"],
+      ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
+      ["Gabi", null, 0.25, "kg", "1 pc", false, 50],
+      ["Kangkong", null, 0.175, "kg", "1 tali", false, 100],
+      ["Sitaw", "Pole Sitao", 0.125, "kg", "5-8 pcs", true],
+      ["Talong", "Eggplant", 0.2, "kg", "1 pc", true],
+      ["Okra", null, 0.1, "kg", "4-6 pcs", true, 90],
+      ["Siling haba", "Chilli (Green) Local", 0.02, "kg", "1-2 pcs", true],
+    ),
+  ),
 
-  recipe("kare-kare", "Kare-Kare", ings(
-    ["Beef", "Beef Brisket", 0.5, "kg", "1/2 kg"],
-    ["Talong", "Eggplant", 0.2, "kg", "1 pc"],
-    ["Sitaw", "Pole Sitao", 0.125, "kg", "5-8 pcs"],
-    ["Pechay", "Native Pechay", 0.2, "kg", "1 tali"],
-    ["Bawang", "Garlic Native/Local", 0.035, "kg", "4 cloves"],
-    ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
-  )),
+  recipe(
+    "kare-kare",
+    "Kare-Kare",
+    ings(
+      ["Beef", "Beef Brisket", 0.5, "kg", "1/2 kg"],
+      ["Talong", "Eggplant", 0.2, "kg", "1 pc"],
+      ["Sitaw", "Pole Sitao", 0.125, "kg", "5-8 pcs"],
+      ["Pechay", "Native Pechay", 0.2, "kg", "1 tali"],
+      ["Bawang", "Garlic Native/Local", 0.035, "kg", "4 cloves"],
+      ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
+    ),
+  ),
 
-  recipe("tinolang-manok", "Tinolang Manok", ings(
-    ["Chicken", "Chicken Leg Quarter", 0.5, "kg", "1/2 kg"],
-    ["Sayote", "Chayote", 0.4, "kg", "1 pc"],
-    ["Luya", "Ginger Local", 0.04, "kg", "1 piraso"],
-    ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
-    ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
-    ["Malunggay", null, 0.04, "kg", "1 tali", true, 250],
-  )),
+  recipe(
+    "tinolang-manok",
+    "Tinolang Manok",
+    ings(
+      ["Chicken", "Chicken Leg Quarter", 0.5, "kg", "1/2 kg"],
+      ["Sayote", "Chayote", 0.4, "kg", "1 pc"],
+      ["Luya", "Ginger Local", 0.04, "kg", "1 piraso"],
+      ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
+      ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
+      ["Malunggay", null, 0.04, "kg", "1 tali", true, 250],
+    ),
+  ),
 
-  recipe("lechon-kawali", "Lechon Kawali", ings(
-    ["Liempo", "Pork Belly (Liempo)", 0.5, "kg", "1/2 kg"],
-    ["Bawang", "Garlic Native/Local", 0.035, "kg", "4-6 cloves"],
-  )),
+  recipe(
+    "lechon-kawali",
+    "Lechon Kawali",
+    ings(
+      ["Liempo", "Pork Belly (Liempo)", 0.5, "kg", "1/2 kg"],
+      ["Bawang", "Garlic Native/Local", 0.035, "kg", "4-6 cloves"],
+    ),
+  ),
 
-  recipe("lumpiang-shanghai", "Lumpiang Shanghai", ings(
-    ["Ground Pork", "Pork Picnic Shoulder (Kasim)", 0.5, "kg", "1/2 kg"],
-    ["Carrots", "Carrots Local", 0.1, "kg", "1 pc"],
-    ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
-    ["Bawang", "Garlic Native/Local", 0.035, "kg", "4 cloves"],
-    ["Itlog", "Chicken Egg (White Medium)", 1, "pcs", "1 pc", true],
-  )),
+  recipe(
+    "lumpiang-shanghai",
+    "Lumpiang Shanghai",
+    ings(
+      ["Ground Pork", "Pork Picnic Shoulder (Kasim)", 0.5, "kg", "1/2 kg"],
+      ["Carrots", "Carrots Local", 0.1, "kg", "1 pc"],
+      ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
+      ["Bawang", "Garlic Native/Local", 0.035, "kg", "4 cloves"],
+      ["Itlog", "Chicken Egg (White Medium)", 1, "pcs", "1 pc", true],
+    ),
+  ),
 
-  recipe("pork-sisig", "Pork Sisig", ings(
-    ["Liempo", "Pork Belly (Liempo)", 0.5, "kg", "1/2 kg"],
-    ["Sibuyas", "Red Onion Local", 0.15, "kg", "1-2 pcs"],
-    ["Siling green", "Chilli (Green) Local", 0.02, "kg", "2-4 pcs"],
-    ["Kalamansi", "Calamansi", 0.04, "kg", "3-5 pcs"],
-    ["Itlog", "Chicken Egg (White Medium)", 1, "pcs", "1 pc", true],
-  )),
+  recipe(
+    "pork-sisig",
+    "Pork Sisig",
+    ings(
+      ["Liempo", "Pork Belly (Liempo)", 0.5, "kg", "1/2 kg"],
+      ["Sibuyas", "Red Onion Local", 0.15, "kg", "1-2 pcs"],
+      ["Siling green", "Chilli (Green) Local", 0.02, "kg", "2-4 pcs"],
+      ["Kalamansi", "Calamansi", 0.04, "kg", "3-5 pcs"],
+      ["Itlog", "Chicken Egg (White Medium)", 1, "pcs", "1 pc", true],
+    ),
+  ),
 
-  recipe("nilagang-baboy", "Nilagang Baboy", ings(
-    ["Pork", "Pork Picnic Shoulder (Kasim)", 0.5, "kg", "1/2 kg"],
-    ["Repolyo", "Cabbage (Scorpio)", 0.25, "kg", "1/4 head"],
-    ["Patatas", "White Potato Local", 0.3, "kg", "1-2 pcs"],
-    ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
-    ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
-    ["Pechay", "Native Pechay", 0.2, "kg", "1 tali", true],
-    ["Mais", null, 1, "pcs", "1 pc", true, 18],
-  )),
+  recipe(
+    "nilagang-baboy",
+    "Nilagang Baboy",
+    ings(
+      ["Pork", "Pork Picnic Shoulder (Kasim)", 0.5, "kg", "1/2 kg"],
+      ["Repolyo", "Cabbage (Scorpio)", 0.25, "kg", "1/4 head"],
+      ["Patatas", "White Potato Local", 0.3, "kg", "1-2 pcs"],
+      ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
+      ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
+      ["Pechay", "Native Pechay", 0.2, "kg", "1 tali", true],
+      ["Mais", null, 1, "pcs", "1 pc", true, 18],
+    ),
+  ),
 
-  recipe("chicken-afritada", "Chicken Afritada", ings(
-    ["Chicken", "Chicken Leg Quarter", 0.5, "kg", "1/2 kg"],
-    ["Patatas", "White Potato Local", 0.3, "kg", "1-2 pcs"],
-    ["Carrots", "Carrots Local", 0.1, "kg", "1 pc"],
-    ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
-    ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
-    ["Bell pepper", "Bell Pepper (Red) Local", 0.125, "kg", "1 pc", true],
-  )),
+  recipe(
+    "chicken-afritada",
+    "Chicken Afritada",
+    ings(
+      ["Chicken", "Chicken Leg Quarter", 0.5, "kg", "1/2 kg"],
+      ["Patatas", "White Potato Local", 0.3, "kg", "1-2 pcs"],
+      ["Carrots", "Carrots Local", 0.1, "kg", "1 pc"],
+      ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
+      ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
+      ["Bell pepper", "Bell Pepper (Red) Local", 0.125, "kg", "1 pc", true],
+    ),
+  ),
 
-  recipe("pork-menudo", "Pork Menudo", ings(
-    ["Pork", "Pork Picnic Shoulder (Kasim)", 0.5, "kg", "1/2 kg"],
-    ["Patatas", "White Potato Local", 0.3, "kg", "1-2 pcs"],
-    ["Carrots", "Carrots Local", 0.1, "kg", "1 pc"],
-    ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
-    ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
-    ["Atay ng baboy", null, 0.25, "kg", "1/4 kg", true, 225],
-    ["Bell pepper", "Bell Pepper (Red) Local", 0.125, "kg", "1 pc", true],
-  )),
+  recipe(
+    "pork-menudo",
+    "Pork Menudo",
+    ings(
+      ["Pork", "Pork Picnic Shoulder (Kasim)", 0.5, "kg", "1/2 kg"],
+      ["Patatas", "White Potato Local", 0.3, "kg", "1-2 pcs"],
+      ["Carrots", "Carrots Local", 0.1, "kg", "1 pc"],
+      ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
+      ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
+      ["Atay ng baboy", null, 0.25, "kg", "1/4 kg", true, 225],
+      ["Bell pepper", "Bell Pepper (Red) Local", 0.125, "kg", "1 pc", true],
+    ),
+  ),
 
-  recipe("ginataang-kalabasa", "Ginataang Kalabasa", ings(
-    ["Kalabasa", "Squash", 0.5, "kg", "1/2 kg"],
-    ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
-    ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
-    ["Luya", "Ginger Local", 0.04, "kg", "1 piraso"],
-    ["Sitaw", "Pole Sitao", 0.125, "kg", "5-8 pcs", true],
-    ["Pork", "Pork Picnic Shoulder (Kasim)", 0.25, "kg", "1/4 kg", true],
-    ["Siling haba", "Chilli (Green) Local", 0.02, "kg", "1-2 pcs", true],
-  )),
+  recipe(
+    "ginataang-kalabasa",
+    "Ginataang Kalabasa",
+    ings(
+      ["Kalabasa", "Squash", 0.5, "kg", "1/2 kg"],
+      ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
+      ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
+      ["Luya", "Ginger Local", 0.04, "kg", "1 piraso"],
+      ["Sitaw", "Pole Sitao", 0.125, "kg", "5-8 pcs", true],
+      ["Pork", "Pork Picnic Shoulder (Kasim)", 0.25, "kg", "1/4 kg", true],
+      ["Siling haba", "Chilli (Green) Local", 0.02, "kg", "1-2 pcs", true],
+    ),
+  ),
 
-  recipe("tortang-talong", "Tortang Talong", ings(
-    ["Talong", "Eggplant", 0.4, "kg", "2-3 pcs"],
-    ["Itlog", "Chicken Egg (White Medium)", 3, "pcs", "3 pcs"],
-    ["Sibuyas", "Red Onion Local", 0.065, "kg", "1 pc", true],
-    ["Bawang", "Garlic Native/Local", 0.015, "kg", "2-3 cloves", true],
-    ["Ground Pork", "Pork Picnic Shoulder (Kasim)", 0.25, "kg", "1/4 kg", true],
-  )),
+  recipe(
+    "tortang-talong",
+    "Tortang Talong",
+    ings(
+      ["Talong", "Eggplant", 0.4, "kg", "2-3 pcs"],
+      ["Itlog", "Chicken Egg (White Medium)", 3, "pcs", "3 pcs"],
+      ["Sibuyas", "Red Onion Local", 0.065, "kg", "1 pc", true],
+      ["Bawang", "Garlic Native/Local", 0.015, "kg", "2-3 cloves", true],
+      ["Ground Pork", "Pork Picnic Shoulder (Kasim)", 0.25, "kg", "1/4 kg", true],
+    ),
+  ),
 
-  recipe("pinakbet", "Pinakbet", ings(
-    ["Kalabasa", "Squash", 0.25, "kg", "1/4 kg"],
-    ["Sitaw", "Pole Sitao", 0.125, "kg", "5-8 pcs"],
-    ["Talong", "Eggplant", 0.275, "kg", "1-2 pcs"],
-    ["Kamatis", "Tomato", 0.2, "kg", "2 pcs"],
-    ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
-    ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
-    ["Okra", null, 0.1, "kg", "4-6 pcs", true, 90],
-    ["Ampalaya", "Ampalaya", 0.2, "kg", "1 pc", true],
-    ["Pork", "Pork Picnic Shoulder (Kasim)", 0.25, "kg", "1/4 kg", true],
-  )),
+  recipe(
+    "pinakbet",
+    "Pinakbet",
+    ings(
+      ["Kalabasa", "Squash", 0.25, "kg", "1/4 kg"],
+      ["Sitaw", "Pole Sitao", 0.125, "kg", "5-8 pcs"],
+      ["Talong", "Eggplant", 0.275, "kg", "1-2 pcs"],
+      ["Kamatis", "Tomato", 0.2, "kg", "2 pcs"],
+      ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
+      ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
+      ["Okra", null, 0.1, "kg", "4-6 pcs", true, 90],
+      ["Ampalaya", "Ampalaya", 0.2, "kg", "1 pc", true],
+      ["Pork", "Pork Picnic Shoulder (Kasim)", 0.25, "kg", "1/4 kg", true],
+    ),
+  ),
 
-  recipe("giniling-na-baboy", "Pork Giniling", ings(
-    ["Ground Pork", "Pork Picnic Shoulder (Kasim)", 0.5, "kg", "1/2 kg"],
-    ["Patatas", "White Potato Local", 0.175, "kg", "1 pc"],
-    ["Carrots", "Carrots Local", 0.1, "kg", "1 pc"],
-    ["Bell pepper", "Bell Pepper (Red) Local", 0.125, "kg", "1 pc"],
-    ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
-    ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
-  )),
+  recipe(
+    "giniling-na-baboy",
+    "Pork Giniling",
+    ings(
+      ["Ground Pork", "Pork Picnic Shoulder (Kasim)", 0.5, "kg", "1/2 kg"],
+      ["Patatas", "White Potato Local", 0.175, "kg", "1 pc"],
+      ["Carrots", "Carrots Local", 0.1, "kg", "1 pc"],
+      ["Bell pepper", "Bell Pepper (Red) Local", 0.125, "kg", "1 pc"],
+      ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
+      ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
+    ),
+  ),
 
-  recipe("ginisang-sayote", "Ginisang Sayote", ings(
-    ["Sayote", "Chayote", 0.5, "kg", "2 pcs"],
-    ["Pork", "Pork Picnic Shoulder (Kasim)", 0.25, "kg", "1/4 kg"],
-    ["Kamatis", "Tomato", 0.1, "kg", "1 pc"],
-    ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
-    ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
-  )),
+  recipe(
+    "ginisang-sayote",
+    "Ginisang Sayote",
+    ings(
+      ["Sayote", "Chayote", 0.5, "kg", "2 pcs"],
+      ["Pork", "Pork Picnic Shoulder (Kasim)", 0.25, "kg", "1/4 kg"],
+      ["Kamatis", "Tomato", 0.1, "kg", "1 pc"],
+      ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
+      ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
+    ),
+  ),
 
-  recipe("pritong-tilapia", "Fried Tilapia", ings(
-    ["Tilapia", "Tilapia", 0.75, "kg", "3/4 kg"],
-    ["Kalamansi", "Calamansi", 0.025, "kg", "2-3 pcs", true],
-  )),
+  recipe(
+    "pritong-tilapia",
+    "Fried Tilapia",
+    ings(
+      ["Tilapia", "Tilapia", 0.75, "kg", "3/4 kg"],
+      ["Kalamansi", "Calamansi", 0.025, "kg", "2-3 pcs", true],
+    ),
+  ),
 
-  recipe("ginisang-repolyo-at-manok", "Ginisang Repolyo at Manok", ings(
-    ["Repolyo", "Cabbage (Scorpio)", 0.5, "kg", "1/2 head"],
-    ["Chicken Breast", "Chicken Breast", 0.625, "kg", "1/2 kg"],
-    ["Carrots", "Carrots Local", 0.1, "kg", "1 pc"],
-    ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
-    ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
-  )),
+  recipe(
+    "ginisang-repolyo-at-manok",
+    "Ginisang Repolyo at Manok",
+    ings(
+      ["Repolyo", "Cabbage (Scorpio)", 0.5, "kg", "1/2 head"],
+      ["Chicken Breast", "Chicken Breast", 0.625, "kg", "1/2 kg"],
+      ["Carrots", "Carrots Local", 0.1, "kg", "1 pc"],
+      ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
+      ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
+    ),
+  ),
 
-  recipe("sopas", "Sopas", ings(
-    ["Chicken Breast", "Chicken Breast", 0.25, "kg", "1/4 kg"],
-    ["Repolyo", "Cabbage (Scorpio)", 0.25, "kg", "1/4 head"],
-    ["Carrots", "Carrots Local", 0.1, "kg", "1 pc"],
-    ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
-    ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
-  )),
+  recipe(
+    "sopas",
+    "Sopas",
+    ings(
+      ["Chicken Breast", "Chicken Breast", 0.25, "kg", "1/4 kg"],
+      ["Repolyo", "Cabbage (Scorpio)", 0.25, "kg", "1/4 head"],
+      ["Carrots", "Carrots Local", 0.1, "kg", "1 pc"],
+      ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
+      ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
+    ),
+  ),
 
-  recipe("ginisang-ampalaya", "Ginisang Ampalaya", ings(
-    ["Ampalaya", "Ampalaya", 0.4, "kg", "1-2 pcs"],
-    ["Itlog", "Chicken Egg (White Medium)", 3, "pcs", "3 pcs"],
-    ["Kamatis", "Tomato", 0.14, "kg", "1-2 pcs"],
-    ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
-    ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
-    ["Ground Pork", "Pork Picnic Shoulder (Kasim)", 0.25, "kg", "1/4 kg", true],
-  )),
+  recipe(
+    "ginisang-ampalaya",
+    "Ginisang Ampalaya",
+    ings(
+      ["Ampalaya", "Ampalaya", 0.4, "kg", "1-2 pcs"],
+      ["Itlog", "Chicken Egg (White Medium)", 3, "pcs", "3 pcs"],
+      ["Kamatis", "Tomato", 0.14, "kg", "1-2 pcs"],
+      ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
+      ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
+      ["Ground Pork", "Pork Picnic Shoulder (Kasim)", 0.25, "kg", "1/4 kg", true],
+    ),
+  ),
 
-  recipe("chicken-caldereta", "Chicken Caldereta", ings(
-    ["Chicken", "Chicken Leg Quarter", 0.625, "kg", "1/2 kg"],
-    ["Patatas", "White Potato Local", 0.3, "kg", "1-2 pcs"],
-    ["Carrots", "Carrots Local", 0.1, "kg", "1 pc"],
-    ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
-    ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
-    ["Bell pepper", "Bell Pepper (Red) Local", 0.125, "kg", "1 pc", true],
-  )),
+  recipe(
+    "chicken-caldereta",
+    "Chicken Caldereta",
+    ings(
+      ["Chicken", "Chicken Leg Quarter", 0.625, "kg", "1/2 kg"],
+      ["Patatas", "White Potato Local", 0.3, "kg", "1-2 pcs"],
+      ["Carrots", "Carrots Local", 0.1, "kg", "1 pc"],
+      ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
+      ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
+      ["Bell pepper", "Bell Pepper (Red) Local", 0.125, "kg", "1 pc", true],
+    ),
+  ),
 
-  recipe("beef-nilaga", "Beef Nilaga", ings(
-    ["Beef", "Beef Brisket", 0.5, "kg", "1/2 kg"],
-    ["Repolyo", "Cabbage (Scorpio)", 0.25, "kg", "1/4 head"],
-    ["Patatas", "White Potato Local", 0.3, "kg", "1-2 pcs"],
-    ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
-    ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
-    ["Pechay", "Native Pechay", 0.2, "kg", "1 tali", true],
-    ["Mais", null, 1, "pcs", "1 pc", true, 18],
-  )),
+  recipe(
+    "beef-nilaga",
+    "Beef Nilaga",
+    ings(
+      ["Beef", "Beef Brisket", 0.5, "kg", "1/2 kg"],
+      ["Repolyo", "Cabbage (Scorpio)", 0.25, "kg", "1/4 head"],
+      ["Patatas", "White Potato Local", 0.3, "kg", "1-2 pcs"],
+      ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
+      ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
+      ["Pechay", "Native Pechay", 0.2, "kg", "1 tali", true],
+      ["Mais", null, 1, "pcs", "1 pc", true, 18],
+    ),
+  ),
 
-  recipe("ginataang-sitaw-at-kalabasa", "Ginataang Sitaw at Kalabasa", ings(
-    ["Kalabasa", "Squash", 0.5, "kg", "1/2 kg"],
-    ["Sitaw", "Pole Sitao", 0.125, "kg", "5-8 pcs"],
-    ["Pork", "Pork Picnic Shoulder (Kasim)", 0.25, "kg", "1/4 kg"],
-    ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
-    ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
-    ["Luya", "Ginger Local", 0.04, "kg", "1 piraso", true],
-    ["Siling haba", "Chilli (Green) Local", 0.02, "kg", "1-2 pcs", true],
-  )),
+  recipe(
+    "ginataang-sitaw-at-kalabasa",
+    "Ginataang Sitaw at Kalabasa",
+    ings(
+      ["Kalabasa", "Squash", 0.5, "kg", "1/2 kg"],
+      ["Sitaw", "Pole Sitao", 0.125, "kg", "5-8 pcs"],
+      ["Pork", "Pork Picnic Shoulder (Kasim)", 0.25, "kg", "1/4 kg"],
+      ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
+      ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
+      ["Luya", "Ginger Local", 0.04, "kg", "1 piraso", true],
+      ["Siling haba", "Chilli (Green) Local", 0.02, "kg", "1-2 pcs", true],
+    ),
+  ),
 
-  recipe("ginisang-pechay-at-baboy", "Ginisang Pechay at Baboy", ings(
-    ["Pechay", "Native Pechay", 0.325, "kg", "1-2 tali"],
-    ["Pork", "Pork Picnic Shoulder (Kasim)", 0.25, "kg", "1/4 kg"],
-    ["Kamatis", "Tomato", 0.1, "kg", "1 pc"],
-    ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
-    ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
-  )),
+  recipe(
+    "ginisang-pechay-at-baboy",
+    "Ginisang Pechay at Baboy",
+    ings(
+      ["Pechay", "Native Pechay", 0.325, "kg", "1-2 tali"],
+      ["Pork", "Pork Picnic Shoulder (Kasim)", 0.25, "kg", "1/4 kg"],
+      ["Kamatis", "Tomato", 0.1, "kg", "1 pc"],
+      ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
+      ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
+    ),
+  ),
 
-  recipe("ginisang-sayote-at-manok", "Ginisang Sayote at Manok", ings(
-    ["Chicken", "Chicken Leg Quarter", 0.5, "kg", "1/2 kg"],
-    ["Sayote", "Chayote", 0.5, "kg", "2 pcs"],
-    ["Kamatis", "Tomato", 0.1, "kg", "1 pc"],
-    ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
-    ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
-    ["Luya", "Ginger Local", 0.04, "kg", "1 piraso", true],
-  )),
+  recipe(
+    "ginisang-sayote-at-manok",
+    "Ginisang Sayote at Manok",
+    ings(
+      ["Chicken", "Chicken Leg Quarter", 0.5, "kg", "1/2 kg"],
+      ["Sayote", "Chayote", 0.5, "kg", "2 pcs"],
+      ["Kamatis", "Tomato", 0.1, "kg", "1 pc"],
+      ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
+      ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
+      ["Luya", "Ginger Local", 0.04, "kg", "1 piraso", true],
+    ),
+  ),
 
-  recipe("ginisang-sayote-at-baboy", "Ginisang Sayote at Baboy", ings(
-    ["Pork", "Pork Picnic Shoulder (Kasim)", 0.5, "kg", "1/2 kg"],
-    ["Sayote", "Chayote", 0.5, "kg", "2 pcs"],
-    ["Kamatis", "Tomato", 0.1, "kg", "1 pc"],
-    ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
-    ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
-  )),
+  recipe(
+    "ginisang-sayote-at-baboy",
+    "Ginisang Sayote at Baboy",
+    ings(
+      ["Pork", "Pork Picnic Shoulder (Kasim)", 0.5, "kg", "1/2 kg"],
+      ["Sayote", "Chayote", 0.5, "kg", "2 pcs"],
+      ["Kamatis", "Tomato", 0.1, "kg", "1 pc"],
+      ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
+      ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
+    ),
+  ),
 
-  recipe("pritong-manok", "Fried Chicken", ings(
-    ["Chicken", "Chicken Leg Quarter", 0.625, "kg", "1/2 kg"],
-    ["Kalamansi", "Calamansi", 0.04, "kg", "3-5 pcs", true],
-    ["Itlog", "Chicken Egg (White Medium)", 1, "pcs", "1 pc", true],
-  )),
+  recipe(
+    "pritong-manok",
+    "Fried Chicken",
+    ings(
+      ["Chicken", "Chicken Leg Quarter", 0.625, "kg", "1/2 kg"],
+      ["Kalamansi", "Calamansi", 0.04, "kg", "3-5 pcs", true],
+      ["Itlog", "Chicken Egg (White Medium)", 1, "pcs", "1 pc", true],
+    ),
+  ),
 
-  recipe("beef-broccoli", "Beef Broccoli", ings(
-    ["Beef", "Beef Brisket", 0.5, "kg", "1/2 kg"],
-    ["Broccoli", "Broccoli Local", 0.4, "kg", "1 head"],
-    ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
-    ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
-    ["Carrots", "Carrots Local", 0.1, "kg", "1 pc", true],
-  )),
+  recipe(
+    "beef-broccoli",
+    "Beef Broccoli",
+    ings(
+      ["Beef", "Beef Brisket", 0.5, "kg", "1/2 kg"],
+      ["Broccoli", "Broccoli Local", 0.4, "kg", "1 head"],
+      ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
+      ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
+      ["Carrots", "Carrots Local", 0.1, "kg", "1 pc", true],
+    ),
+  ),
 
-  recipe("ginisang-upo", "Ginisang Upo", ings(
-    ["Upo", null, 0.7, "kg", "1 pc", false, 50],
-    ["Kamatis", "Tomato", 0.1, "kg", "1 pc"],
-    ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
-    ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
-    ["Pork", "Pork Picnic Shoulder (Kasim)", 0.25, "kg", "1/4 kg", true],
-  )),
+  recipe(
+    "ginisang-upo",
+    "Ginisang Upo",
+    ings(
+      ["Upo", null, 0.7, "kg", "1 pc", false, 50],
+      ["Kamatis", "Tomato", 0.1, "kg", "1 pc"],
+      ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
+      ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
+      ["Pork", "Pork Picnic Shoulder (Kasim)", 0.25, "kg", "1/4 kg", true],
+    ),
+  ),
 
-  recipe("ginataang-tilapia", "Ginataang Tilapia", ings(
-    ["Tilapia", "Tilapia", 0.625, "kg", "2-3 pcs"],
-    ["Pechay", "Native Pechay", 0.2, "kg", "1 tali"],
-    ["Luya", "Ginger Local", 0.04, "kg", "1 piraso"],
-    ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
-    ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
-    ["Siling haba", "Chilli (Green) Local", 0.02, "kg", "1-2 pcs", true],
-  )),
+  recipe(
+    "ginataang-tilapia",
+    "Ginataang Tilapia",
+    ings(
+      ["Tilapia", "Tilapia", 0.625, "kg", "2-3 pcs"],
+      ["Pechay", "Native Pechay", 0.2, "kg", "1 tali"],
+      ["Luya", "Ginger Local", 0.04, "kg", "1 piraso"],
+      ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
+      ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
+      ["Siling haba", "Chilli (Green) Local", 0.02, "kg", "1-2 pcs", true],
+    ),
+  ),
 
-  recipe("pritong-bangus", "Fried Bangus", ings(
-    ["Bangus", "Bangus", 0.75, "kg", "3/4 kg"],
-    ["Kalamansi", "Calamansi", 0.04, "kg", "3-5 pcs", true],
-    ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo", true],
-  )),
+  recipe(
+    "pritong-bangus",
+    "Fried Bangus",
+    ings(
+      ["Bangus", "Bangus", 0.75, "kg", "3/4 kg"],
+      ["Kalamansi", "Calamansi", 0.04, "kg", "3-5 pcs", true],
+      ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo", true],
+    ),
+  ),
 
-  recipe("sarciadong-tilapia", "Sarciadong Tilapia", ings(
-    ["Tilapia", "Tilapia", 0.625, "kg", "2-3 pcs"],
-    ["Kamatis", "Tomato", 0.225, "kg", "2-3 pcs"],
-    ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
-    ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
-    ["Itlog", "Chicken Egg (White Medium)", 2, "pcs", "1-2 pcs"],
-  )),
+  recipe(
+    "sarciadong-tilapia",
+    "Sarciadong Tilapia",
+    ings(
+      ["Tilapia", "Tilapia", 0.625, "kg", "2-3 pcs"],
+      ["Kamatis", "Tomato", 0.225, "kg", "2-3 pcs"],
+      ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
+      ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
+      ["Itlog", "Chicken Egg (White Medium)", 2, "pcs", "1-2 pcs"],
+    ),
+  ),
 
-  recipe("pritong-galunggong", "Fried Galunggong", ings(
-    ["Galunggong", "Galunggong", 0.625, "kg", "1/2 kg"],
-    ["Kalamansi", "Calamansi", 0.025, "kg", "2-3 pcs", true],
-    ["Bawang", "Garlic Native/Local", 0.025, "kg", "3-4 cloves", true],
-  )),
+  recipe(
+    "pritong-galunggong",
+    "Fried Galunggong",
+    ings(
+      ["Galunggong", "Galunggong", 0.625, "kg", "1/2 kg"],
+      ["Kalamansi", "Calamansi", 0.025, "kg", "2-3 pcs", true],
+      ["Bawang", "Garlic Native/Local", 0.025, "kg", "3-4 cloves", true],
+    ),
+  ),
 
-  recipe("sarciadong-galunggong", "Sarciadong Galunggong", ings(
-    ["Galunggong", "Galunggong", 0.5, "kg", "1/2 kg"],
-    ["Kamatis", "Tomato", 0.225, "kg", "2-3 pcs"],
-    ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
-    ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
-    ["Itlog", "Chicken Egg (White Medium)", 2, "pcs", "1-2 pcs"],
-  )),
+  recipe(
+    "sarciadong-galunggong",
+    "Sarciadong Galunggong",
+    ings(
+      ["Galunggong", "Galunggong", 0.5, "kg", "1/2 kg"],
+      ["Kamatis", "Tomato", 0.225, "kg", "2-3 pcs"],
+      ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
+      ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
+      ["Itlog", "Chicken Egg (White Medium)", 2, "pcs", "1-2 pcs"],
+    ),
+  ),
 
-  recipe("pritong-tamban", "Fried Tamban", ings(
-    ["Tamban", "Sardines (Tamban)", 0.5, "kg", "1/2 kg"],
-    ["Kalamansi", "Calamansi", 0.025, "kg", "2-3 pcs", true],
-    ["Bawang", "Garlic Native/Local", 0.025, "kg", "3-4 cloves", true],
-  )),
+  recipe(
+    "pritong-tamban",
+    "Fried Tamban",
+    ings(
+      ["Tamban", "Sardines (Tamban)", 0.5, "kg", "1/2 kg"],
+      ["Kalamansi", "Calamansi", 0.025, "kg", "2-3 pcs", true],
+      ["Bawang", "Garlic Native/Local", 0.025, "kg", "3-4 cloves", true],
+    ),
+  ),
 
-  recipe("tortang-giniling", "Tortang Giniling", ings(
-    ["Ground Pork", "Pork Picnic Shoulder (Kasim)", 0.25, "kg", "1/4 kg"],
-    ["Itlog", "Chicken Egg (White Medium)", 3, "pcs", "3 pcs"],
-    ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
-    ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
-    ["Patatas", "White Potato Local", 0.175, "kg", "1 pc", true],
-    ["Carrots", "Carrots Local", 0.1, "kg", "1 pc", true],
-  )),
+  recipe(
+    "tortang-giniling",
+    "Tortang Giniling",
+    ings(
+      ["Ground Pork", "Pork Picnic Shoulder (Kasim)", 0.25, "kg", "1/4 kg"],
+      ["Itlog", "Chicken Egg (White Medium)", 3, "pcs", "3 pcs"],
+      ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
+      ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
+      ["Patatas", "White Potato Local", 0.175, "kg", "1 pc", true],
+      ["Carrots", "Carrots Local", 0.1, "kg", "1 pc", true],
+    ),
+  ),
 
-  recipe("pritong-pork-chop", "Fried Pork Chop", ings(
-    ["Pork Chop", "Pork Chop", 0.5, "kg", "1/2 kg"],
-    ["Kalamansi", "Calamansi", 0.04, "kg", "3-5 pcs", true],
-    ["Bawang", "Garlic Native/Local", 0.035, "kg", "4-6 cloves", true],
-    ["Itlog", "Chicken Egg (White Medium)", 1, "pcs", "1 pc", true],
-  )),
+  recipe(
+    "pritong-pork-chop",
+    "Fried Pork Chop",
+    ings(
+      ["Pork Chop", "Pork Chop", 0.5, "kg", "1/2 kg"],
+      ["Kalamansi", "Calamansi", 0.04, "kg", "3-5 pcs", true],
+      ["Bawang", "Garlic Native/Local", 0.035, "kg", "4-6 cloves", true],
+      ["Itlog", "Chicken Egg (White Medium)", 1, "pcs", "1 pc", true],
+    ),
+  ),
 
-  recipe("pritong-liempo", "Fried Liempo", ings(
-    ["Liempo", "Pork Belly (Liempo)", 0.5, "kg", "1/2 kg"],
-    ["Bawang", "Garlic Native/Local", 0.035, "kg", "4-6 cloves", true],
-    ["Kalamansi", "Calamansi", 0.025, "kg", "2-3 pcs", true],
-  )),
+  recipe(
+    "pritong-liempo",
+    "Fried Liempo",
+    ings(
+      ["Liempo", "Pork Belly (Liempo)", 0.5, "kg", "1/2 kg"],
+      ["Bawang", "Garlic Native/Local", 0.035, "kg", "4-6 cloves", true],
+      ["Kalamansi", "Calamansi", 0.025, "kg", "2-3 pcs", true],
+    ),
+  ),
 
-  recipe("pritong-pakpak-ng-manok", "Fried Chicken Wings", ings(
-    ["Chicken Wings", "Chicken Wing", 0.625, "kg", "1/2 kg"],
-    ["Kalamansi", "Calamansi", 0.04, "kg", "3-5 pcs", true],
-  )),
+  recipe(
+    "pritong-pakpak-ng-manok",
+    "Fried Chicken Wings",
+    ings(
+      ["Chicken Wings", "Chicken Wing", 0.625, "kg", "1/2 kg"],
+      ["Kalamansi", "Calamansi", 0.04, "kg", "3-5 pcs", true],
+    ),
+  ),
 
-  recipe("adobong-baboy", "Adobong Baboy", ings(
-    ["Pork", "Pork Picnic Shoulder (Kasim)", 0.5, "kg", "1/2 kg"],
-    ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
-    ["Sibuyas", "Red Onion Local", 0.15, "kg", "1-2 pcs"],
-    ["Patatas", "White Potato Local", 0.3, "kg", "1-2 pcs", true],
-    ["Itlog", "Chicken Egg (White Medium)", 2, "pcs", "2 pcs", true],
-  )),
+  recipe(
+    "adobong-baboy",
+    "Adobong Baboy",
+    ings(
+      ["Pork", "Pork Picnic Shoulder (Kasim)", 0.5, "kg", "1/2 kg"],
+      ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
+      ["Sibuyas", "Red Onion Local", 0.15, "kg", "1-2 pcs"],
+      ["Patatas", "White Potato Local", 0.3, "kg", "1-2 pcs", true],
+      ["Itlog", "Chicken Egg (White Medium)", 2, "pcs", "2 pcs", true],
+    ),
+  ),
 
-  recipe("pork-mechado", "Pork Mechado", ings(
-    ["Pork", "Pork Picnic Shoulder (Kasim)", 0.5, "kg", "1/2 kg"],
-    ["Patatas", "White Potato Local", 0.3, "kg", "1-2 pcs"],
-    ["Carrots", "Carrots Local", 0.1, "kg", "1 pc"],
-    ["Kamatis", "Tomato", 0.14, "kg", "1-2 pcs"],
-    ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
-    ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
-    ["Bell pepper", "Bell Pepper (Red) Local", 0.125, "kg", "1 pc", true],
-  )),
+  recipe(
+    "pork-mechado",
+    "Pork Mechado",
+    ings(
+      ["Pork", "Pork Picnic Shoulder (Kasim)", 0.5, "kg", "1/2 kg"],
+      ["Patatas", "White Potato Local", 0.3, "kg", "1-2 pcs"],
+      ["Carrots", "Carrots Local", 0.1, "kg", "1 pc"],
+      ["Kamatis", "Tomato", 0.14, "kg", "1-2 pcs"],
+      ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
+      ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
+      ["Bell pepper", "Bell Pepper (Red) Local", 0.125, "kg", "1 pc", true],
+    ),
+  ),
 
-  recipe("beef-mechado", "Beef Mechado", ings(
-    ["Beef", "Beef Brisket", 0.5, "kg", "1/2 kg"],
-    ["Patatas", "White Potato Local", 0.3, "kg", "1-2 pcs"],
-    ["Carrots", "Carrots Local", 0.1, "kg", "1 pc"],
-    ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
-    ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
-    ["Bell pepper", "Bell Pepper (Red) Local", 0.125, "kg", "1 pc", true],
-    ["Kamatis", "Tomato", 0.14, "kg", "1-2 pcs", true],
-  )),
+  recipe(
+    "beef-mechado",
+    "Beef Mechado",
+    ings(
+      ["Beef", "Beef Brisket", 0.5, "kg", "1/2 kg"],
+      ["Patatas", "White Potato Local", 0.3, "kg", "1-2 pcs"],
+      ["Carrots", "Carrots Local", 0.1, "kg", "1 pc"],
+      ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
+      ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
+      ["Bell pepper", "Bell Pepper (Red) Local", 0.125, "kg", "1 pc", true],
+      ["Kamatis", "Tomato", 0.14, "kg", "1-2 pcs", true],
+    ),
+  ),
 
-  recipe("pork-caldereta", "Pork Caldereta", ings(
-    ["Pork", "Pork Picnic Shoulder (Kasim)", 0.5, "kg", "1/2 kg"],
-    ["Patatas", "White Potato Local", 0.3, "kg", "1-2 pcs"],
-    ["Carrots", "Carrots Local", 0.1, "kg", "1 pc"],
-    ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
-    ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
-  )),
+  recipe(
+    "pork-caldereta",
+    "Pork Caldereta",
+    ings(
+      ["Pork", "Pork Picnic Shoulder (Kasim)", 0.5, "kg", "1/2 kg"],
+      ["Patatas", "White Potato Local", 0.3, "kg", "1-2 pcs"],
+      ["Carrots", "Carrots Local", 0.1, "kg", "1 pc"],
+      ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
+      ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
+    ),
+  ),
 
-  recipe("beef-caldereta", "Beef Caldereta", ings(
-    ["Beef", "Beef Brisket", 0.5, "kg", "1/2 kg"],
-    ["Patatas", "White Potato Local", 0.3, "kg", "1-2 pcs"],
-    ["Carrots", "Carrots Local", 0.1, "kg", "1 pc"],
-    ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
-    ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
-    ["Bell pepper", "Bell Pepper (Red) Local", 0.125, "kg", "1 pc", true],
-  )),
+  recipe(
+    "beef-caldereta",
+    "Beef Caldereta",
+    ings(
+      ["Beef", "Beef Brisket", 0.5, "kg", "1/2 kg"],
+      ["Patatas", "White Potato Local", 0.3, "kg", "1-2 pcs"],
+      ["Carrots", "Carrots Local", 0.1, "kg", "1 pc"],
+      ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
+      ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
+      ["Bell pepper", "Bell Pepper (Red) Local", 0.125, "kg", "1 pc", true],
+    ),
+  ),
 
-  recipe("chicken-inasal", "Chicken Inasal", ings(
-    ["Chicken", "Chicken Leg Quarter", 0.625, "kg", "1/2 kg"],
-    ["Kalamansi", "Calamansi", 0.04, "kg", "3-5 pcs", true],
-  )),
+  recipe(
+    "chicken-inasal",
+    "Chicken Inasal",
+    ings(
+      ["Chicken", "Chicken Leg Quarter", 0.625, "kg", "1/2 kg"],
+      ["Kalamansi", "Calamansi", 0.04, "kg", "3-5 pcs", true],
+    ),
+  ),
 
-  recipe("inihaw-na-liempo", "Inihaw na Liempo", ings(
-    ["Liempo", "Pork Belly (Liempo)", 0.5, "kg", "1/2 kg"],
-    ["Kalamansi", "Calamansi", 0.04, "kg", "3-5 pcs", true],
-    ["Bawang", "Garlic Native/Local", 0.035, "kg", "4-6 cloves", true],
-  )),
+  recipe(
+    "inihaw-na-liempo",
+    "Inihaw na Liempo",
+    ings(
+      ["Liempo", "Pork Belly (Liempo)", 0.5, "kg", "1/2 kg"],
+      ["Kalamansi", "Calamansi", 0.04, "kg", "3-5 pcs", true],
+      ["Bawang", "Garlic Native/Local", 0.035, "kg", "4-6 cloves", true],
+    ),
+  ),
 
-  recipe("inihaw-na-bangus", "Inihaw na Bangus", ings(
-    ["Bangus", "Bangus", 0.75, "kg", "3/4 kg"],
-    ["Kamatis", "Tomato", 0.2, "kg", "2 pcs"],
-    ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
-    ["Luya", "Ginger Local", 0.04, "kg", "1 piraso", true],
-    ["Kalamansi", "Calamansi", 0.04, "kg", "3-5 pcs", true],
-    ["Siling haba", "Chilli (Green) Local", 0.02, "kg", "1-2 pcs", true],
-  )),
+  recipe(
+    "inihaw-na-bangus",
+    "Inihaw na Bangus",
+    ings(
+      ["Bangus", "Bangus", 0.75, "kg", "3/4 kg"],
+      ["Kamatis", "Tomato", 0.2, "kg", "2 pcs"],
+      ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
+      ["Luya", "Ginger Local", 0.04, "kg", "1 piraso", true],
+      ["Kalamansi", "Calamansi", 0.04, "kg", "3-5 pcs", true],
+      ["Siling haba", "Chilli (Green) Local", 0.02, "kg", "1-2 pcs", true],
+    ),
+  ),
 
-  recipe("sinigang-na-bangus", "Sinigang na Bangus", ings(
-    ["Bangus", "Bangus", 0.625, "kg", "1/2 kg"],
-    ["Kamatis", "Tomato", 0.225, "kg", "2-3 pcs"],
-    ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
-    ["Kangkong", null, 0.175, "kg", "1 tali", false, 100],
-    ["Gabi", null, 0.25, "kg", "1 pc", false, 50],
-    ["Talong", "Eggplant", 0.2, "kg", "1 pc", true],
-    ["Okra", null, 0.1, "kg", "4-6 pcs", true, 90],
-    ["Siling haba", "Chilli (Green) Local", 0.02, "kg", "1-2 pcs", true],
-  )),
+  recipe(
+    "sinigang-na-bangus",
+    "Sinigang na Bangus",
+    ings(
+      ["Bangus", "Bangus", 0.625, "kg", "1/2 kg"],
+      ["Kamatis", "Tomato", 0.225, "kg", "2-3 pcs"],
+      ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
+      ["Kangkong", null, 0.175, "kg", "1 tali", false, 100],
+      ["Gabi", null, 0.25, "kg", "1 pc", false, 50],
+      ["Talong", "Eggplant", 0.2, "kg", "1 pc", true],
+      ["Okra", null, 0.1, "kg", "4-6 pcs", true, 90],
+      ["Siling haba", "Chilli (Green) Local", 0.02, "kg", "1-2 pcs", true],
+    ),
+  ),
 ];
 
 // ═══════════════════════════════════════════════════════════
@@ -462,12 +650,14 @@ export const RECIPES: Recipe[] = [
 // Palengke-realistic rates for items bought by piece, not by kilo.
 // DA per-kg wholesale rates inflate small quantities unrealistically.
 const PALENGKE_RATE_OVERRIDES: Record<string, number> = {
-  "Garlic Native/Local": 175,   // 1 ulo ≈ ₱7 (DA ₱383/kg × 0.04 = ₱15 — too high)
-  "Red Onion Local": 80,        // 1 pc ≈ ₱8 (DA ₱102/kg × 0.10 = ₱10 — slightly high)
-  "Ginger Local": 125,          // 1 piraso ≈ ₱5 (DA ₱180/kg × 0.04 = ₱7 — slightly high)
+  "Garlic Native/Local": 175, // 1 ulo ≈ ₱7 (DA ₱383/kg × 0.04 = ₱15 — too high)
+  "Red Onion Local": 80, // 1 pc ≈ ₱8 (DA ₱102/kg × 0.10 = ₱10 — slightly high)
+  "Ginger Local": 125, // 1 piraso ≈ ₱5 (DA ₱180/kg × 0.04 = ₱7 — slightly high)
 };
 
-function getProteinType(recipe: Recipe): "fish" | "chicken" | "pork" | "beef" | "egg" | "veggie" | "other" {
+function getProteinType(
+  recipe: Recipe,
+): "fish" | "chicken" | "pork" | "beef" | "egg" | "veggie" | "other" {
   const id = recipe.id;
 
   if (
@@ -478,7 +668,8 @@ function getProteinType(recipe: Recipe): "fish" | "chicken" | "pork" | "beef" | 
     id.includes("afritada") ||
     id.includes("sopas") ||
     id.includes("repolyo-at-manok")
-  ) return "chicken";
+  )
+    return "chicken";
 
   if (
     id.includes("baboy") ||
@@ -492,7 +683,8 @@ function getProteinType(recipe: Recipe): "fish" | "chicken" | "pork" | "beef" | 
     id.includes("mechado") ||
     id.includes("caldereta") ||
     id.includes("inihaw-na-liempo")
-  ) return "pork";
+  )
+    return "pork";
 
   if (id.includes("beef") || id.includes("kare-kare") || id.includes("broccoli")) return "beef";
 
@@ -502,9 +694,11 @@ function getProteinType(recipe: Recipe): "fish" | "chicken" | "pork" | "beef" | 
     id.includes("galunggong") ||
     id.includes("tamban") ||
     id.includes("sarciadong")
-  ) return "fish";
+  )
+    return "fish";
 
-  if (id.includes("tortang-talong") || id.includes("ampalaya") || id.includes("tortang-giniling")) return "egg";
+  if (id.includes("tortang-talong") || id.includes("ampalaya") || id.includes("tortang-giniling"))
+    return "egg";
 
   if (
     id.includes("pinakbet") ||
@@ -512,7 +706,8 @@ function getProteinType(recipe: Recipe): "fish" | "chicken" | "pork" | "beef" | 
     id.includes("upo") ||
     id.includes("sayote") ||
     id.includes("pechay")
-  ) return "veggie";
+  )
+    return "veggie";
 
   return "other";
 }
@@ -595,7 +790,7 @@ function getIngredientCost(recipe: Recipe, ing: RecipeIngredient, priceMap: Pric
 
   if (normalized.daKey && priceMap[normalized.daKey] !== undefined) {
     // Use palengke rate for small-quantity items bought by piece
-    if (normalized.qty <= 0.20 && PALENGKE_RATE_OVERRIDES[normalized.daKey]) {
+    if (normalized.qty <= 0.2 && PALENGKE_RATE_OVERRIDES[normalized.daKey]) {
       return PALENGKE_RATE_OVERRIDES[normalized.daKey] * normalized.qty;
     }
     return priceMap[normalized.daKey] * normalized.qty;
@@ -666,13 +861,20 @@ export function calculateRecipeCostDetailed(
 
 function getProteinLimit(protein: string): number {
   switch (protein) {
-    case "fish": return 2;
-    case "chicken": return 2;
-    case "pork": return 2;
-    case "beef": return 1;
-    case "egg": return 1;
-    case "veggie": return 1;
-    default: return 1;
+    case "fish":
+      return 2;
+    case "chicken":
+      return 2;
+    case "pork":
+      return 2;
+    case "beef":
+      return 1;
+    case "egg":
+      return 1;
+    case "veggie":
+      return 1;
+    default:
+      return 1;
   }
 }
 
@@ -724,13 +926,20 @@ function chooseBalancedMeals(allResults: CostResult[], count: number): CostResul
   return selected;
 }
 
+// ═══════════════════════════════════════════════════════════
+// UPDATED: Added excludeIds for daily meal rotation
+// Excludes yesterday's meal picks so users see variety
+// ═══════════════════════════════════════════════════════════
 export function findCheapestMeals(
   recipes: Recipe[],
   todayPrices: PriceMap,
   lastPrices: PriceMap,
   count: number = 8,
+  excludeIds: string[] = [],
 ): CostResult[] {
-  const validRecipes = recipes.filter((recipe) => hasRequiredPrices(recipe, todayPrices));
+  const validRecipes = recipes
+    .filter((recipe) => hasRequiredPrices(recipe, todayPrices))
+    .filter((recipe) => !excludeIds.includes(recipe.id));
 
   const allResults = validRecipes
     .map((recipe) => calculateRecipeCostDetailed(recipe, todayPrices, lastPrices))

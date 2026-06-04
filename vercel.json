@@ -1,12 +1,8 @@
 {
   "crons": [
     {
-      "path": "/api/cron/ingest",
-      "schedule": "0 0 * * *"
-    },
-    {
-      "path": "/api/cron/suggest",
-      "schedule": "5 0 * * *"
+      "path": "/api/cron/daily",
+      "schedule": "0 2 * * *"
     }
   ]
 }

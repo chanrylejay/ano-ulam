@@ -75,6 +75,32 @@ export async function POST(request: NextRequest) {
       AND p.price_prevailing IS NOT NULL
     `;
 
+    // ── Fetch yesterday's meal IDs for rotation ──────────
+    const yesterdaySuggestion = await sql`
+      SELECT meals FROM daily_suggestions
+      WHERE suggestion_date < ${today}
+      ORDER BY suggestion_date DESC, generated_at DESC NULLS LAST, id DESC
+      LIMIT 1
+    `;
+
+    let excludeIds: string[] = [];
+    if (yesterdaySuggestion.length > 0) {
+      try {
+        const yesterdayMeals =
+          typeof yesterdaySuggestion[0].meals === "string"
+            ? JSON.parse(yesterdaySuggestion[0].meals)
+            : yesterdaySuggestion[0].meals;
+
+        if (Array.isArray(yesterdayMeals)) {
+          const yesterdayNames = yesterdayMeals.map((m: any) => m.name);
+          excludeIds = RECIPES.filter((r) => yesterdayNames.includes(r.name)).map((r) => r.id);
+        }
+      } catch (parseError) {
+        console.error("Failed to parse yesterday's meals for rotation:", parseError);
+        // Continue without exclusion — rotation is best-effort
+      }
+    }
+
     // ── Build price maps ─────────────────────────────────
     const todayPriceMap: PriceMap = {};
     prices.forEach((p: any) => {
@@ -87,7 +113,19 @@ export async function POST(request: NextRequest) {
     });
 
     // ── Run cost engine — find cheapest 8 meals ──────────
-    const cheapestMeals: CostResult[] = findCheapestMeals(RECIPES, todayPriceMap, lastPriceMap, 8);
+    // excludeIds removes yesterday's picks for variety
+    let cheapestMeals: CostResult[] = findCheapestMeals(
+      RECIPES,
+      todayPriceMap,
+      lastPriceMap,
+      8,
+      excludeIds,
+    );
+
+    // Fallback: if not enough meals after exclusion, relax rotation
+    if (cheapestMeals.length < 6) {
+      cheapestMeals = findCheapestMeals(RECIPES, todayPriceMap, lastPriceMap, 8, []);
+    }
 
     // ── Build summary for DeepSeek "Bakit?" prompt ───────
     const mealSummaries = cheapestMeals
@@ -197,6 +235,7 @@ Recipe IDs: ${cheapestMeals.map((r) => r.recipe.id).join(", ")}`;
     return NextResponse.json({
       success: true,
       mealsCount: meals.length,
+      rotatedOut: excludeIds.length,
       meals: meals.map((m) => ({
         name: m.name,
         cost: m.estimated_cost,
