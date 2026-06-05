@@ -8,6 +8,69 @@ import { isHidden } from "@/lib/commodity-names";
 import { RECIPES, findCheapestMeals, type PriceMap, type CostResult } from "@/lib/recipes";
 
 // ═══════════════════════════════════════════════════════════
+// PRICE MAP NORMALIZATION
+// DA commodity names include brand, origin, and size suffixes
+// (e.g., "Chicken Leg Quarter Bounty Fresh", "Bangus Large").
+// Recipe daKeys use base names (e.g., "Chicken Leg Quarter").
+// This function builds a priceMap with BOTH exact names AND
+// base names (cheapest variant wins for each base name).
+// V2.1.1 fix — without this, all chicken/pork/beef/fish
+// recipes were excluded due to price lookup failure.
+// ═══════════════════════════════════════════════════════════
+
+const STRIP_SUFFIXES = [
+  " Bounty Fresh",
+  " Magnolia",
+  " Unbranded Fresh",
+  " Fully Dressed",
+  " Imported",
+  " Local",
+  " Large",
+  " Medium",
+  " Small",
+  " Male",
+  " Female",
+];
+
+function buildNormalizedPriceMap(prices: any[]): PriceMap {
+  const priceMap: PriceMap = {};
+
+  prices.forEach((p: any) => {
+    const price = parseFloat(p.price_prevailing);
+    const name: string = p.name;
+
+    // Always add exact name
+    priceMap[name] = price;
+
+    // Generate base names by recursively stripping known suffixes
+    const bases = new Set<string>();
+
+    function strip(current: string) {
+      for (const suffix of STRIP_SUFFIXES) {
+        if (current.endsWith(suffix)) {
+          const stripped = current.slice(0, -suffix.length).trim();
+          if (stripped && !bases.has(stripped)) {
+            bases.add(stripped);
+            strip(stripped); // recurse to handle multiple suffixes
+          }
+        }
+      }
+    }
+
+    strip(name);
+
+    // For each base name, keep the CHEAPEST price among variants
+    bases.forEach((baseName) => {
+      if (!(baseName in priceMap) || price < priceMap[baseName]) {
+        priceMap[baseName] = price;
+      }
+    });
+  });
+
+  return priceMap;
+}
+
+// ═══════════════════════════════════════════════════════════
 // POST /api/cron/suggest
 // Recipe DB + Cost Engine + DeepSeek "Bakit?" only
 // Supports both manual (x-cron-secret) and Vercel Cron (Bearer)
@@ -101,16 +164,11 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // ── Build price maps ─────────────────────────────────
-    const todayPriceMap: PriceMap = {};
-    prices.forEach((p: any) => {
-      todayPriceMap[p.name] = parseFloat(p.price_prevailing);
-    });
-
-    const lastPriceMap: PriceMap = {};
-    lastPrices.forEach((p: any) => {
-      lastPriceMap[p.name] = parseFloat(p.price_prevailing);
-    });
+    // ── Build NORMALIZED price maps ──────────────────────
+    // Strips brand/origin/size suffixes, keeps cheapest variant
+    // e.g., "Chicken Leg Quarter Imported" → "Chicken Leg Quarter"
+    const todayPriceMap: PriceMap = buildNormalizedPriceMap(prices);
+    const lastPriceMap: PriceMap = buildNormalizedPriceMap(lastPrices);
 
     // ── Run cost engine — find cheapest 8 meals ──────────
     // excludeIds removes yesterday's picks for variety
