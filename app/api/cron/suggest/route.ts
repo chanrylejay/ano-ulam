@@ -122,8 +122,8 @@ export async function POST(request: NextRequest) {
       excludeIds,
     );
 
-    // Fallback: if not enough meals after exclusion, relax rotation
-    if (cheapestMeals.length < 6) {
+    // Fallback: if rotation prevents full 8, retry without rotation
+    if (cheapestMeals.length < 8) {
       cheapestMeals = findCheapestMeals(RECIPES, todayPriceMap, lastPriceMap, 8, []);
     }
 

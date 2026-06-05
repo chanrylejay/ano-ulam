@@ -655,11 +655,26 @@ const PALENGKE_RATE_OVERRIDES: Record<string, number> = {
   "Ginger Local": 125, // 1 piraso ≈ ₱5 (DA ₱180/kg × 0.04 = ₱7 — slightly high)
 };
 
+// ═══════════════════════════════════════════════════════════
+// PROTEIN TYPE CLASSIFICATION
+// Order matters! Specific checks (beef, egg) run BEFORE
+// generic pork patterns to prevent misclassification.
+// V2.1.1 fix: beef-caldereta, beef-mechado, tortang-giniling,
+// ginataang-sitaw-at-kalabasa all correctly classified now.
+// ═══════════════════════════════════════════════════════════
+
 function getProteinType(
   recipe: Recipe,
 ): "fish" | "chicken" | "pork" | "beef" | "egg" | "veggie" | "other" {
   const id = recipe.id;
 
+  // ── Beef: FIRST — prevents "caldereta"/"mechado" from matching pork ──
+  if (id.includes("beef") || id.includes("kare-kare")) return "beef";
+
+  // ── Egg: BEFORE pork — prevents "tortang-giniling" from matching pork ──
+  if (id.includes("tortang") || id.includes("ampalaya")) return "egg";
+
+  // ── Chicken ──
   if (
     id.includes("manok") ||
     id.includes("chicken") ||
@@ -671,6 +686,7 @@ function getProteinType(
   )
     return "chicken";
 
+  // ── Pork ──
   if (
     id.includes("baboy") ||
     id.includes("pork") ||
@@ -686,8 +702,7 @@ function getProteinType(
   )
     return "pork";
 
-  if (id.includes("beef") || id.includes("kare-kare") || id.includes("broccoli")) return "beef";
-
+  // ── Fish ──
   if (
     id.includes("bangus") ||
     id.includes("tilapia") ||
@@ -697,12 +712,11 @@ function getProteinType(
   )
     return "fish";
 
-  if (id.includes("tortang-talong") || id.includes("ampalaya") || id.includes("tortang-giniling"))
-    return "egg";
-
+  // ── Veggie ──
   if (
     id.includes("pinakbet") ||
     id.includes("ginataang-kalabasa") ||
+    id.includes("ginataang-sitaw") ||
     id.includes("upo") ||
     id.includes("sayote") ||
     id.includes("pechay")
@@ -712,23 +726,39 @@ function getProteinType(
   return "other";
 }
 
+// ═══════════════════════════════════════════════════════════
+// MAIN INGREDIENT KEY
+// Used for Pass 1 ingredient diversity check.
+// V2.1.1 fix: chicken breast/wing checked BEFORE generic
+// "chicken" to prevent all chicken cuts mapping to "chicken-leg".
+// ═══════════════════════════════════════════════════════════
+
 function getMainIngredientKey(recipe: Recipe): string {
   const required = recipe.ingredients.find((ing) => !ing.optional);
   if (!required) return recipe.id;
 
   const key = (required.daKey || required.name).toLowerCase();
 
+  // Fish — specific species
   if (key.includes("galunggong")) return "galunggong";
   if (key.includes("tilapia")) return "tilapia";
   if (key.includes("bangus")) return "bangus";
   if (key.includes("tamban") || key.includes("sardines")) return "tamban";
-  if (key.includes("chicken leg") || key.includes("chicken")) return "chicken-leg";
+
+  // Chicken — specific cuts BEFORE generic "chicken"
   if (key.includes("chicken breast")) return "chicken-breast";
   if (key.includes("chicken wing")) return "chicken-wing";
+  if (key.includes("chicken leg") || key.includes("chicken")) return "chicken-leg";
+
+  // Pork — specific cuts
   if (key.includes("pork belly") || key.includes("liempo")) return "liempo";
   if (key.includes("pork chop")) return "pork-chop";
   if (key.includes("pork picnic") || key.includes("kasim")) return "kasim";
+
+  // Beef
   if (key.includes("beef")) return "beef";
+
+  // Vegetables
   if (key.includes("eggplant") || key.includes("talong")) return "talong";
   if (key.includes("ampalaya")) return "ampalaya";
   if (key.includes("squash") || key.includes("kalabasa")) return "kalabasa";
@@ -878,10 +908,18 @@ function getProteinLimit(protein: string): number {
   }
 }
 
+// ═══════════════════════════════════════════════════════════
+// BALANCED SELECTION — 4-PASS SYSTEM
+// V2.1.1: Added Pass 4 (no caps) to guarantee filling all
+// slots when caps prevent reaching target count.
+// Uses Set for O(1) dedup instead of Array.some() scans.
+// ═══════════════════════════════════════════════════════════
+
 function chooseBalancedMeals(allResults: CostResult[], count: number): CostResult[] {
   const selected: CostResult[] = [];
   const proteinCount: Record<string, number> = {};
   const mainIngredientUsed = new Set<string>();
+  const selectedIds = new Set<string>();
 
   // Pass 1: strict — respect caps + no duplicate main ingredients
   for (const result of allResults) {
@@ -896,6 +934,7 @@ function chooseBalancedMeals(allResults: CostResult[], count: number): CostResul
     if (mainIngredientUsed.has(mainKey)) continue;
 
     selected.push(result);
+    selectedIds.add(result.recipe.id);
     proteinCount[protein] = current + 1;
     mainIngredientUsed.add(mainKey);
   }
@@ -904,7 +943,7 @@ function chooseBalancedMeals(allResults: CostResult[], count: number): CostResul
   if (selected.length < count) {
     for (const result of allResults) {
       if (selected.length >= count) break;
-      if (selected.some((x) => x.recipe.id === result.recipe.id)) continue;
+      if (selectedIds.has(result.recipe.id)) continue;
 
       const protein = getProteinType(result.recipe);
       const limit = getProteinLimit(protein);
@@ -913,6 +952,7 @@ function chooseBalancedMeals(allResults: CostResult[], count: number): CostResul
       if (current >= limit) continue;
 
       selected.push(result);
+      selectedIds.add(result.recipe.id);
       proteinCount[protein] = current + 1;
     }
   }
@@ -921,7 +961,7 @@ function chooseBalancedMeals(allResults: CostResult[], count: number): CostResul
   if (selected.length < count) {
     for (const result of allResults) {
       if (selected.length >= count) break;
-      if (selected.some((x) => x.recipe.id === result.recipe.id)) continue;
+      if (selectedIds.has(result.recipe.id)) continue;
 
       const protein = getProteinType(result.recipe);
       const doubleLimit = getProteinLimit(protein) * 2;
@@ -930,7 +970,20 @@ function chooseBalancedMeals(allResults: CostResult[], count: number): CostResul
       if (current >= doubleLimit) continue;
 
       selected.push(result);
+      selectedIds.add(result.recipe.id);
       proteinCount[protein] = current + 1;
+    }
+  }
+
+  // Pass 4: NO caps — fill remaining with cheapest available
+  // Guarantees we reach target count if pool has enough recipes
+  if (selected.length < count) {
+    for (const result of allResults) {
+      if (selected.length >= count) break;
+      if (selectedIds.has(result.recipe.id)) continue;
+
+      selected.push(result);
+      selectedIds.add(result.recipe.id);
     }
   }
 
