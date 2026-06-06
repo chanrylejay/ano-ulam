@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { MealCard } from "@/components/MealCard";
 import { Footer } from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
+import { RECIPES, getProteinType } from "@/lib/recipes";
 
 interface Ingredient {
   name: string;
@@ -33,8 +34,18 @@ interface PriceItem {
   price_prevailing: number;
 }
 
-// Homepage shows only key prices at a glance.
-// Full list is on /prices.
+type ProteinFilter = "lahat" | "fish" | "chicken" | "pork" | "beef" | "egg" | "veggie";
+
+const FILTER_TABS: { key: ProteinFilter; label: string }[] = [
+  { key: "lahat", label: "Lahat" },
+  { key: "fish", label: "🐟 Isda" },
+  { key: "chicken", label: "🍗 Manok" },
+  { key: "pork", label: "🥩 Baboy" },
+  { key: "beef", label: "🐄 Beef" },
+  { key: "egg", label: "🥚 Itlog" },
+  { key: "veggie", label: "🥬 Gulay" },
+];
+
 const defaultItemKeys = [
   { key: "Liempo", label: "Baboy" },
   { key: "Paa ng manok", label: "Manok" },
@@ -63,6 +74,7 @@ export default function HomePage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [dataDate, setDataDate] = useState<string>("");
+  const [activeFilter, setActiveFilter] = useState<ProteinFilter>("lahat");
 
   const pathname = usePathname();
 
@@ -88,28 +100,20 @@ export default function HomePage() {
         const priceData = await pricesRes.json();
         if (priceData.prices) {
           const tags: PriceTag[] = [];
-
           for (const item of defaultItemKeys) {
             const found = (priceData.prices as PriceItem[]).find((p) => {
               const apiName = p.commodities.name.toLowerCase().trim();
               const targetName = item.key.toLowerCase().trim();
-
               return (
                 apiName === targetName ||
                 apiName.includes(targetName) ||
                 targetName.includes(apiName)
               );
             });
-
             if (found) {
-              tags.push({
-                name: item.key,
-                label: item.label,
-                price: found.price_prevailing,
-              });
+              tags.push({ name: item.key, label: item.label, price: found.price_prevailing });
             }
           }
-
           setPriceTags(tags);
         }
       }
@@ -123,6 +127,17 @@ export default function HomePage() {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  // ── Filter meals by protein type ──────────────────────────
+  // Matches meal name → RECIPES → getProteinType()
+  const filteredMeals =
+    activeFilter === "lahat"
+      ? meals
+      : meals.filter((meal) => {
+          const recipe = RECIPES.find((r) => r.name === meal.name);
+          if (!recipe) return false;
+          return getProteinType(recipe) === activeFilter;
+        });
 
   const today = new Date();
   const formattedDate = format(today, "EEEE, MMMM d, yyyy");
@@ -157,7 +172,6 @@ export default function HomePage() {
               <div className="h-5 w-56 max-w-full animate-pulse rounded bg-white/15" />
               <div className="mt-2 h-4 w-44 max-w-full animate-pulse rounded bg-white/10" />
             </div>
-
             <div className="flex w-full items-center justify-center gap-5 pt-4">
               {[...Array(6)].map((_, i) => (
                 <div key={i} className="flex items-center gap-1.5">
@@ -168,7 +182,6 @@ export default function HomePage() {
             </div>
           </div>
         </div>
-
         <main className="mx-auto max-w-2xl space-y-3 px-4 py-5">
           {[...Array(3)].map((_, i) => (
             <div
@@ -204,9 +217,7 @@ export default function HomePage() {
             <h1 className="mb-2 text-[4.2rem] font-black leading-[0.85] tracking-tight sm:text-7xl md:text-[8rem] md:leading-none">
               ma, Ano ulam?
             </h1>
-
             <p className="mb-4 text-base text-white/90 sm:text-xl">Anong murang ulam ngayon</p>
-
             <p className="text-sm text-white/70">{formattedDate}</p>
           </section>
 
@@ -230,7 +241,6 @@ export default function HomePage() {
                   </span>
                 </div>
               ))}
-
               <a
                 href="/prices"
                 className="shrink-0 whitespace-nowrap text-sm font-bold text-white underline decoration-white/40 underline-offset-2 transition-colors hover:decoration-white/80"
@@ -255,7 +265,6 @@ export default function HomePage() {
                   </span>
                 </div>
               ))}
-
               <a
                 href="/prices"
                 className="whitespace-nowrap text-sm font-bold text-white underline decoration-white/40 underline-offset-2 transition-colors hover:decoration-white/80"
@@ -269,10 +278,33 @@ export default function HomePage() {
 
       <main
         id="main-content"
-        className="mx-auto max-w-2xl space-y-3 px-4 py-5"
+        className="mx-auto max-w-2xl px-4 py-5"
         aria-live="polite"
         aria-atomic="false"
       >
+        {/* ── Filter Tabs ── */}
+        {meals.length > 0 && (
+          <div className="scrollbar-hide -mx-4 mb-4 flex items-center gap-2 overflow-x-auto px-4 pb-1">
+            {FILTER_TABS.map((tab) => {
+              const isActive = activeFilter === tab.key;
+              return (
+                <button
+                  key={tab.key}
+                  onClick={() => setActiveFilter(tab.key)}
+                  className={`shrink-0 rounded-full px-4 py-2 text-sm font-semibold transition-all ${
+                    isActive
+                      ? "bg-amber-600 text-white shadow-sm"
+                      : "bg-white text-gray-600 hover:bg-amber-50 hover:text-amber-700 border border-gray-200"
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              );
+            })}
+          </div>
+        )}
+
+        {/* ── Empty state ── */}
         {meals.length === 0 && !error && (
           <Card className="border-gray-200 bg-gradient-to-br from-amber-50 to-orange-50">
             <CardContent className="p-12 text-center">
@@ -283,14 +315,29 @@ export default function HomePage() {
           </Card>
         )}
 
-        {meals.length > 0 && (
+        {/* ── Filtered empty state ── */}
+        {meals.length > 0 && filteredMeals.length === 0 && (
+          <Card className="border-gray-200 bg-white">
+            <CardContent className="p-10 text-center">
+              <div className="mb-3 text-4xl">🔍</div>
+              <p className="font-semibold text-gray-700">
+                Walang {FILTER_TABS.find((t) => t.key === activeFilter)?.label} ngayon.
+              </p>
+              <p className="mt-1 text-sm text-gray-400">Wala sa listahan ng murang ulam ngayon.</p>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* ── Meal cards ── */}
+        {filteredMeals.length > 0 && (
           <ul className="space-y-3" aria-label="Meal suggestions">
-            {meals.map((meal, i) => (
-              <MealCard key={i} meal={meal} index={i} />
+            {filteredMeals.map((meal, i) => (
+              <MealCard key={meal.name} meal={meal} index={i} />
             ))}
           </ul>
         )}
 
+        {/* ── Bottom nav buttons ── */}
         {meals.length > 0 && (
           <div className="flex flex-col gap-3 pb-8 pt-4">
             {pathname !== "/prices" && (
@@ -301,7 +348,6 @@ export default function HomePage() {
                 🛒 See All Prices
               </a>
             )}
-
             {pathname !== "/about" && (
               <a
                 href="/about"
@@ -313,7 +359,6 @@ export default function HomePage() {
           </div>
         )}
       </main>
-
       <Footer />
     </div>
   );
