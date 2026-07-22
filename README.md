@@ -97,7 +97,7 @@ Result: **10/10 accuracy.** AI is now used only for natural language reasoning (
 | Language | TypeScript |
 | Styling | Tailwind CSS |
 | Database | Neon PostgreSQL (Singapore region) |
-| AI | DeepSeek API (`deepseek-chat`) |
+| AI | DeepSeek API (`deepseek-v4-flash`) |
 | Hosting | Vercel (Hobby plan) |
 | PDF Parsing | pdf-parse v2 |
 | Scheduling | Vercel Cron Jobs |

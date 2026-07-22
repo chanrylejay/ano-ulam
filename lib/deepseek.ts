@@ -20,7 +20,7 @@ export async function callDeepSeekAPI(prompt: string, systemPrompt?: string): Pr
       Authorization: `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
-      model: "deepseek-chat",
+      model: "deepseek-v4-flash",
       messages,
       max_tokens: 8192,
       temperature: 0.7,
