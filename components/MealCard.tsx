@@ -31,6 +31,12 @@ interface Meal {
 interface MealCardProps {
   meal: Meal;
   index: number;
+  /**
+   * Today's DA sheet cannot price a required ingredient, so there is no honest
+   * total to show. The recipe still renders; the cost does not. Defaults false,
+   * so the homepage is unaffected.
+   */
+  unpriced?: boolean;
 }
 
 function formatPeso(amount?: number): string {
@@ -67,7 +73,7 @@ function sortIngredients(ingredients: Ingredient[] = []): Ingredient[] {
   });
 }
 
-export function MealCard({ meal, index }: MealCardProps) {
+export function MealCard({ meal, index, unpriced = false }: MealCardProps) {
   const [showIngredients, setShowIngredients] = useState(false);
   const [showSteps, setShowSteps] = useState(false);
   const [showNutrition, setShowNutrition] = useState(false);
@@ -85,7 +91,7 @@ export function MealCard({ meal, index }: MealCardProps) {
   return (
     <li>
       <article
-        aria-label={`${meal.name}, estimated cost ${formatCost(meal)}, serves ${meal.servings || "1-3 katao"}`}
+        aria-label={`${meal.name}, ${unpriced ? "walang presyo ngayon" : `estimated cost ${formatCost(meal)}`}, serves ${meal.servings || "1-3 katao"}`}
         style={{ animationDelay: `${index * 80}ms` }}
         className="animate-card-enter"
       >
@@ -108,14 +114,32 @@ export function MealCard({ meal, index }: MealCardProps) {
                   {meal.name}
                 </h2>
               </div>
-              <span
-                className={`${getCostBadgeColor(meal.estimated_cost)} text-white text-sm font-bold px-3 py-1.5 rounded-full shrink-0 whitespace-nowrap`}
-              >
-                {formatCost(meal)}
-              </span>
+              {/*
+                The DA sheet cannot always price every required ingredient. On the
+                browse page those dishes still get a card, but never a number:
+                this project's canon treats a rendered ₱0 as a lie (it once made a
+                Galunggong dish rank cheapest).
+              */}
+              {unpriced ? (
+                <span className="bg-gray-100 text-gray-500 text-xs font-semibold px-3 py-1.5 rounded-full shrink-0 whitespace-nowrap border border-gray-200">
+                  Walang presyo
+                </span>
+              ) : (
+                <span
+                  className={`${getCostBadgeColor(meal.estimated_cost)} text-white text-sm font-bold px-3 py-1.5 rounded-full shrink-0 whitespace-nowrap`}
+                >
+                  {formatCost(meal)}
+                </span>
+              )}
             </div>
 
             {/* ── DA Ingredient Cost Breakdown ── */}
+            {unpriced && (
+              <p className="mb-3 rounded-lg bg-gray-50 px-3 py-2 text-sm leading-relaxed text-gray-500">
+                Walang presyo ang DA ngayon para sa isa sa mga kailangang sangkap, kaya walang
+                total. Nasa ibaba pa rin ang buong recipe.
+              </p>
+            )}
             <div className="mb-3 space-y-0">
               {visibleIngredients.map((ing, j) => {
                 const isOptional = !!ing.optional;

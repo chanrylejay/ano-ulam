@@ -6,7 +6,12 @@ import { usePathname } from "next/navigation";
 import { MealCard } from "@/components/MealCard";
 import { Footer } from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
-import { RECIPES, getProteinType } from "@/lib/recipes";
+import { RECIPES } from "@/lib/recipes";
+import {
+  PROTEIN_TABS,
+  matchesProteinFilter,
+  type ProteinFilter,
+} from "@/lib/protein-tabs";
 
 interface Ingredient {
   name: string;
@@ -36,17 +41,9 @@ interface PriceItem {
   price_prevailing: number;
 }
 
-type ProteinFilter = "lahat" | "fish" | "chicken" | "pork" | "beef" | "egg" | "veggie";
-
-const FILTER_TABS: { key: ProteinFilter; label: string }[] = [
-  { key: "lahat", label: "Lahat" },
-  { key: "fish", label: "🐟 Isda" },
-  { key: "chicken", label: "🍗 Manok" },
-  { key: "pork", label: "🥩 Baboy" },
-  { key: "beef", label: "🐄 Beef" },
-  { key: "egg", label: "🥚 Itlog" },
-  { key: "veggie", label: "🥬 Gulay" },
-];
+// The tab row and the category rules live in lib/protein-tabs.ts. /ulam renders
+// the same row, and a second copy here would let the two pages disagree about
+// what "Gulay" means the first time a category changes.
 
 const defaultItemKeys = [
   { key: "Liempo", label: "Baboy" },
@@ -131,14 +128,15 @@ export default function HomePage() {
   }, [fetchData]);
 
   // ── Filter meals by protein type ──────────────────────────
-  // Matches meal name → RECIPES → getProteinType()
+  // The cached row carries only a name, so the category comes from looking the
+  // dish back up in RECIPES.
   const filteredMeals =
     activeFilter === "lahat"
       ? meals
       : meals.filter((meal) => {
           const recipe = RECIPES.find((r) => r.name === meal.name);
           if (!recipe) return false;
-          return getProteinType(recipe) === activeFilter;
+          return matchesProteinFilter(recipe, activeFilter);
         });
 
   const today = new Date();
@@ -287,7 +285,7 @@ export default function HomePage() {
         {/* ── Filter Tabs ── */}
         {meals.length > 0 && (
           <div className="scrollbar-hide -mx-4 mb-4 flex items-center gap-2 overflow-x-auto px-4 pb-1">
-            {FILTER_TABS.map((tab) => {
+            {PROTEIN_TABS.map((tab) => {
               const isActive = activeFilter === tab.key;
               return (
                 <button
@@ -312,7 +310,18 @@ export default function HomePage() {
             <CardContent className="p-12 text-center">
               <div className="mb-4 text-5xl">🍳</div>
               <p className="mb-2 text-xl font-bold text-amber-900">Wala pang data ngayon.</p>
-              <p className="text-lg text-amber-700">Babalik kami bukas ng 8AM!</p>
+              <p className="text-lg text-amber-700">Babalik kami bukas ng 10AM!</p>
+              {/*
+                The five-day outage in Jul 2026 left this card as the entire
+                site. The recipes never depend on the daily run, so there is
+                always somewhere to go from here.
+              */}
+              <a
+                href="/ulam"
+                className="mt-5 inline-block rounded-xl bg-amber-600 px-5 py-3 font-bold text-white transition-colors hover:bg-amber-700"
+              >
+                🍲 Tingnan ang {RECIPES.length} recipe
+              </a>
             </CardContent>
           </Card>
         )}
@@ -323,9 +332,15 @@ export default function HomePage() {
             <CardContent className="p-10 text-center">
               <div className="mb-3 text-4xl">🔍</div>
               <p className="font-semibold text-gray-700">
-                Walang {FILTER_TABS.find((t) => t.key === activeFilter)?.label} ngayon.
+                Walang {PROTEIN_TABS.find((t) => t.key === activeFilter)?.label} ngayon.
               </p>
-              <p className="mt-1 text-sm text-gray-400">Wala sa listahan ng murang ulam ngayon.</p>
+              <p className="mt-1 text-sm text-gray-500">Wala sa listahan ng murang ulam ngayon.</p>
+              <a
+                href="/ulam"
+                className="mt-4 inline-block rounded-lg bg-amber-50 px-4 py-2 text-sm font-semibold text-amber-800 transition-colors hover:bg-amber-100"
+              >
+                Tingnan lahat ng ulam →
+              </a>
             </CardContent>
           </Card>
         )}
@@ -342,6 +357,16 @@ export default function HomePage() {
         {/* ── Bottom nav buttons ── */}
         {meals.length > 0 && (
           <div className="flex flex-col gap-3 pb-8 pt-4">
+            {/*
+              The 8 cards above are today's picks. 47 recipes exist, and until
+              this link there was no way to reach the other 39 at all.
+            */}
+            <a
+              href="/ulam"
+              className="flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 py-4 text-lg font-bold text-white shadow-sm transition-all hover:shadow-md"
+            >
+              🍲 Lahat ng Ulam ({RECIPES.length})
+            </a>
             {pathname !== "/prices" && (
               <a
                 href="/prices"

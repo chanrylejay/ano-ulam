@@ -345,12 +345,18 @@ export default function PricesPage() {
 
         {/* Bottom nav */}
         {pathname !== "/" && prices.length > 0 && (
-          <div className="pt-6">
+          <div className="flex flex-col gap-3 pt-6">
             <a
               href="/"
               className="flex items-center justify-center gap-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-bold py-3.5 rounded-xl shadow-sm hover:shadow-md transition-all text-lg"
             >
               🏠 Back to Home
+            </a>
+            <a
+              href="/ulam"
+              className="flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white py-3 text-sm font-medium text-amber-700 transition-all hover:bg-amber-50"
+            >
+              🍲 Lahat ng Ulam
             </a>
           </div>
         )}

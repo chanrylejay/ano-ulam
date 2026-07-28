@@ -7,6 +7,7 @@ import { callDeepSeekAPI } from "@/lib/deepseek";
 import { isHidden } from "@/lib/commodity-names";
 import {
   RECIPES,
+  RECIPE_DA_KEYS,
   selectDailyMeals,
   orderForDisplay,
   type PriceMap,
@@ -39,15 +40,6 @@ import { buildPriceMap, type DARecord } from "@/lib/da-parser";
  * pattern the rest of this project uses.
  */
 type DbRow = Record<string, unknown>;
-
-/** Every daKey the 47 recipes can ask for. */
-const RECIPE_DA_KEYS: string[] = Array.from(
-  new Set(
-    RECIPES.flatMap((r) => r.ingredients.map((i) => i.daKey)).filter(
-      (k): k is string => typeof k === "string" && k.length > 0,
-    ),
-  ),
-);
 
 function asString(value: unknown, fallback = ""): string {
   return typeof value === "string" ? value : fallback;

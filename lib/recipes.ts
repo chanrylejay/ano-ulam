@@ -1933,6 +1933,22 @@ export function orderForDisplay<T>(items: T[], dateKey: string): T[] {
 }
 
 // ═══════════════════════════════════════════════════════════
-// PROTEIN TYPE EXPORT — used by page.tsx filter tabs
+// PROTEIN TYPE EXPORT — used by the filter tabs (lib/protein-tabs.ts)
 // ═══════════════════════════════════════════════════════════
 export { getProteinType };
+
+/**
+ * Every daKey the 47 recipes can ask for.
+ *
+ * ONE home. Anything that builds a PriceMap feeds this list to
+ * buildPriceMap() — the suggest cron and the /ulam browse page both do, and a
+ * second hand-rolled copy would let the two pages price the same dish
+ * differently.
+ */
+export const RECIPE_DA_KEYS: string[] = Array.from(
+  new Set(
+    RECIPES.flatMap((r) => r.ingredients.map((i) => i.daKey)).filter(
+      (k): k is string => typeof k === "string" && k.length > 0,
+    ),
+  ),
+);

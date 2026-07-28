@@ -127,6 +127,25 @@ check(ibaCount === DEFAULT_SELECTION.count - DEFAULT_SELECTION.coreSlots,
 check(muraMax <= 200, 'nothing absurd is labelled "mura"',
   'dearest mura pick was P' + muraMax);
 
+// ── /ulam browse page: the two assumptions it is built on ─────────────
+// The browse page costs all 47 recipes IN THE BROWSER, from whatever
+// /api/prices returns. Both of these are silent if they break: a dish would
+// simply read "walang presyo" or vanish from every tab, with nothing thrown.
+const { getProteinType } = await import(pathToFileURL(path.join(ROOT, 'lib/recipes.ts')).href);
+const { isHidden } = await import(pathToFileURL(path.join(ROOT, 'lib/commodity-names.ts')).href);
+
+// daKeys is the same list the price check above already built.
+const hiddenKeys = daKeys.filter((k) => isHidden(k));
+check(hiddenKeys.length === 0,
+  '/api/prices does not hide any ingredient the recipes need',
+  'hidden: ' + hiddenKeys.join(', '));
+
+const TAB_KEYS = ['fish', 'chicken', 'pork', 'beef', 'egg', 'veggie'];
+const untabbed = RECIPES.filter((r) => TAB_KEYS.indexOf(getProteinType(r)) === -1);
+check(untabbed.length === 0,
+  'every recipe lands in a category tab on /ulam',
+  'unreachable except under "Lahat": ' + untabbed.map((r) => r.id).join(', '));
+
 console.log('\n' + '─'.repeat(58));
 console.log('  distinct menus     ' + menus.size + '/' + DAYS + '        (old engine: 2)');
 console.log('  recipes surfaced   ' + surfaced.size + '/' + RECIPES.length + '        (old engine: 16)');
