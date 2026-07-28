@@ -1,8 +1,18 @@
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@/lib/db";
 import { getDisplayName, isHidden } from "@/lib/commodity-names";
+
+// Match /api/suggestions. force-dynamic alone did NOT stop this route serving a
+// stale day on 28 Jul 2026; the edge reported a cache MISS while the response
+// was still a day behind the database.
+const NO_STORE_HEADERS = {
+  "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
+  "CDN-Cache-Control": "no-store",
+  "Vercel-CDN-Cache-Control": "no-store",
+};
 
 export async function GET(request: NextRequest) {
   try {
@@ -18,7 +28,7 @@ export async function GET(request: NextRequest) {
     `;
 
     if (latestDate.length === 0) {
-      return NextResponse.json({ prices: [], date: null });
+      return NextResponse.json({ prices: [], date: null }, { headers: NO_STORE_HEADERS });
     }
 
     const priceDate = latestDate[0].price_date;
@@ -64,12 +74,18 @@ export async function GET(request: NextRequest) {
       filtered.sort((a: any, b: any) => b.price_prevailing - a.price_prevailing);
     }
 
-    return NextResponse.json({
-      prices: filtered,
-      date: priceDate,
-    });
+    return NextResponse.json(
+      {
+        prices: filtered,
+        date: priceDate,
+      },
+      { headers: NO_STORE_HEADERS },
+    );
   } catch (error) {
     console.error("Error fetching prices:", error);
-    return NextResponse.json({ error: "Failed to fetch prices" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to fetch prices" },
+      { status: 500, headers: NO_STORE_HEADERS },
+    );
   }
 }
