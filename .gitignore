@@ -136,3 +136,6 @@ dist
 .pnp.*
 .vercel
 .env*
+# ...but the template holding only placeholder names IS committed, because the
+# README tells contributors to copy it.
+!.env.example

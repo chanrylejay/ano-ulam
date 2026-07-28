@@ -127,7 +127,7 @@ export default function AboutPage() {
                   <h3 className="font-semibold text-gray-800">Smart Cost Calculation</h3>
                   <p className="text-gray-600 text-sm">
                     Our recipe engine calculates the real cost of 47 Filipino dishes using
-                    today's market prices, then picks the cheapest meals with protein variety.
+                    today&apos;s market prices, then picks the cheapest meals with protein variety.
                   </p>
                 </div>
               </div>
@@ -142,7 +142,7 @@ export default function AboutPage() {
                   <h3 className="font-semibold text-gray-800">Meal Suggestions</h3>
                   <p className="text-gray-600 text-sm">
                     Each dish shows a full ingredient cost breakdown with per-item prices, and AI
-                    explains why it was chosen based on today's price trends.
+                    explains why it was chosen based on today&apos;s price trends.
                   </p>
                 </div>
               </div>
