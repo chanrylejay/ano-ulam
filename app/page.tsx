@@ -228,7 +228,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50">
       <header className="overflow-hidden bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 text-white shadow-lg">
-        <div className="relative mx-auto flex w-full max-w-3xl flex-col items-center gap-5 px-4 pb-6 pt-14">
+        <div className="relative mx-auto flex w-full max-w-3xl flex-col items-center gap-4 px-4 pb-5 pt-12">
           {/*
             Small on purpose. Chan: "the date is too big i think". It is
             orientation, not a headline.
@@ -264,7 +264,7 @@ export default function HomePage() {
               (208px row against a 116px text block was the gap Chan spotted on
               mobile). Set it too short and the plate lands on the ticker.
             */
-            <div className="relative flex min-h-[9.5rem] w-full items-center sm:min-h-[13.5rem] md:min-h-[18rem]">
+            <div className="relative flex min-h-[15rem] w-full items-end sm:min-h-[20rem] md:min-h-[22rem]">
               {/*
                 pr reserves the plate's side so text can never flow under it.
                 Each value clears the plate's VISIBLE width (its size minus the

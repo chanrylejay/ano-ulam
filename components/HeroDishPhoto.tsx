@@ -34,22 +34,28 @@ export function HeroDishPhoto({ recipeId, name }: HeroDishPhotoProps) {
 
   return (
     /*
-      Anchored to the BOTTOM right of the hero row, and deliberately taller
-      than that row, so it grows upward into the header's top padding.
+      Bottom-right of the hero row, and it must fit INSIDE that row's height.
 
-      Why bottom rather than centred: a plate big enough to fill the row also
-      overflows it, and overflowing downward puts it on top of the price
-      ticker. Upward there is nothing but padding and the date chip, which
-      lives on the far left. The header's overflow-hidden trims the rest.
+      An earlier version made the plate taller than the row so it grew up into
+      the header padding. It looked bigger, but the header's overflow-hidden
+      sliced a flat edge across the top of the plate — Chan: "its touching the
+      header so its really weird". A circle cropped square at the top reads as
+      a rendering bug, not a bleed. So the row's min-height is now at least the
+      plate's size, and the row is bottom-aligned so the wordmark's baseline
+      and the plate's base sit on the same line.
+
+      Sideways is different: bleeding off the RIGHT edge is deliberate and
+      reads as intentional, because a shape leaving the frame horizontally is a
+      normal thing for a hero to do.
 
       Why it overlaps the text at all: the source PNG is a round plate inside a
-      square canvas, so roughly 8% of each edge is transparent. The boxes can
+      square canvas, so roughly 8.5% of each edge is transparent. The boxes can
       overlap by that much before anything visually touches — which is what
-      finally closes the awkward orange gap between the wordmark and the dish
-      without shrinking either one.
+      closes the awkward orange gap between the wordmark and the dish without
+      shrinking either one.
     */
     <div className="pointer-events-none absolute bottom-0 right-0 -mr-16 sm:-mr-20 md:-mr-24">
-      <div className="relative h-60 w-60 sm:h-80 sm:w-80 md:h-[26rem] md:w-[26rem]">
+      <div className="relative h-60 w-60 sm:h-80 sm:w-80 md:h-[22rem] md:w-[22rem]">
         <Image
           src={photo.src}
           alt={name}
