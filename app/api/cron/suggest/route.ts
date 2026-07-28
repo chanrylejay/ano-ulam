@@ -6,68 +6,66 @@ import { sql } from "@/lib/db";
 import { callDeepSeekAPI } from "@/lib/deepseek";
 import { isHidden } from "@/lib/commodity-names";
 import { RECIPES, findCheapestMeals, type PriceMap, type CostResult } from "@/lib/recipes";
+import { buildPriceMap, type DARecord } from "@/lib/da-parser";
 
 // ═══════════════════════════════════════════════════════════
-// PRICE MAP NORMALIZATION
-// DA commodity names include brand, origin, and size suffixes
-// (e.g., "Chicken Leg Quarter Bounty Fresh", "Bangus Large").
-// Recipe daKeys use base names (e.g., "Chicken Leg Quarter").
-// This function builds a priceMap with BOTH exact names AND
-// base names (cheapest variant wins for each base name).
-// V2.1.1 fix — without this, all chicken/pork/beef/fish
-// recipes were excluded due to price lookup failure.
+// PRICE MAP — matching DA commodity names to recipe daKeys
 // ═══════════════════════════════════════════════════════════
+// Replaces the V2.1.1 suffix stripper on Jul 28 2026.
+//
+// That version removed a fixed list of trailing suffixes (" Local", " Large",
+// " Magnolia" ...) to reduce a DA name down to a recipe daKey. It broke as soon
+// as a name did not end in exactly one of those, which is what happened when the
+// CSV parser started leaving quote characters on: it tested endsWith(" Large")
+// while the mangled name ended in `Large"`.
+//
+// Word matching is used instead. Measured over the full 17-month DA archive,
+// where the department reorganised this document twice: word matching keeps
+// 39/47 recipes costable through the Jun-Sep 2025 layout and 20/47 through the
+// Mar-May 2025 one. The homepage needs 8. See lib/da-parser.ts.
 
-const STRIP_SUFFIXES = [
-  " Bounty Fresh",
-  " Magnolia",
-  " Unbranded Fresh",
-  " Fully Dressed",
-  " Imported",
-  " Local",
-  " Large",
-  " Medium",
-  " Small",
-  " Male",
-  " Female",
-];
+/**
+ * Rows come back from the Neon driver as Record<string, any>, so they are
+ * narrowed here rather than asserted. Typing DB output as an exact interface
+ * fails the build; typing it as Record<string, unknown> and coercing is the
+ * pattern the rest of this project uses.
+ */
+type DbRow = Record<string, unknown>;
 
-function buildNormalizedPriceMap(prices: any[]): PriceMap {
-  const priceMap: PriceMap = {};
+/** Every daKey the 47 recipes can ask for. */
+const RECIPE_DA_KEYS: string[] = Array.from(
+  new Set(
+    RECIPES.flatMap((r) => r.ingredients.map((i) => i.daKey)).filter(
+      (k): k is string => typeof k === "string" && k.length > 0,
+    ),
+  ),
+);
 
-  prices.forEach((p: any) => {
-    const price = parseFloat(p.price_prevailing);
-    const name: string = p.name;
+function asString(value: unknown, fallback = ""): string {
+  return typeof value === "string" ? value : fallback;
+}
 
-    // Always add exact name
-    priceMap[name] = price;
+/**
+ * Neon returns NUMERIC columns as STRINGS in JS, so parseFloat is mandatory.
+ * Anything unparseable becomes null rather than NaN, because NaN would sail
+ * through a `> 0` check as false but still poison any arithmetic it touched.
+ */
+function toPrice(value: unknown): number | null {
+  const n = typeof value === "number" ? value : parseFloat(String(value));
+  return Number.isFinite(n) ? n : null;
+}
 
-    // Generate base names by recursively stripping known suffixes
-    const bases = new Set<string>();
+function toDARecords(prices: DbRow[]): DARecord[] {
+  return prices.map((p) => ({
+    name: asString(p.name),
+    specification: asString(p.specification),
+    category: asString(p.category, "other"),
+    price: toPrice(p.price_prevailing),
+  }));
+}
 
-    function strip(current: string) {
-      for (const suffix of STRIP_SUFFIXES) {
-        if (current.endsWith(suffix)) {
-          const stripped = current.slice(0, -suffix.length).trim();
-          if (stripped && !bases.has(stripped)) {
-            bases.add(stripped);
-            strip(stripped); // recurse to handle multiple suffixes
-          }
-        }
-      }
-    }
-
-    strip(name);
-
-    // For each base name, keep the CHEAPEST price among variants
-    bases.forEach((baseName) => {
-      if (!(baseName in priceMap) || price < priceMap[baseName]) {
-        priceMap[baseName] = price;
-      }
-    });
-  });
-
-  return priceMap;
+function buildNormalizedPriceMap(prices: DbRow[]): PriceMap {
+  return buildPriceMap(RECIPE_DA_KEYS, toDARecords(prices));
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -185,6 +183,32 @@ export async function POST(request: NextRequest) {
       cheapestMeals = findCheapestMeals(RECIPES, todayPriceMap, lastPriceMap, 8, []);
     }
 
+    // ── THE GUARD ────────────────────────────────────────
+    // Never write an empty meals list. On Jul 27 2026 this route did exactly
+    // that: the price data was too thin to cost a single recipe, it wrote
+    // `meals: []`, and the homepage rendered zero meal cards for anyone who
+    // visited. Failing here instead leaves the previous day's row as the newest,
+    // and /api/suggestions already falls back to it with isToday:false, so
+    // visitors keep seeing real ulam while the underlying problem is fixed.
+    if (cheapestMeals.length === 0) {
+      const pricedKeys = Object.keys(todayPriceMap).length;
+      const detail =
+        `Cost engine could not price a single recipe from ${prices.length} price rows ` +
+        `(${pricedKeys}/${RECIPE_DA_KEYS.length} recipe ingredients had a price). ` +
+        `Nothing was written; the previous suggestion row stays live.`;
+      console.error("SUGGEST REFUSED: " + detail);
+      return NextResponse.json(
+        {
+          error: "No meals could be costed, refused to write an empty day",
+          details: detail,
+          priceRows: prices.length,
+          ingredientsPriced: pricedKeys,
+          ingredientsNeeded: RECIPE_DA_KEYS.length,
+        },
+        { status: 500 },
+      );
+    }
+
     // ── Build summary for DeepSeek "Bakit?" prompt ───────
     const mealSummaries = cheapestMeals
       .map((result, i) => {
@@ -222,7 +246,15 @@ Recipe IDs: ${cheapestMeals.map((r) => r.recipe.id).join(", ")}`;
     const fallbackReason = "Abot-kayang ulam para sa pamilya ngayon.";
 
     try {
-      const responseText = await callDeepSeekAPI(prompt, systemPrompt);
+      // Prose only, and a small prompt, so the reasoning budget stays modest.
+      // Capped well under the extraction budget because this route also has to
+      // finish inside Vercel Hobby's 60s limit. If it throws, the catch below
+      // falls back to a generic reason and the meals still ship.
+      const responseText = await callDeepSeekAPI(prompt, systemPrompt, {
+        maxTokens: 8000,
+        timeoutMs: 35_000,
+        temperature: 0.7,
+      });
 
       const cleanedText = responseText
         .replace(/```json\s*/g, "")

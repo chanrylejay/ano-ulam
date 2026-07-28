@@ -1,0 +1,87 @@
+name: Site watchdog
+
+# Checks the LIVE site from outside Vercel and emails Chan (via a GitHub issue)
+# when Ano Ulam stops showing meals.
+#
+# Why this lives on GitHub and not in the app: on 23-28 Jul 2026 the site served
+# zero meals for five days and nothing raised a hand, because the only thing that
+# could have noticed was the app that was broken. This runs somewhere else.
+#
+# Free: GitHub Actions has no minute limit on public repositories.
+
+on:
+  schedule:
+    # 04:00 UTC = 12:00 noon Manila. The daily pipeline runs at 02:00 UTC
+    # (10 AM Manila) and Vercel Hobby gives it a one-hour window, so this
+    # leaves an hour of slack before checking.
+    - cron: "0 4 * * *"
+  workflow_dispatch: # lets Chan run it by hand from the Actions tab
+
+permissions:
+  issues: write
+  contents: read
+
+concurrency:
+  group: watchdog
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Check the live site
+        id: check
+        continue-on-error: true
+        run: node .github/scripts/watchdog.mjs
+
+      - name: Open or update the alert issue
+        if: steps.check.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          TITLE="Ano Ulam is unhealthy"
+          # The label must exist before it can be used or filtered on.
+          gh label create watchdog \
+            --color B60205 \
+            --description "Automated live-site health alert" \
+            --force >/dev/null 2>&1 || true
+          # Reuse one issue instead of opening a new one every day.
+          EXISTING=$(gh issue list --state open --label watchdog --json number --jq '.[0].number // empty')
+          if [ -n "$EXISTING" ]; then
+            echo "Updating issue #$EXISTING"
+            gh issue comment "$EXISTING" --body-file watchdog-report.md
+          else
+            echo "Opening a new issue"
+            gh issue create \
+              --title "$TITLE" \
+              --body-file watchdog-report.md \
+              --label watchdog
+          fi
+
+      - name: Close the alert issue once the site recovers
+        if: steps.check.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          EXISTING=$(gh issue list --state open --label watchdog --json number --jq '.[0].number // empty')
+          if [ -n "$EXISTING" ]; then
+            gh issue comment "$EXISTING" --body-file watchdog-report.md
+            gh issue close "$EXISTING" --reason completed
+            echo "Closed issue #$EXISTING"
+          else
+            echo "Healthy, and no open alert to close."
+          fi
+
+      - name: Fail the run so the Actions tab shows red
+        if: steps.check.outcome == 'failure'
+        run: |
+          echo "Site check failed. See the issue for details."
+          exit 1
