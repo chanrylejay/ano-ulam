@@ -228,7 +228,10 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50">
       <header className="overflow-hidden bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 text-white shadow-lg">
-        <div className="relative mx-auto flex w-full max-w-3xl flex-col items-center gap-4 px-4 pb-5 pt-12">
+        {/* max-w-2xl, the SAME width as the meal cards below. It used to be
+            max-w-3xl, so the header ran wider than the content and nothing
+            lined up down the left edge. One margin for the whole page. */}
+        <div className="relative mx-auto flex w-full max-w-2xl flex-col items-center gap-4 px-4 pb-5 pt-12">
           {/*
             Small on purpose. Chan: "the date is too big i think". It is
             orientation, not a headline.
@@ -268,13 +271,13 @@ export default function HomePage() {
               row this tall visibly dropped the wordmark down the page. The
               title shares a centre line with the plate beside it instead.
             */
-            <div className="relative flex min-h-[15rem] w-full items-center sm:min-h-[20rem] md:min-h-[22rem]">
+            <div className="relative flex min-h-[15rem] w-full items-center sm:min-h-[20rem] md:min-h-[20rem]">
               {/*
                 pr reserves the plate's side so text can never flow under it.
                 Each value clears the plate's VISIBLE width (its size minus the
                 bleed) at that breakpoint, with a few px of slack.
               */}
-              <section className="relative z-10 min-w-0 pr-[42%] text-left sm:pr-[36%] md:pr-[34%]">
+              <section className="relative z-10 min-w-0 pr-[42%] text-left sm:pr-[44%] md:pr-[38%]">
                 {/*
                   The break is FORCED, not left to wrapping, so the wordmark is
                   two lines at every width rather than depending on the viewport.
@@ -283,8 +286,8 @@ export default function HomePage() {
                   nearly touched and the whole thing read as compressed.
                 */}
                 <h1 className="mb-2.5 font-black leading-[0.95] tracking-tight">
-                  <span className="block text-[2.625rem] sm:text-6xl md:text-8xl">ma, Ano</span>
-                  <span className="block text-[2.625rem] sm:text-6xl md:text-8xl">ulam?</span>
+                  <span className="block text-[2.625rem] sm:text-6xl md:text-[5.5rem]">ma, Ano</span>
+                  <span className="block text-[2.625rem] sm:text-6xl md:text-[5.5rem]">ulam?</span>
                 </h1>
                 <p className="text-sm text-white/90 sm:text-lg">Anong murang ulam ngayon</p>
               </section>

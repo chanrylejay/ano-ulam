@@ -54,8 +54,8 @@ export function HeroDishPhoto({ recipeId, name }: HeroDishPhotoProps) {
       closes the awkward orange gap between the wordmark and the dish without
       shrinking either one.
     */
-    <div className="pointer-events-none absolute bottom-0 right-0 -mr-16 sm:-mr-20 md:-mr-24">
-      <div className="relative h-60 w-60 sm:h-80 sm:w-80 md:h-[22rem] md:w-[22rem]">
+    <div className="pointer-events-none absolute bottom-0 right-0 -mr-16 sm:-mr-14 md:-mr-8">
+      <div className="relative h-60 w-60 sm:h-80 sm:w-80 md:h-80 md:w-80">
         <Image
           src={photo.src}
           alt={name}
