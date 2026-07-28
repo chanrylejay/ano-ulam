@@ -59,8 +59,8 @@ export function RecommendationCard({
         </p>
 
         <h2
-          className={`flex items-baseline gap-2 text-2xl font-bold leading-tight text-white sm:text-3xl ${
-            photo ? "" : "justify-center"
+          className={`flex items-baseline gap-2 font-bold leading-tight text-white sm:text-3xl ${
+            photo ? "text-xl" : "justify-center text-2xl"
           }`}
         >
           {!photo && (
@@ -83,19 +83,32 @@ export function RecommendationCard({
       </div>
 
       {photo && (
-        <div className="relative h-32 w-32 shrink-0 overflow-hidden rounded-2xl shadow-lg ring-4 ring-white/25 sm:h-40 sm:w-40">
-          <Image
-            src={photo.src}
-            alt={name}
-            fill
-            sizes="(max-width: 640px) 128px, 160px"
-            className="object-cover"
-            priority
-          />
+        /*
+          Floating free, Chan's call. No frame, no ring, no rounded crop: the
+          plate is a cut-out PNG sitting straight on the gradient, the way it
+          does in the mockup. That means object-CONTAIN, not cover — cover
+          would crop the circle into a square and undo the whole effect.
+
+          The generated files already carry their own soft shadow under the
+          plate, so no drop-shadow is added here. Doubling it looks muddy.
+        */
+        <div className="-mr-7 flex shrink-0 flex-col items-center sm:-mr-10">
+          <div className="relative h-40 w-40 sm:h-56 sm:w-56">
+            <Image
+              src={photo.src}
+              alt={name}
+              fill
+              sizes="(max-width: 640px) 160px, 224px"
+              className="object-contain"
+              priority
+            />
+          </div>
+          {/*
+            Attribution is an obligation, not decoration. If a photo comes from
+            someone in the FB group, their name ships with it.
+          */}
           {photo.credit && (
-            <span className="absolute bottom-0 right-0 rounded-tl bg-black/45 px-1 py-0.5 text-[9px] text-white">
-              📷 {photo.credit}
-            </span>
+            <span className="mt-1 text-[10px] text-white/70">📷 {photo.credit}</span>
           )}
         </div>
       )}

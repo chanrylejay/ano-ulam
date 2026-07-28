@@ -10,9 +10,19 @@
 // first and the photos arrive later, one at a time, with no further code work.
 //
 // TO ADD A PHOTO:
-//   1. drop the file in  public/dishes/<recipe-id>.jpg
-//      (recipe ids are in lib/recipes.ts — e.g. "pinakbet", "adobong-manok")
+//   1. drop the file in  public/dishes/<recipe-id>.png
+//      (recipe ids are in lib/recipes.ts — e.g. "pinakbet", "pritong-tilapia")
 //   2. add one line to DISH_PHOTOS below
+//
+// PNG, not JPG. The plate floats free on the orange gradient with no frame
+// around it, so the file needs a real alpha channel — a JPG would arrive as a
+// white square. Check with: colour type 6 in the PNG header means RGBA.
+//
+// House style, so 47 of them look like one set rather than 47 photoshoots:
+// square, plate centred and filling ~85% of the frame, camera locked at 90
+// degrees overhead, plain white matte plate, soft light from upper left,
+// transparent background, nothing else in the frame. The full generation
+// prompt lives with Chan; the template is what keeps them consistent.
 //
 // The explicit map exists so a missing file can never 404. Deriving the path
 // from the id would make every photo-less dish request an image that is not
@@ -26,7 +36,7 @@ export interface DishPhoto {
 }
 
 export const DISH_PHOTOS: Record<string, DishPhoto> = {
-  // "pinakbet": { src: "/dishes/pinakbet.jpg", credit: "Juan dela Cruz" },
+  "ginataang-kalabasa": { src: "/dishes/ginataang-kalabasa.png" },
 };
 
 export function dishPhoto(recipeId: string): DishPhoto | undefined {
