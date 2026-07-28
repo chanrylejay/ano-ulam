@@ -302,12 +302,17 @@ Recipe IDs: ${cheapestMeals.map((r) => r.recipe.id).join(", ")}`;
     // meant the single cheapest dish permanently owned the top of the page;
     // Chan saw Ginataang Kalabasa every time he opened the site. The order is
     // stable all day for every visitor and different tomorrow.
-    const meals = orderForDisplay(cheapestMeals, today).map((result) => ({
+    //
+    // Passing the slot lookup adds one rule on top: the first two cards are
+    // always cheap picks, so a rotation pick cannot appear before third. See
+    // orderForDisplay for why.
+    const ordered = orderForDisplay(cheapestMeals, today, (r) => slotById[r.recipe.id]);
+    const meals = ordered.map((result) => ({
       name: result.recipe.name,
       estimated_cost: result.totalCost,
       servings: "1-3 katao",
       // "mura" = picked on price, "iba" = picked because it has waited longest.
-      // The card labels the second kind "Iba naman ngayon" so a pricier rotation
+      // The card labels the second kind "Maiba naman" so a pricier rotation
       // pick is never passed off as a value pick.
       slot: slotById[result.recipe.id] || "mura",
       ingredients: result.ingredientCosts.map((ing) => ({

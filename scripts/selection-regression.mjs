@@ -117,6 +117,29 @@ check(orderForDisplay(log[0], '2026-09-01').map((p) => p.result.recipe.id).join(
       orderForDisplay(log[0], '2026-09-01').map((p) => p.result.recipe.id).join(),
   'display order is deterministic for a given date');
 
+// ── no rotation pick before the third card ────────────────────────
+// Chan: "dont put it in first place to third place so they will not be shocked
+// when a dish with 200+ price show up, upon opening the app". The app is named
+// after cheap food, so the opening cards have to deliver that before the page
+// starts showing variety. Silent if it breaks — the page still renders, it just
+// greets people with the most expensive dish of the day.
+const bySlot = (p) => p.slot;
+let earliestIba = 99;
+let worstOpener = 0;
+for (let i = 0; i < log.length; i++) {
+  const dateKey = '2026-09-' + String((i % 28) + 1).padStart(2, '0');
+  const ordered = orderForDisplay(log[i], dateKey, bySlot);
+  const idx = ordered.findIndex((p) => p.slot === 'iba');
+  if (idx !== -1 && idx < earliestIba) earliestIba = idx;
+  worstOpener = Math.max(worstOpener, ordered[0].result.totalCost);
+}
+check(earliestIba >= 2,
+  'no "maiba naman" pick lands in the first two cards',
+  'earliest was position ' + (earliestIba + 1));
+check(worstOpener <= 150,
+  'the card that opens the page is always genuinely cheap',
+  'dearest opener across the simulation was P' + worstOpener);
+
 // ── the pool must never be treated as a price ranking by accident ─────
 const day1 = log[0];
 const muraMax = Math.max(...day1.filter((p) => p.slot === 'mura').map((p) => p.result.totalCost));

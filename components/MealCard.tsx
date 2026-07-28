@@ -101,13 +101,19 @@ export function MealCard({ meal, index, unpriced = false }: MealCardProps) {
             <div className="flex items-start justify-between gap-3 mb-3">
               <div className="min-w-0">
                 {/*
-                  Rotation picks are chosen for variety, not price, so they say so.
-                  Without this a ₱255 dish sits next to a ₱70 one with nothing to
-                  explain why, and the page quietly stops meaning "murang ulam".
+                  Rotation picks are chosen for variety, not price, so they say
+                  so. Without this a ₱255 dish sits next to a ₱70 one with
+                  nothing to explain why, and the page quietly stops meaning
+                  "murang ulam".
+
+                  Deliberately NOT a pill. It was a bordered uppercase badge and
+                  Chan's verdict was "the badge is ugly" — the box is what made
+                  it shout. A quiet kicker line does the same job without
+                  competing with the dish name underneath it.
                 */}
                 {meal.slot === "iba" && (
-                  <span className="inline-block mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-amber-700 bg-amber-50 border border-amber-200 rounded-full px-2.5 py-0.5">
-                    Iba naman ngayon
+                  <span className="mb-0.5 block text-xs font-semibold text-amber-600">
+                    Maiba naman
                   </span>
                 )}
                 <h2 className="text-lg sm:text-xl font-bold text-gray-950 leading-tight">

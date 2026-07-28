@@ -1902,6 +1902,9 @@ export function selectDailyMeals(
   return picked;
 }
 
+/** The page opens with this many price-driven picks before any rotation pick. */
+export const LEAD_MURA_CARDS = 2;
+
 /**
  * Stable per-day shuffle for page order.
  *
@@ -1912,8 +1915,23 @@ export function selectDailyMeals(
  * Seeded by the date, so every visitor sees the same order all day and a
  * different one tomorrow. Simulated: 8 different dishes led over 10 days, and
  * Ginataang Kalabasa led none of them.
+ *
+ * `getSlot` is optional, and supplying it adds one guarantee on top of the
+ * shuffle: **the first two cards are always "mura" picks, so the earliest a
+ * rotation pick can appear is third.**
+ *
+ * Chan asked for this after seeing a ₱119 rotation pick lead the page: *"dont
+ * put it in first place to third place so they will not be shocked when a dish
+ * with 200+ price show up, upon opening the app"*. The app is named after cheap
+ * food; the first thing a visitor sees has to deliver on that before it starts
+ * showing them variety. Everything from the third card down keeps the shuffled
+ * order, so the rotation picks still move around day to day.
  */
-export function orderForDisplay<T>(items: T[], dateKey: string): T[] {
+export function orderForDisplay<T>(
+  items: T[],
+  dateKey: string,
+  getSlot?: (item: T) => MealSlot | undefined,
+): T[] {
   let seed = 0;
   for (let i = 0; i < dateKey.length; i++) {
     seed = (Math.imul(seed, 31) + dateKey.charCodeAt(i)) >>> 0;
@@ -1929,7 +1947,20 @@ export function orderForDisplay<T>(items: T[], dateKey: string): T[] {
     out[i] = out[j];
     out[j] = tmp;
   }
-  return out;
+
+  if (!getSlot) return out;
+
+  // Promote the first LEAD_MURA_CARDS cheap picks to the front, keeping the
+  // shuffled order among themselves and among everything left behind. If a day
+  // somehow has fewer than two mura picks, this simply leads with what exists
+  // rather than inventing anything.
+  const lead: T[] = [];
+  for (const item of out) {
+    if (lead.length >= LEAD_MURA_CARDS) break;
+    if (getSlot(item) !== "iba") lead.push(item);
+  }
+  const tail = out.filter((item) => lead.indexOf(item) === -1);
+  return lead.concat(tail);
 }
 
 // ═══════════════════════════════════════════════════════════
