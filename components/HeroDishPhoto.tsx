@@ -33,13 +33,24 @@ export function HeroDishPhoto({ recipeId, name }: HeroDishPhotoProps) {
   if (!photo) return null;
 
   return (
-    <div className="-mr-14 flex shrink-0 flex-col items-center sm:-mr-16">
-      <div className="relative h-52 w-52 sm:h-72 sm:w-72">
+    /*
+      Absolutely anchored to the right of the hero row and vertically centred,
+      NOT a flex sibling of the title.
+
+      As a flex item the plate could only ever be as tall as the text beside
+      it, which left a band of empty orange above and below it — the dead space
+      Chan circled. Taking it out of flow lets it fill the row's full height
+      and spill past the right edge, so the header has no wasted room in it.
+    */
+    <div className="pointer-events-none absolute inset-y-0 right-0 -mr-8 sm:-mr-10 md:-mr-12">
+      {/* Square, sized off the row's height rather than fixed pixels, so it
+          grows with the header at every breakpoint instead of at three. */}
+      <div className="relative h-full aspect-square">
         <Image
           src={photo.src}
           alt={name}
           fill
-          sizes="(max-width: 640px) 208px, 288px"
+          sizes="(max-width: 640px) 240px, 384px"
           // CONTAIN, never cover: cover would crop the round plate back into a
           // square. The file already carries its own shadow, so none is added.
           className="object-contain"
@@ -51,7 +62,11 @@ export function HeroDishPhoto({ recipeId, name }: HeroDishPhotoProps) {
         from someone in the FB group rather than from Chan, their name ships
         with it.
       */}
-      {photo.credit && <span className="mt-1 text-[10px] text-white/70">📷 {photo.credit}</span>}
+      {photo.credit && (
+        <span className="mt-1 block text-center text-[10px] text-white/70">
+          📷 {photo.credit}
+        </span>
+      )}
     </div>
   );
 }

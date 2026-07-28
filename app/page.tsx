@@ -252,12 +252,26 @@ export default function HomePage() {
             width and gets to be properly big instead.
           */}
           {showHeroPhoto ? (
-            <div className="flex w-full items-center gap-3">
-              <section className="min-w-0 flex-1 text-left">
-                {/* 2.5rem, not larger: above this "ma, Ano" stops fitting the
-                    column and the wordmark breaks into three ragged lines. */}
-                <h1 className="mb-1.5 text-[2.5rem] font-black leading-[0.88] tracking-tight sm:text-6xl md:text-7xl">
-                  ma, Ano ulam?
+            /*
+              min-h is what the plate fills. The plate is positioned absolutely
+              inside this row, so it contributes no height of its own — without
+              a floor here the row would collapse to the height of the text and
+              the plate would spill over the ticker below.
+            */
+            <div className="relative flex w-full h-[13rem] items-center sm:h-[21rem] md:h-[28rem]">
+              {/*
+                pr reserves the plate's half. The text never flows under it,
+                which is what lets the plate grow this large without a collision.
+              */}
+              <section className="relative z-10 min-w-0 pr-[50%] text-left sm:pr-[48%] md:pr-[55%]">
+                {/*
+                  The line break is FORCED, not left to wrapping. Chan asked for
+                  two lines on desktop, and a narrow two-line wordmark is also
+                  what frees the horizontal room for a plate this size.
+                */}
+                <h1 className="mb-1.5 font-black leading-[0.88] tracking-tight">
+                  <span className="block text-[2.5rem] sm:text-6xl md:text-7xl">ma, Ano</span>
+                  <span className="block text-[2.5rem] sm:text-6xl md:text-7xl">ulam?</span>
                 </h1>
                 <p className="text-sm text-white/90 sm:text-lg">Anong murang ulam ngayon</p>
               </section>
