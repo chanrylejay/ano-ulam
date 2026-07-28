@@ -3,13 +3,16 @@
 import { useState, useEffect, useCallback } from "react";
 import { format } from "date-fns";
 import { usePathname } from "next/navigation";
+import { Calendar } from "lucide-react";
 import { MealCard } from "@/components/MealCard";
+import { RecommendationCard } from "@/components/RecommendationCard";
 import { Footer } from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
 import { RECIPES } from "@/lib/recipes";
 import {
   PROTEIN_TABS,
   matchesProteinFilter,
+  proteinEmoji,
   type ProteinFilter,
 } from "@/lib/protein-tabs";
 
@@ -142,6 +145,17 @@ export default function HomePage() {
   const today = new Date();
   const formattedDate = format(today, "EEEE, MMMM d, yyyy");
 
+  // ── The headline pick ───────────────────────────────────
+  // Always from the FULL list, never the filtered one. "Rekomendasyon ngayon"
+  // is the day's answer; it must not change because someone tapped Isda.
+  // The cron already shuffles display order by date, so this is not
+  // permanently the cheapest dish — that was the exact thing Chan was tired
+  // of seeing (Ginataang Kalabasa, every single day).
+  const featuredMeal = meals.length > 0 ? meals[0] : null;
+  const featuredRecipe = featuredMeal
+    ? RECIPES.find((r) => r.name === featuredMeal.name)
+    : undefined;
+
   if (error && meals.length === 0) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-amber-50 to-orange-50 px-4">
@@ -165,14 +179,20 @@ export default function HomePage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50">
-        <div className="min-h-[340px] bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 shadow-lg sm:min-h-[380px] md:min-h-[400px]">
-          <div className="mx-auto flex min-h-[340px] max-w-3xl flex-col items-center justify-between px-4 pb-6 pt-9 text-center sm:min-h-[380px] md:min-h-[400px]">
-            <div className="flex flex-1 flex-col items-center justify-center space-y-3">
-              <div className="h-20 w-[520px] max-w-full animate-pulse rounded-lg bg-white/20" />
+        {/* Mirrors the real header's shape, so nothing jumps when data lands. */}
+        <div className="bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 shadow-lg">
+          <div className="relative mx-auto flex w-full max-w-3xl flex-col items-center gap-5 px-4 pb-6 pt-16 text-center">
+            <div className="absolute left-4 top-4 h-8 w-56 max-w-[70%] animate-pulse rounded-xl bg-white/20" />
+            <div className="flex flex-col items-center space-y-3">
+              <div className="h-16 w-[440px] max-w-full animate-pulse rounded-lg bg-white/20" />
               <div className="h-5 w-56 max-w-full animate-pulse rounded bg-white/15" />
-              <div className="mt-2 h-4 w-44 max-w-full animate-pulse rounded bg-white/10" />
             </div>
-            <div className="flex w-full items-center justify-center gap-5 pt-4">
+            <div className="flex w-full flex-col items-center space-y-2">
+              <div className="h-3 w-40 animate-pulse rounded bg-white/15" />
+              <div className="h-8 w-64 max-w-full animate-pulse rounded bg-white/25" />
+              <div className="h-4 w-32 animate-pulse rounded bg-white/15" />
+            </div>
+            <div className="flex w-full items-center justify-center gap-5">
               {[...Array(6)].map((_, i) => (
                 <div key={i} className="flex items-center gap-1.5">
                   <div className="h-2.5 w-2.5 animate-pulse rounded-full bg-white/30" />
@@ -211,21 +231,56 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50">
-      <header className="min-h-[340px] overflow-hidden bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 text-white shadow-lg sm:min-h-[380px] md:min-h-[400px]">
-        <div className="mx-auto flex min-h-[340px] w-full max-w-3xl flex-col items-center justify-between px-4 pb-6 pt-9 text-center sm:min-h-[380px] md:min-h-[400px]">
-          <section className="flex flex-1 flex-col items-center justify-center">
-            <h1 className="mb-2 text-[4.2rem] font-black leading-[0.85] tracking-tight sm:text-7xl md:text-[8rem] md:leading-none">
+      <header className="overflow-hidden bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 text-white shadow-lg">
+        <div className="relative mx-auto flex w-full max-w-3xl flex-col items-center gap-5 px-4 pb-6 pt-16 text-center">
+          {/*
+            Date as a chip rather than faint centred text, per Jam's mockup.
+            It reads as information the app is telling you, not decoration.
+          */}
+          <div className="absolute left-4 top-4 flex items-center gap-2 rounded-xl bg-white/20 px-3 py-1.5 text-sm">
+            <Calendar className="h-4 w-4 shrink-0" aria-hidden="true" />
+            <span className="whitespace-nowrap font-medium">{formattedDate}</span>
+          </div>
+
+          <section className="flex flex-col items-center">
+            {/*
+              Smaller than it was. The header now carries the recommendation
+              card as well, and at the old 8rem the title alone filled a phone
+              screen. Still the biggest thing on the page.
+            */}
+            <h1 className="mb-2 text-[3.4rem] font-black leading-[0.85] tracking-tight sm:text-6xl md:text-[6rem] md:leading-none">
               ma, Ano ulam?
             </h1>
-            <p className="mb-4 text-base text-white/90 sm:text-xl">Anong murang ulam ngayon</p>
-            <p className="text-sm text-white/70">{formattedDate}</p>
+            <p className="text-base text-white/90 sm:text-xl">Anong murang ulam ngayon</p>
           </section>
 
-          <nav className="relative w-full pt-5" aria-label="Pangunahing presyo ngayon">
-            <div className="pointer-events-none absolute bottom-0 left-0 top-5 z-10 w-6 bg-gradient-to-r from-orange-500/90 to-transparent sm:hidden" />
-            <div className="pointer-events-none absolute bottom-0 right-0 top-5 z-10 w-6 bg-gradient-to-l from-red-500/90 to-transparent sm:hidden" />
+          {/*
+            The headline pick. It repeats the first meal card below on purpose,
+            exactly as the mockup does: this is the answer, that is the recipe.
+          */}
+          {featuredMeal && (
+            <RecommendationCard
+              name={featuredMeal.name}
+              cost={featuredMeal.estimated_cost}
+              servings={featuredMeal.servings}
+              recipeId={featuredRecipe?.id}
+              emoji={featuredRecipe ? proteinEmoji(featuredRecipe) : "🍽️"}
+            />
+          )}
 
-            <div className="scrollbar-hide -mx-4 flex items-center gap-4 overflow-x-auto px-4 pb-1 sm:hidden">
+          {/*
+            The ticker stays plain text on the gradient. Jam's mockup wraps it
+            in a translucent pill, which makes it a fourth panel in a header
+            that already had enough of them.
+          */}
+          <nav
+            className="relative -mx-4 w-[calc(100%+2rem)] px-4"
+            aria-label="Pangunahing presyo ngayon"
+          >
+            <div className="pointer-events-none absolute bottom-0 left-0 top-0 z-10 w-6 bg-gradient-to-r from-orange-500/90 to-transparent sm:hidden" />
+            <div className="pointer-events-none absolute bottom-0 right-0 top-0 z-10 w-6 bg-gradient-to-l from-red-500/90 to-transparent sm:hidden" />
+
+            <div className="scrollbar-hide flex items-center gap-4 overflow-x-auto px-1 sm:hidden">
               {priceTags.map((tag) => (
                 <div
                   key={tag.label}
@@ -235,7 +290,7 @@ export default function HomePage() {
                   <span className="text-sm shrink-0" aria-hidden="true">
                     {getDotEmoji(tag.price)}
                   </span>
-                  <span className="whitespace-nowrap text-sm text-white/85">
+                  <span className="whitespace-nowrap text-sm text-white/90">
                     <span className="font-semibold">{tag.label}</span>{" "}
                     <span className="font-black">{formatPeso(tag.price)}</span>
                   </span>
@@ -259,7 +314,7 @@ export default function HomePage() {
                   <span className="text-sm shrink-0" aria-hidden="true">
                     {getDotEmoji(tag.price)}
                   </span>
-                  <span className="whitespace-nowrap text-sm text-white/85">
+                  <span className="whitespace-nowrap text-sm text-white/90">
                     <span className="font-semibold">{tag.label}</span>{" "}
                     <span className="font-black">{formatPeso(tag.price)}</span>
                   </span>
