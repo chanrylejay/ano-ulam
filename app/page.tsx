@@ -5,16 +5,11 @@ import { format } from "date-fns";
 import { usePathname } from "next/navigation";
 import { Calendar } from "lucide-react";
 import { MealCard } from "@/components/MealCard";
-import { RecommendationCard } from "@/components/RecommendationCard";
+import { HeroDishPhoto, hasDishPhoto } from "@/components/HeroDishPhoto";
 import { Footer } from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
 import { RECIPES } from "@/lib/recipes";
-import {
-  PROTEIN_TABS,
-  matchesProteinFilter,
-  proteinEmoji,
-  type ProteinFilter,
-} from "@/lib/protein-tabs";
+import { PROTEIN_TABS, matchesProteinFilter, type ProteinFilter } from "@/lib/protein-tabs";
 
 interface Ingredient {
   name: string;
@@ -155,6 +150,7 @@ export default function HomePage() {
   const featuredRecipe = featuredMeal
     ? RECIPES.find((r) => r.name === featuredMeal.name)
     : undefined;
+  const showHeroPhoto = hasDishPhoto(featuredRecipe?.id);
 
   if (error && meals.length === 0) {
     return (
@@ -232,40 +228,48 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50">
       <header className="overflow-hidden bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 text-white shadow-lg">
-        <div className="relative mx-auto flex w-full max-w-3xl flex-col items-center gap-5 px-4 pb-6 pt-16 text-center">
+        <div className="relative mx-auto flex w-full max-w-3xl flex-col items-center gap-5 px-4 pb-6 pt-14">
           {/*
-            Date as a chip rather than faint centred text, per Jam's mockup.
-            It reads as information the app is telling you, not decoration.
+            Small on purpose. Chan: "the date is too big i think". It is
+            orientation, not a headline.
           */}
-          <div className="absolute left-4 top-4 flex items-center gap-2 rounded-xl bg-white/20 px-3 py-1.5 text-sm">
-            <Calendar className="h-4 w-4 shrink-0" aria-hidden="true" />
+          <div className="absolute left-4 top-3.5 flex items-center gap-1.5 rounded-lg bg-white/20 px-2.5 py-1 text-xs">
+            <Calendar className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
             <span className="whitespace-nowrap font-medium">{formattedDate}</span>
           </div>
 
-          <section className="flex flex-col items-center">
-            {/*
-              Smaller than it was. The header now carries the recommendation
-              card as well, and at the old 8rem the title alone filled a phone
-              screen. Still the biggest thing on the page.
-            */}
-            <h1 className="mb-2 text-[3.4rem] font-black leading-[0.85] tracking-tight sm:text-6xl md:text-[6rem] md:leading-none">
-              ma, Ano ulam?
-            </h1>
-            <p className="text-base text-white/90 sm:text-xl">Anong murang ulam ngayon</p>
-          </section>
-
           {/*
-            The headline pick. It repeats the first meal card below on purpose,
-            exactly as the mockup does: this is the answer, that is the recipe.
+            Two layouts, picked by whether today's dish actually has a photo.
+
+            WITH a photo: title left, plate right, both as large as the width
+            allows. On a phone these two share 358px, so neither can be huge on
+            its own — the plate is drawn oversized and allowed to hang off the
+            right edge, which is how the mockup makes it read big while
+            spending less room.
+
+            WITHOUT a photo (46 of the 47 dishes today): a lone left-aligned
+            title with dead space beside it looks broken, so it centres full
+            width and gets to be properly big instead.
           */}
-          {featuredMeal && (
-            <RecommendationCard
-              name={featuredMeal.name}
-              cost={featuredMeal.estimated_cost}
-              servings={featuredMeal.servings}
-              recipeId={featuredRecipe?.id}
-              emoji={featuredRecipe ? proteinEmoji(featuredRecipe) : "🍽️"}
-            />
+          {showHeroPhoto ? (
+            <div className="flex w-full items-center gap-3">
+              <section className="min-w-0 flex-1 text-left">
+                {/* 2.5rem, not larger: above this "ma, Ano" stops fitting the
+                    column and the wordmark breaks into three ragged lines. */}
+                <h1 className="mb-1.5 text-[2.5rem] font-black leading-[0.88] tracking-tight sm:text-6xl md:text-7xl">
+                  ma, Ano ulam?
+                </h1>
+                <p className="text-sm text-white/90 sm:text-lg">Anong murang ulam ngayon</p>
+              </section>
+              <HeroDishPhoto recipeId={featuredRecipe?.id} name={featuredMeal?.name ?? ""} />
+            </div>
+          ) : (
+            <section className="flex flex-col items-center text-center">
+              <h1 className="mb-2 text-[3.6rem] font-black leading-[0.85] tracking-tight sm:text-7xl md:text-[7rem] md:leading-none">
+                ma, Ano ulam?
+              </h1>
+              <p className="text-base text-white/90 sm:text-xl">Anong murang ulam ngayon</p>
+            </section>
           )}
 
           {/*
