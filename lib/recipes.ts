@@ -1506,12 +1506,35 @@ function normalizeIngredientForCost(recipe: Recipe, ing: RecipeIngredient): Reci
   return ing;
 }
 
+/**
+ * Can this recipe be costed from today's prices?
+ *
+ * A required ingredient with no price EXCLUDES the whole recipe. That guard is
+ * deliberate — a missing Galunggong price once read as free and ranked the dish
+ * cheapest — and it stays.
+ *
+ * What changed (Jul 28 2026) is an asymmetry: getIngredientCost() already falls
+ * back to `fallbackPrice` when the DA has no price for a daKey, but this
+ * function ignored `fallbackPrice` unless daKey was null. So a recipe was thrown
+ * out BEFORE costing even ran, even though the cost function was ready to handle
+ * it. Now the two agree.
+ *
+ * Measured impact: on 3 of the 28 Feb 2026 sheets the DA published no Cabbage
+ * (Scorpio) price, which silently removed Sopas, Nilagang Baboy, Beef Nilaga and
+ * Ginisang Repolyo at Manok — all sabaw or ginisa, the fragile categories.
+ *
+ * NOTE: no daKey ingredient carries a fallbackPrice yet. This only opens the
+ * door; the numbers are Chan's to set during his recipe pass, because a made-up
+ * price is exactly what this project's canon forbids.
+ */
 function hasRequiredPrices(recipe: Recipe, priceMap: PriceMap): boolean {
   return recipe.ingredients.every((ing) => {
     if (ing.optional) return true;
     if (ing.daKey === null) return ing.fallbackPrice !== undefined;
     const price = priceMap[ing.daKey];
-    return typeof price === "number" && Number.isFinite(price) && price > 0;
+    if (typeof price === "number" && Number.isFinite(price) && price > 0) return true;
+    // DA did not price it today: a hand-set fallback may still carry the recipe.
+    return ing.fallbackPrice !== undefined && ing.fallbackPrice > 0;
   });
 }
 
