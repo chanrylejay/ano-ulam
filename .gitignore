@@ -142,3 +142,7 @@ dist
 
 # Playwright MCP scratch output (screenshots, page snapshots)
 .playwright-mcp/
+
+# Output of npm run check:ingredients (a report, regenerate it any time)
+ingredient-coverage.json
+ingredient-sweep.log

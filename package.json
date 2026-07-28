@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "test:selection": "node scripts/selection-regression.mjs"
+    "test:selection": "node scripts/selection-regression.mjs",
+    "check:ingredients": "node scripts/ingredient-coverage.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
