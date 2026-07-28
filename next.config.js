@@ -41,14 +41,15 @@ const nextConfig = {
         // and it is the reason DISH_PHOTOS is an explicit map rather than a
         // path derived from the recipe id.
         //
-        // WHAT THIS DOES AND DOES NOT DO, measured on a production build:
-        // the raw file at /dishes/*.png now returns max-age=2592000. The
-        // OPTIMIZED response at /_next/image still returns max-age=60, and no
-        // config setting moved it — the optimizer reads /public off the disk,
-        // so there is no upstream header for it to inherit. On Vercel the edge
-        // CDN is what actually serves repeat requests for that endpoint, so
-        // the practical cost is small, but do not read this rule as having
-        // fixed the optimized TTL. It has not.
+        // VERIFIED ON THE DEPLOYED SITE, not just locally. Both the raw file
+        // and the optimized /_next/image response come back with
+        // `Cache-Control: public, max-age=2592000, immutable`, and the
+        // optimized one as image/webp.
+        //
+        // Worth knowing because it cost a wrong conclusion once: `next start`
+        // on a dev machine reports max-age=60 for the optimized response no
+        // matter what this rule says. That is a local artifact. Check headers
+        // against the real deployment before believing them.
         source: '/dishes/:path*',
         headers: [
           { key: 'Cache-Control', value: 'public, max-age=2592000, immutable' },
