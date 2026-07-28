@@ -34,25 +34,27 @@ export function HeroDishPhoto({ recipeId, name }: HeroDishPhotoProps) {
 
   return (
     /*
-      Absolutely anchored to the right of the hero row and vertically centred,
-      NOT a flex sibling of the title.
+      Anchored to the BOTTOM right of the hero row, and deliberately taller
+      than that row, so it grows upward into the header's top padding.
 
-      As a flex item the plate could only ever be as tall as the text beside
-      it, which left a band of empty orange above and below it — the dead space
-      Chan circled. Taking it out of flow lets it fill the row's full height
-      and spill past the right edge, so the header has no wasted room in it.
+      Why bottom rather than centred: a plate big enough to fill the row also
+      overflows it, and overflowing downward puts it on top of the price
+      ticker. Upward there is nothing but padding and the date chip, which
+      lives on the far left. The header's overflow-hidden trims the rest.
+
+      Why it overlaps the text at all: the source PNG is a round plate inside a
+      square canvas, so roughly 8% of each edge is transparent. The boxes can
+      overlap by that much before anything visually touches — which is what
+      finally closes the awkward orange gap between the wordmark and the dish
+      without shrinking either one.
     */
-    <div className="pointer-events-none absolute inset-y-0 right-0 -mr-8 sm:-mr-10 md:-mr-12">
-      {/* The bleed above is what the page.tsx `pr-[..]` values are computed
-          against: visible width = this square's size MINUS the negative margin. */}
-      {/* Square, sized off the row's height rather than fixed pixels, so it
-          grows with the header at every breakpoint instead of at three. */}
-      <div className="relative h-full aspect-square">
+    <div className="pointer-events-none absolute bottom-0 right-0 -mr-16 sm:-mr-20 md:-mr-24">
+      <div className="relative h-60 w-60 sm:h-80 sm:w-80 md:h-[26rem] md:w-[26rem]">
         <Image
           src={photo.src}
           alt={name}
           fill
-          sizes="(max-width: 640px) 240px, 384px"
+          sizes="(max-width: 640px) 240px, (max-width: 768px) 320px, 416px"
           // CONTAIN, never cover: cover would crop the round plate back into a
           // square. The file already carries its own shadow, so none is added.
           className="object-contain"

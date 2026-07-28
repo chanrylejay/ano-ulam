@@ -264,13 +264,13 @@ export default function HomePage() {
               (208px row against a 116px text block was the gap Chan spotted on
               mobile). Set it too short and the plate lands on the ticker.
             */
-            <div className="relative flex h-40 w-full items-center sm:h-56 md:h-[19rem]">
+            <div className="relative flex min-h-[9.5rem] w-full items-center sm:min-h-[13.5rem] md:min-h-[18rem]">
               {/*
                 pr reserves the plate's side so text can never flow under it.
                 Each value clears the plate's VISIBLE width (its size minus the
                 bleed) at that breakpoint, with a few px of slack.
               */}
-              <section className="relative z-10 min-w-0 pr-[44%] text-left sm:pr-[34%] md:pr-[38%]">
+              <section className="relative z-10 min-w-0 pr-[42%] text-left sm:pr-[36%] md:pr-[34%]">
                 {/*
                   The break is FORCED, not left to wrapping, so the wordmark is
                   two lines at every width rather than depending on the viewport.
