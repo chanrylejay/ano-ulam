@@ -271,13 +271,13 @@ export default function HomePage() {
               row this tall visibly dropped the wordmark down the page. The
               title shares a centre line with the plate beside it instead.
             */
-            <div className="relative flex min-h-[15rem] w-full items-center sm:min-h-[20rem] md:min-h-[20rem]">
+            <div className="relative flex min-h-[calc(0.66*min(100vw-2rem,40rem))] w-full items-center md:min-h-[20rem]">
               {/*
                 pr reserves the plate's side so text can never flow under it.
                 Each value clears the plate's VISIBLE width (its size minus the
                 bleed) at that breakpoint, with a few px of slack.
               */}
-              <section className="relative z-10 min-w-0 pr-[42%] text-left sm:pr-[44%] md:pr-[38%]">
+              <section className="relative z-10 min-w-0 pr-[44%] text-left md:pr-[38%]">
                 {/*
                   The break is FORCED, not left to wrapping, so the wordmark is
                   two lines at every width rather than depending on the viewport.
@@ -286,8 +286,8 @@ export default function HomePage() {
                   nearly touched and the whole thing read as compressed.
                 */}
                 <h1 className="mb-2.5 font-black leading-[0.95] tracking-tight">
-                  <span className="block text-[2.625rem] sm:text-6xl md:text-[5.5rem]">ma, Ano</span>
-                  <span className="block text-[2.625rem] sm:text-6xl md:text-[5.5rem]">ulam?</span>
+                  <span className="block text-[min(10.8vw,5rem)] md:text-[5.5rem]">ma, Ano</span>
+                  <span className="block text-[min(10.8vw,5rem)] md:text-[5.5rem]">ulam?</span>
                 </h1>
                 <p className="text-sm text-white/90 sm:text-lg">Anong murang ulam ngayon</p>
               </section>

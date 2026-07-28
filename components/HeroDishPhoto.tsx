@@ -53,14 +53,28 @@ export function HeroDishPhoto({ recipeId, name }: HeroDishPhotoProps) {
       overlap by that much before anything visually touches — which is what
       closes the awkward orange gap between the wordmark and the dish without
       shrinking either one.
+      On phones the size and the bleed are PERCENTAGES of the row, not pixels.
+
+      They used to be pixels, and that quietly broke every phone wider than the
+      one being tested on. The plate is pinned to the right edge, so on a 430px
+      screen it slid 20px further right than on a 390px one while the title,
+      being a fixed pixel size, did not grow to follow — and an orange gap
+      opened between them. Chan found it on 412px and 430px devices.
+
+      As percentages the plate keeps its proportion of the screen, and the
+      title beside it is fluid for the same reason, so the space between the
+      two is now constant on every phone instead of a function of its width.
+
+      From sm up the container itself stops growing, so fixed sizes are safe
+      again and are easier to reason about.
     */
-    <div className="pointer-events-none absolute bottom-0 right-0 -mr-16 sm:-mr-14 md:-mr-8">
-      <div className="relative h-60 w-60 sm:h-80 sm:w-80 md:h-80 md:w-80">
+    <div className="pointer-events-none absolute bottom-0 right-0 -mr-[14%] w-[66%] md:-mr-8 md:w-80">
+      <div className="relative aspect-square w-full">
         <Image
           src={photo.src}
           alt={name}
           fill
-          sizes="(max-width: 640px) 240px, (max-width: 768px) 320px, 416px"
+          sizes="(max-width: 640px) 66vw, 320px"
           // CONTAIN, never cover: cover would crop the round plate back into a
           // square. The file already carries its own shadow, so none is added.
           className="object-contain"
