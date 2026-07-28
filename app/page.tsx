@@ -263,8 +263,12 @@ export default function HomePage() {
               tall and a band of empty orange appears above and below the text
               (208px row against a 116px text block was the gap Chan spotted on
               mobile). Set it too short and the plate lands on the ticker.
+
+              items-CENTER, not items-end. Bottom-aligning the text against a
+              row this tall visibly dropped the wordmark down the page. The
+              title shares a centre line with the plate beside it instead.
             */
-            <div className="relative flex min-h-[15rem] w-full items-end sm:min-h-[20rem] md:min-h-[22rem]">
+            <div className="relative flex min-h-[15rem] w-full items-center sm:min-h-[20rem] md:min-h-[22rem]">
               {/*
                 pr reserves the plate's side so text can never flow under it.
                 Each value clears the plate's VISIBLE width (its size minus the
