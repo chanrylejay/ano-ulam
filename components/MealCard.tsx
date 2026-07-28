@@ -19,6 +19,13 @@ interface Meal {
   servings: string;
   ingredients: Ingredient[];
   reason: string;
+  /**
+   * Why this dish is on the page today.
+   *   "mura" — picked on price
+   *   "iba"  — picked because it has waited longest, price ignored
+   * Optional so older cached rows written before V2.4 still render.
+   */
+  slot?: "mura" | "iba";
 }
 
 interface MealCardProps {
@@ -86,9 +93,21 @@ export function MealCard({ meal, index }: MealCardProps) {
           <CardContent className="p-5 sm:p-6">
             {/* ── Title + Total Price ── */}
             <div className="flex items-start justify-between gap-3 mb-3">
-              <h2 className="text-lg sm:text-xl font-bold text-gray-950 leading-tight">
-                {meal.name}
-              </h2>
+              <div className="min-w-0">
+                {/*
+                  Rotation picks are chosen for variety, not price, so they say so.
+                  Without this a ₱255 dish sits next to a ₱70 one with nothing to
+                  explain why, and the page quietly stops meaning "murang ulam".
+                */}
+                {meal.slot === "iba" && (
+                  <span className="inline-block mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-amber-700 bg-amber-50 border border-amber-200 rounded-full px-2.5 py-0.5">
+                    Iba naman ngayon
+                  </span>
+                )}
+                <h2 className="text-lg sm:text-xl font-bold text-gray-950 leading-tight">
+                  {meal.name}
+                </h2>
+              </div>
               <span
                 className={`${getCostBadgeColor(meal.estimated_cost)} text-white text-sm font-bold px-3 py-1.5 rounded-full shrink-0 whitespace-nowrap`}
               >

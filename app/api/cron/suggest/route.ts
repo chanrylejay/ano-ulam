@@ -5,7 +5,15 @@ import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@/lib/db";
 import { callDeepSeekAPI } from "@/lib/deepseek";
 import { isHidden } from "@/lib/commodity-names";
-import { RECIPES, findCheapestMeals, type PriceMap, type CostResult } from "@/lib/recipes";
+import {
+  RECIPES,
+  selectDailyMeals,
+  orderForDisplay,
+  type PriceMap,
+  type CostResult,
+  type DailyPick,
+  type MealSlot,
+} from "@/lib/recipes";
 import { buildPriceMap, type DARecord } from "@/lib/da-parser";
 
 // ═══════════════════════════════════════════════════════════
@@ -136,52 +144,75 @@ export async function POST(request: NextRequest) {
       AND p.price_prevailing IS NOT NULL
     `;
 
-    // ── Fetch yesterday's meal IDs for rotation ──────────
-    const yesterdaySuggestion = await sql`
-      SELECT meals FROM daily_suggestions
+    // ── Recent history for rotation ──────────────────────
+    // V2.4: was "yesterday's 8 ids". Remembering ONE day is what created the
+    // two-day loop, because day N could not repeat day N-1 but was free to
+    // repeat day N-2. Production served 2 distinct menus across 16-22 Jul 2026.
+    // Now we read back several days and pass how long each dish has waited.
+    const HISTORY_DAYS = 8;
+    const recentRows = await sql`
+      SELECT DISTINCT ON (suggestion_date)
+        suggestion_date,
+        meals
+      FROM daily_suggestions
       WHERE suggestion_date < ${today}
       ORDER BY suggestion_date DESC, generated_at DESC NULLS LAST, id DESC
-      LIMIT 1
+      LIMIT ${HISTORY_DAYS}
     `;
 
-    let excludeIds: string[] = [];
-    if (yesterdaySuggestion.length > 0) {
-      try {
-        const yesterdayMeals =
-          typeof yesterdaySuggestion[0].meals === "string"
-            ? JSON.parse(yesterdaySuggestion[0].meals)
-            : yesterdaySuggestion[0].meals;
+    const nameToId: Record<string, string> = {};
+    for (const recipe of RECIPES) nameToId[recipe.name] = recipe.id;
 
-        if (Array.isArray(yesterdayMeals)) {
-          const yesterdayNames = yesterdayMeals.map((m: any) => m.name);
-          excludeIds = RECIPES.filter((r) => yesterdayNames.includes(r.name)).map((r) => r.id);
+    const daysSinceShown: Record<string, number> = {};
+    const todayMs = new Date(`${today}T00:00:00Z`).getTime();
+
+    for (const row of recentRows as DbRow[]) {
+      let mealsValue: unknown = row.meals;
+      if (typeof mealsValue === "string") {
+        try {
+          mealsValue = JSON.parse(mealsValue);
+        } catch {
+          continue; // rotation is best-effort; a bad row must not break the day
         }
-      } catch (parseError) {
-        console.error("Failed to parse yesterday's meals for rotation:", parseError);
-        // Continue without exclusion — rotation is best-effort
+      }
+      if (!Array.isArray(mealsValue)) continue;
+
+      const rowDate = new Date(`${String(row.suggestion_date).slice(0, 10)}T00:00:00Z`).getTime();
+      const daysAgo = Math.max(1, Math.round((todayMs - rowDate) / 86400000));
+
+      for (const meal of mealsValue as Array<Record<string, unknown>>) {
+        const id = nameToId[asString(meal?.name)];
+        if (!id) continue;
+        // keep the most RECENT sighting
+        if (daysSinceShown[id] === undefined || daysAgo < daysSinceShown[id]) {
+          daysSinceShown[id] = daysAgo;
+        }
       }
     }
 
     // ── Build NORMALIZED price maps ──────────────────────
-    // Strips brand/origin/size suffixes, keeps cheapest variant
-    // e.g., "Chicken Leg Quarter Imported" → "Chicken Leg Quarter"
+    // Word matching against the recipe daKeys; see lib/da-parser.ts
     const todayPriceMap: PriceMap = buildNormalizedPriceMap(prices);
     const lastPriceMap: PriceMap = buildNormalizedPriceMap(lastPrices);
 
-    // ── Run cost engine — find cheapest 8 meals ──────────
-    // excludeIds removes yesterday's picks for variety
-    let cheapestMeals: CostResult[] = findCheapestMeals(
+    // ── Run the V2.4 selector ────────────────────────────
+    // 5 price-driven "mura" slots + 3 "iba naman ngayon" rotation slots,
+    // prito/inihaw capped at 2. See lib/recipes.ts for why.
+    const picks: DailyPick[] = selectDailyMeals(
       RECIPES,
       todayPriceMap,
       lastPriceMap,
-      8,
-      excludeIds,
+      daysSinceShown,
     );
+    let cheapestMeals: CostResult[] = picks.map((p) => p.result);
+    const slotById: Record<string, MealSlot> = {};
+    for (const p of picks) slotById[p.result.recipe.id] = p.slot;
 
-    // Fallback: if rotation prevents full 8, retry without rotation
-    if (cheapestMeals.length < 8) {
-      cheapestMeals = findCheapestMeals(RECIPES, todayPriceMap, lastPriceMap, 8, []);
-    }
+    // No "retry without rotation" fallback is needed any more. selectDailyMeals
+    // relaxes its own constraints in order (rested -> whole cheap pool -> ignore
+    // protein caps -> ignore the prito cap) and always fills the page when the
+    // price data can cost that many recipes at all. The old retry existed only
+    // because excludeIds could starve the pool outright.
 
     // ── THE GUARD ────────────────────────────────────────
     // Never write an empty meals list. On Jul 27 2026 this route did exactly
@@ -275,10 +306,18 @@ Recipe IDs: ${cheapestMeals.map((r) => r.recipe.id).join(", ")}`;
     }
 
     // ── Build final meals array for frontend ─────────────
-    const meals = cheapestMeals.map((result) => ({
+    // Page order is a date-seeded shuffle, NOT cheapest-first. Sorting by price
+    // meant the single cheapest dish permanently owned the top of the page;
+    // Chan saw Ginataang Kalabasa every time he opened the site. The order is
+    // stable all day for every visitor and different tomorrow.
+    const meals = orderForDisplay(cheapestMeals, today).map((result) => ({
       name: result.recipe.name,
       estimated_cost: result.totalCost,
       servings: "1-3 katao",
+      // "mura" = picked on price, "iba" = picked because it has waited longest.
+      // The card labels the second kind "Iba naman ngayon" so a pricier rotation
+      // pick is never passed off as a value pick.
+      slot: slotById[result.recipe.id] || "mura",
       ingredients: result.ingredientCosts.map((ing) => ({
         name: ing.name,
         amount: ing.amount,
@@ -325,10 +364,16 @@ Recipe IDs: ${cheapestMeals.map((r) => r.recipe.id).join(", ")}`;
     return NextResponse.json({
       success: true,
       mealsCount: meals.length,
-      rotatedOut: excludeIds.length,
+      // Telemetry for the cron response, so a bad rotation is visible without
+      // opening the database.
+      historyDaysRead: recentRows.length,
+      recipesOnCooldown: Object.keys(daysSinceShown).length,
+      muraSlots: meals.filter((m) => m.slot === "mura").length,
+      ibaSlots: meals.filter((m) => m.slot === "iba").length,
       meals: meals.map((m) => ({
         name: m.name,
         cost: m.estimated_cost,
+        slot: m.slot,
       })),
     });
   } catch (error) {

@@ -21,6 +21,8 @@ interface Meal {
   servings: string;
   ingredients: Ingredient[];
   reason: string;
+  /** "mura" = picked on price, "iba" = variety pick. Optional for pre-V2.4 rows. */
+  slot?: "mura" | "iba";
 }
 
 interface PriceTag {

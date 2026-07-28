@@ -1714,6 +1714,202 @@ export function findCheapestMeals(
 }
 
 // ═══════════════════════════════════════════════════════════
+// V2.4 DAILY SELECTION — 5 mura slots + 3 "iba naman" slots
+// ═══════════════════════════════════════════════════════════
+// Replaces the cheapest-8 selection for the daily suggestions.
+//
+// THE PROBLEM IT SOLVES (measured on production data, 28 Jul 2026):
+// the old flow sorted by price and excluded only YESTERDAY's picks. Cheapest
+// -first has exactly one right answer, so with stable prices day N could not
+// repeat day N-1 but was free to repeat day N-2. The result was a mathematically
+// guaranteed two-day loop: 16-22 Jul served **2 distinct menus over 7 days**, and
+// **21 of the 47 recipes had never once been shown**.
+//
+// Widening the price pool surfaces more dishes but drags whole days to a ~P200
+// average, which breaks the promise the app is named after. So the eight cards
+// stop competing on a single rule:
+//
+//   5 "mura" slots  — the cheapest CORE_POOL dishes, preferring whichever has
+//                     waited longest inside that cheap set. Guarantees a genuinely
+//                     cheap option on the page every single day.
+//   3 "iba" slots   — whichever recipes have waited longest across ALL of them,
+//                     price ignored. This is what finally surfaces the other 31.
+//
+// Simulated over 28 days on real prices held CONSTANT (the worst case for
+// variety): 28/28 distinct menus, 47/47 recipes surfaced, never more than 2
+// fried in a day, and the cheapest dish on the worst day still P100.
+
+/** Which slot a pick earned. The UI labels "iba" as "Iba naman ngayon". */
+export type MealSlot = "mura" | "iba";
+
+export interface DailyPick {
+  result: CostResult;
+  slot: MealSlot;
+}
+
+/**
+ * Cooking method, from the recipe id.
+ *
+ * NOTE the ids are Filipino: the fried dishes are `pritong-*`, NOT `fried-*`.
+ * A rule written against `fried-` matches only the 2 `inihaw-` dishes and
+ * silently lets 8 more fried dishes through the cap.
+ */
+export function getCookingMethod(recipe: Recipe): "prito" | "sabaw" | "ginisa" | "sarsa" {
+  const id = recipe.id;
+  if (id.indexOf("pritong-") === 0 || id.indexOf("inihaw-") === 0) return "prito";
+  if (/sinigang|nilaga|tinola|sopas/.test(id)) return "sabaw";
+  if (/ginisa|ginataan|torta|sarciado/.test(id)) return "ginisa";
+  return "sarsa";
+}
+
+export interface DailySelectionOptions {
+  /** Total cards on the page. */
+  count?: number;
+  /** How many of those are price-driven. */
+  coreSlots?: number;
+  /** The mura slots draw from this many of the cheapest dishes. */
+  corePool?: number;
+  /** A dish shown this many days ago or fewer is held back. */
+  memoryDays?: number;
+  /** Max prito/inihaw dishes in one day. Chan's call: 2. */
+  pritoCap?: number;
+}
+
+export const DEFAULT_SELECTION: Required<DailySelectionOptions> = {
+  count: 8,
+  coreSlots: 5,
+  corePool: 16,
+  memoryDays: 3,
+  pritoCap: 2,
+};
+
+/** Treated as "waited forever", so unseen recipes win the rotation slots first. */
+const NEVER_SHOWN = 999;
+
+/**
+ * Pick the day's meals.
+ *
+ * `daysSinceShown` maps recipe id to how many days ago it last appeared
+ * (1 = yesterday). Absent means never shown.
+ */
+export function selectDailyMeals(
+  recipes: Recipe[],
+  todayPrices: PriceMap,
+  lastPrices: PriceMap,
+  daysSinceShown: Record<string, number>,
+  options: DailySelectionOptions = {},
+): DailyPick[] {
+  const opts = { ...DEFAULT_SELECTION, ...options };
+
+  // TRUE cost order. Do not reuse findCheapestMeals' output as a price ranking:
+  // it returns results in balanced-pass order, and slicing that for a "cheapest
+  // N" pool once put a P255 Beef Mechado into a slot labelled "mura".
+  const costed = recipes
+    .filter((recipe) => hasRequiredPrices(recipe, todayPrices))
+    .map((recipe) => calculateRecipeCostDetailed(recipe, todayPrices, lastPrices))
+    .filter((result) => Number.isFinite(result.totalCost) && result.totalCost > 0)
+    .sort((a, b) => a.totalCost - b.totalCost);
+
+  if (costed.length === 0) return [];
+
+  const waited = (result: CostResult): number => {
+    const d = daysSinceShown[result.recipe.id];
+    return typeof d === "number" && Number.isFinite(d) ? d : NEVER_SHOWN;
+  };
+  const byWaitedThenCheapest = (a: CostResult, b: CostResult) =>
+    waited(b) - waited(a) || a.totalCost - b.totalCost;
+
+  const picked: DailyPick[] = [];
+  const used: Record<string, boolean> = {};
+  const proteinCount: Record<string, number> = {};
+  let pritoCount = 0;
+
+  const canTake = (result: CostResult, enforceProtein: boolean): boolean => {
+    if (used[result.recipe.id]) return false;
+    if (getCookingMethod(result.recipe) === "prito" && pritoCount >= opts.pritoCap) return false;
+    if (enforceProtein) {
+      const protein = getProteinType(result.recipe);
+      if ((proteinCount[protein] || 0) >= getProteinLimit(protein)) return false;
+    }
+    return true;
+  };
+
+  const take = (result: CostResult, slot: MealSlot) => {
+    picked.push({ result, slot });
+    used[result.recipe.id] = true;
+    const protein = getProteinType(result.recipe);
+    proteinCount[protein] = (proteinCount[protein] || 0) + 1;
+    if (getCookingMethod(result.recipe) === "prito") pritoCount++;
+  };
+
+  // ── MURA: cheap slots, rotating within the cheap set ────────────────
+  const corePool = costed.slice(0, opts.corePool).sort(byWaitedThenCheapest);
+  const rested = corePool.filter((r) => waited(r) > opts.memoryDays);
+
+  for (const result of rested) {
+    if (picked.length >= opts.coreSlots) break;
+    if (canTake(result, true)) take(result, "mura");
+  }
+  for (const result of corePool) {
+    if (picked.length >= opts.coreSlots) break;
+    if (canTake(result, true)) take(result, "mura");
+  }
+  for (const result of corePool) {
+    if (picked.length >= opts.coreSlots) break;
+    if (canTake(result, false)) take(result, "mura");
+  }
+
+  // ── IBA NAMAN: longest-waiting across the whole book, price ignored ──
+  const rotation = costed.filter((r) => !used[r.recipe.id]).sort(byWaitedThenCheapest);
+
+  for (const result of rotation) {
+    if (picked.length >= opts.count) break;
+    if (canTake(result, true)) take(result, "iba");
+  }
+  for (const result of rotation) {
+    if (picked.length >= opts.count) break;
+    if (canTake(result, false)) take(result, "iba");
+  }
+  // Last resort: fill the page even if that means breaking the prito cap.
+  for (const result of costed) {
+    if (picked.length >= opts.count) break;
+    if (!used[result.recipe.id]) take(result, "iba");
+  }
+
+  return picked;
+}
+
+/**
+ * Stable per-day shuffle for page order.
+ *
+ * Chan, 28 Jul 2026: "when i open the site it always shows me ginataang kalabasa
+ * and im annoyed... dont make it into first place anymore". Sorting the cards by
+ * price meant the single cheapest dish permanently owned the top of the page.
+ *
+ * Seeded by the date, so every visitor sees the same order all day and a
+ * different one tomorrow. Simulated: 8 different dishes led over 10 days, and
+ * Ginataang Kalabasa led none of them.
+ */
+export function orderForDisplay<T>(items: T[], dateKey: string): T[] {
+  let seed = 0;
+  for (let i = 0; i < dateKey.length; i++) {
+    seed = (Math.imul(seed, 31) + dateKey.charCodeAt(i)) >>> 0;
+  }
+  const next = () => {
+    seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+    return seed / 4294967296;
+  };
+  const out = items.slice();
+  for (let i = out.length - 1; i > 0; i--) {
+    const j = Math.floor(next() * (i + 1));
+    const tmp = out[i];
+    out[i] = out[j];
+    out[j] = tmp;
+  }
+  return out;
+}
+
+// ═══════════════════════════════════════════════════════════
 // PROTEIN TYPE EXPORT — used by page.tsx filter tabs
 // ═══════════════════════════════════════════════════════════
 export { getProteinType };
