@@ -139,3 +139,6 @@ dist
 # ...but the template holding only placeholder names IS committed, because the
 # README tells contributors to copy it.
 !.env.example
+
+# Playwright MCP scratch output (screenshots, page snapshots)
+.playwright-mcp/
