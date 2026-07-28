@@ -253,25 +253,34 @@ export default function HomePage() {
           */}
           {showHeroPhoto ? (
             /*
-              min-h is what the plate fills. The plate is positioned absolutely
-              inside this row, so it contributes no height of its own — without
-              a floor here the row would collapse to the height of the text and
-              the plate would spill over the ticker below.
+              Every number below is measured, not guessed. In this font at this
+              weight, the line "ma, Ano" renders at exactly fontSize x 4.3, so
+              the title's width is a known function of its size and the plate
+              gets whatever is left. Re-measure before changing any of it.
+
+              The row's HEIGHT is what the plate fills, because the plate is
+              absolutely positioned and contributes none of its own. Set it too
+              tall and a band of empty orange appears above and below the text
+              (208px row against a 116px text block was the gap Chan spotted on
+              mobile). Set it too short and the plate lands on the ticker.
             */
-            <div className="relative flex w-full h-[13rem] items-center sm:h-[21rem] md:h-[28rem]">
+            <div className="relative flex h-40 w-full items-center sm:h-56 md:h-[19rem]">
               {/*
-                pr reserves the plate's half. The text never flows under it,
-                which is what lets the plate grow this large without a collision.
+                pr reserves the plate's side so text can never flow under it.
+                Each value clears the plate's VISIBLE width (its size minus the
+                bleed) at that breakpoint, with a few px of slack.
               */}
-              <section className="relative z-10 min-w-0 pr-[50%] text-left sm:pr-[48%] md:pr-[55%]">
+              <section className="relative z-10 min-w-0 pr-[44%] text-left sm:pr-[34%] md:pr-[38%]">
                 {/*
-                  The line break is FORCED, not left to wrapping. Chan asked for
-                  two lines on desktop, and a narrow two-line wordmark is also
-                  what frees the horizontal room for a plate this size.
+                  The break is FORCED, not left to wrapping, so the wordmark is
+                  two lines at every width rather than depending on the viewport.
+
+                  leading is 0.95, not the 0.88 it was: at 0.88 the two lines
+                  nearly touched and the whole thing read as compressed.
                 */}
-                <h1 className="mb-1.5 font-black leading-[0.88] tracking-tight">
-                  <span className="block text-[2.5rem] sm:text-6xl md:text-7xl">ma, Ano</span>
-                  <span className="block text-[2.5rem] sm:text-6xl md:text-7xl">ulam?</span>
+                <h1 className="mb-2.5 font-black leading-[0.95] tracking-tight">
+                  <span className="block text-[2.625rem] sm:text-6xl md:text-8xl">ma, Ano</span>
+                  <span className="block text-[2.625rem] sm:text-6xl md:text-8xl">ulam?</span>
                 </h1>
                 <p className="text-sm text-white/90 sm:text-lg">Anong murang ulam ngayon</p>
               </section>

@@ -43,6 +43,8 @@ export function HeroDishPhoto({ recipeId, name }: HeroDishPhotoProps) {
       and spill past the right edge, so the header has no wasted room in it.
     */
     <div className="pointer-events-none absolute inset-y-0 right-0 -mr-8 sm:-mr-10 md:-mr-12">
+      {/* The bleed above is what the page.tsx `pr-[..]` values are computed
+          against: visible width = this square's size MINUS the negative margin. */}
       {/* Square, sized off the row's height rather than fixed pixels, so it
           grows with the header at every breakpoint instead of at three. */}
       <div className="relative h-full aspect-square">
