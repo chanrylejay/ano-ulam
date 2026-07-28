@@ -198,7 +198,7 @@ export default function UlamPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50 pb-10">
-      <header className="relative bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 px-4 pb-14 pt-10 text-white shadow-lg">
+      <header className="relative bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 px-4 pb-8 pt-12 text-white shadow-lg">
         <a
           href="/"
           className="absolute left-4 top-4 rounded-lg px-3 py-1.5 text-sm text-white/80 transition-colors hover:bg-white/20 hover:text-white"
@@ -206,15 +206,21 @@ export default function UlamPage() {
           ← Home
         </a>
 
+        {/*
+          Deliberately smaller than the homepage hero. That page is a
+          destination and earns its 340px of gradient; this one is an index,
+          and a header that pushes the first row under the fold fights the only
+          thing the page is for.
+        */}
         <div className="mx-auto max-w-2xl text-center">
-          <h1 className="mb-3 text-5xl font-black leading-none tracking-tight sm:text-6xl md:text-[4rem] md:leading-none">
+          <h1 className="mb-1.5 text-4xl font-black leading-none tracking-tight sm:text-5xl">
             Lahat ng Ulam
           </h1>
-          <p className="text-white/85">
+          <p className="text-sm text-white/85">
             {RECIPES.length} recipe, kumpleto ang sangkap at hakbang.
           </p>
           {priceDate && (
-            <span className="mt-3 inline-block rounded-full bg-white/20 px-4 py-1.5 text-sm">
+            <span className="mt-2.5 inline-block rounded-full bg-white/20 px-3 py-1 text-xs">
               Presyo ng {format(new Date(priceDate), "MMMM d, yyyy")}
             </span>
           )}
@@ -229,7 +235,7 @@ export default function UlamPage() {
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Hanapin ang ulam... (hal. Sinigang, Sisig)"
+            placeholder="Hanapin ang ulam..."
             aria-label="Hanapin ang ulam"
             className="w-full rounded-xl border-2 border-gray-200 bg-white py-4 pl-12 pr-4 text-base shadow-sm transition-colors focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-200"
           />
@@ -325,18 +331,28 @@ export default function UlamPage() {
                     <span className="shrink-0 text-lg" aria-hidden="true">
                       {proteinEmoji(row.recipe)}
                     </span>
-                    <span className="min-w-0 flex-1">
-                      <span className="block truncate font-semibold text-gray-900">
+                    {/*
+                      Name and badge share one line. A badge on its own row
+                      made every picked dish twice as tall, and this page is a
+                      47-item index whose whole job is scanning.
+                    */}
+                    <span className="flex min-w-0 flex-1 items-center gap-2">
+                      <span className="truncate font-semibold text-gray-900">
                         {row.recipe.name}
                       </span>
                       {onMenuToday && (
-                        <span className="mt-0.5 inline-block rounded-full bg-emerald-50 px-2 py-px text-[10px] font-bold uppercase tracking-wide text-emerald-700 ring-1 ring-emerald-100">
-                          Nasa listahan ngayon
+                        <span className="shrink-0 rounded-full bg-emerald-50 px-1.5 py-px text-[10px] font-bold uppercase tracking-wide text-emerald-700 ring-1 ring-emerald-100">
+                          Ngayon
                         </span>
                       )}
                     </span>
-                    {row.cost === null ? (
-                      <span className="shrink-0 text-xs font-medium text-gray-400">
+                    {/*
+                      The open card carries its own price pill directly below,
+                      so showing it here too printed the same number twice in
+                      two different styles.
+                    */}
+                    {isOpen ? null : row.cost === null ? (
+                      <span className="shrink-0 text-xs font-medium text-gray-500">
                         walang presyo
                       </span>
                     ) : (
