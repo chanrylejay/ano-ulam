@@ -10,6 +10,8 @@ import { Footer } from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
 import { RECIPES } from "@/lib/recipes";
 import { PROTEIN_TABS, matchesProteinFilter, type ProteinFilter } from "@/lib/protein-tabs";
+import { ServingsPicker, useServingBand } from "@/components/ServingsPicker";
+import { PantryBanner, useOwnedIngredients } from "@/components/Pantry";
 
 interface Ingredient {
   name: string;
@@ -43,11 +45,26 @@ interface PriceItem {
 // the same row, and a second copy here would let the two pages disagree about
 // what "Gulay" means the first time a category changes.
 
+/**
+ * The six headline prices in the header ticker.
+ *
+ * `key` must match a product name that /api/prices ACTUALLY returns, because
+ * the lookup is a plain substring match and a miss shows nothing at all — no
+ * error, no gap, the item just silently disappears from the row.
+ *
+ * Three of the six were doing exactly that (checked 29 Jul 2026). "Paa ng
+ * manok" and "Beef litid" match no product on the sheet, and "Itlog" stopped
+ * matching once the egg row took Chan's name "Egg Medium". Nobody noticed
+ * because a missing ticker item looks identical to a short ticker.
+ *
+ * scripts/selection-regression.mjs now fails if any key stops resolving, so a
+ * future rename cannot quietly empty this row again.
+ */
 const defaultItemKeys = [
   { key: "Liempo", label: "Baboy" },
-  { key: "Paa ng manok", label: "Manok" },
-  { key: "Beef litid", label: "Beef" },
-  { key: "Itlog", label: "Itlog" },
+  { key: "Chicken Legs", label: "Manok" },
+  { key: "Beef pitso", label: "Beef" },
+  { key: "Egg Medium", label: "Itlog" },
   { key: "Bangus", label: "Bangus" },
   { key: "Bigas pinakamura", label: "Bigas" },
 ];
@@ -72,6 +89,10 @@ export default function HomePage() {
   const [error, setError] = useState<string | null>(null);
   const [dataDate, setDataDate] = useState<string>("");
   const [activeFilter, setActiveFilter] = useState<ProteinFilter>("lahat");
+  // Shared with /ulam through localStorage, so the two pages always agree about
+  // how many people are eating.
+  const [band, setBand] = useServingBand();
+  const { owned } = useOwnedIngredients();
 
   const pathname = usePathname();
 
@@ -371,6 +392,18 @@ export default function HomePage() {
         aria-live="polite"
         aria-atomic="false"
       >
+        {/*
+          "Para sa ilan?" sits ABOVE the protein tabs because it answers a
+          different kind of question. The tabs are a filter you browse with; the
+          band is a setting you choose once and the phone remembers.
+        */}
+        {meals.length > 0 && <ServingsPicker value={band} onChange={setBand} />}
+        {/*
+          The way into the pantry, and the proof that it is switched on. A
+          setting that quietly changes every price on the page has to be visible
+          somewhere the person can find and undo it.
+        */}
+        {meals.length > 0 && <PantryBanner owned={owned} />}
         {/* ── Filter Tabs ── */}
         {meals.length > 0 && (
           <div className="scrollbar-hide -mx-4 mb-4 flex items-center gap-2 overflow-x-auto px-4 pb-1">
@@ -438,7 +471,7 @@ export default function HomePage() {
         {filteredMeals.length > 0 && (
           <ul className="space-y-3" aria-label="Meal suggestions">
             {filteredMeals.map((meal, i) => (
-              <MealCard key={meal.name} meal={meal} index={i} />
+              <MealCard key={meal.name} meal={meal} index={i} band={band} owned={owned} />
             ))}
           </ul>
         )}

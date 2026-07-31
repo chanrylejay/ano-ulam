@@ -65,7 +65,6 @@ function getEmojiForItem(name: string): string {
   if (lower.includes("luya") || lower.includes("ginger")) return "🫚";
   if (lower.includes("kamatis") || lower.includes("tomato")) return "🍅";
   if (lower.includes("talong") || lower.includes("eggplant")) return "🍆";
-  if (lower.includes("kalabasa") || lower.includes("squash")) return "🎃";
   if (lower.includes("sitaw")) return "🫘";
   if (lower.includes("ampalaya")) return "🥒";
   if (lower.includes("repolyo") || lower.includes("cabbage")) return "🥬";
@@ -75,21 +74,28 @@ function getEmojiForItem(name: string): string {
   if (lower.includes("saging") || lower.includes("banana")) return "🍌";
   if (lower.includes("mangga") || lower.includes("mango")) return "🥭";
   if (lower.includes("papaya")) return "🥝";
-  if (lower.includes("kalamansi")) return "🍋";
   if (lower.includes("sili") || lower.includes("chilli")) return "🌶️";
   if (lower.includes("sayote")) return "🥒";
   if (lower.includes("carrots")) return "🥕";
   if (lower.includes("patatas") || lower.includes("potato")) return "🥔";
-  if (lower.includes("bell pepper")) return "🫑";
-  if (lower.includes("mantika") || lower.includes("oil")) return "🫗";
   if (lower.includes("munggo") || lower.includes("mungbean")) return "🫘";
   if (lower.includes("asin") || lower.includes("salt")) return "🧂";
-  if (lower.includes("asukal") || lower.includes("sugar")) return "🍬";
   if (lower.includes("gatas") || lower.includes("milk")) return "🥛";
   if (lower.includes("pakwan") || lower.includes("watermelon")) return "🍉";
   if (lower.includes("melon")) return "🍈";
   if (lower.includes("avocado")) return "🥑";
   if (lower.includes("suha") || lower.includes("pomelo")) return "🍊";
+  /*
+    The cart is the fallback AND the deliberate answer for anything whose emoji
+    was misleading. Chan, 29 Jul 2026, went down the live list and called five
+    of them wrong: the pouring jug for mantika, the jack-o-lantern for kalabasa,
+    the wrapped sweet for asukal, the lemon for kalamansi and the green pepper
+    for bell pepper red. His instruction was "please just make it a cart", so
+    those five simply have no rule any more and fall through to here.
+
+    A near-miss emoji is worse than none: a lemon next to kalamansi tells a
+    Filipino shopper it is the wrong fruit.
+  */
   return "🛒";
 }
 

@@ -37,6 +37,10 @@ import {
   proteinEmoji,
   type ProteinFilter,
 } from "@/lib/protein-tabs";
+import { ServingsPicker, useServingBand } from "@/components/ServingsPicker";
+import { PantryLink, useOwnedIngredients } from "@/components/Pantry";
+import { scaleCost } from "@/lib/servings";
+import { ownedDiscount } from "@/lib/pantry";
 
 interface PriceApiItem {
   price_prevailing: number;
@@ -54,6 +58,12 @@ interface RecipeRow {
   recipe: Recipe;
   /** null when the DA has no price for a required ingredient today. */
   cost: number | null;
+  /**
+   * `cost` minus whatever the person already has at home. This is the number
+   * shown AND the number sorted on: a list that sorts by one price and prints
+   * another looks broken, and the printed one is the one they will act on.
+   */
+  effective: number | null;
   detail: CostResult | null;
 }
 
@@ -74,6 +84,8 @@ export default function UlamPage() {
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<SortKey>("mura");
   const [openId, setOpenId] = useState<string | null>(null);
+  const [band, setBand] = useServingBand();
+  const { owned } = useOwnedIngredients();
 
   const fetchData = useCallback(async () => {
     try {
@@ -81,7 +93,10 @@ export default function UlamPage() {
       setError(null);
 
       const [pricesRes, suggestionsRes] = await Promise.all([
-        fetch("/api/prices", { cache: "no-store" }),
+        // ?all=1 — the UNFILTERED sheet. Without it the hide list drops the
+        // cheapest chicken variant here but not in the cron, and the same dish
+        // costs two different amounts on two pages.
+        fetch("/api/prices?all=1", { cache: "no-store" }),
         fetch("/api/suggestions", { cache: "no-store" }),
       ]);
 
@@ -134,14 +149,20 @@ export default function UlamPage() {
       // is too low.
       const cost = calculateRecipeCost(recipe, priceMap);
       const priced = Number.isFinite(cost) && cost > 0;
-      if (!priced) return { recipe, cost: null, detail: null };
+      if (!priced) return { recipe, cost: null, effective: null, detail: null };
 
       // No yesterday on this page, so today's map is passed twice and every
       // trend reads "stable". Honest: we do not know the direction here.
       const detail = calculateRecipeCostDetailed(recipe, priceMap, priceMap);
-      return { recipe, cost: detail.totalCost, detail };
+      const discount = ownedDiscount(detail.ingredientCosts, owned);
+      return {
+        recipe,
+        cost: detail.totalCost,
+        effective: Math.max(0, detail.totalCost - discount),
+        detail,
+      };
     });
-  }, [priceMap]);
+  }, [priceMap, owned]);
 
   const tabCounts = useMemo<Record<string, number>>(() => {
     const counts: Record<string, number> = {};
@@ -163,10 +184,10 @@ export default function UlamPage() {
       if (sort === "az") return byName(a, b);
       // Unpriced dishes have no number to compete on, so they sink rather than
       // sort as if they were free.
-      if (a.cost === null && b.cost === null) return byName(a, b);
-      if (a.cost === null) return 1;
-      if (b.cost === null) return -1;
-      return a.cost - b.cost;
+      if (a.effective === null && b.effective === null) return byName(a, b);
+      if (a.effective === null) return 1;
+      if (b.effective === null) return -1;
+      return a.effective - b.effective;
     });
   }, [rows, tab, query, sort]);
 
@@ -240,6 +261,13 @@ export default function UlamPage() {
             className="w-full rounded-xl border-2 border-gray-200 bg-white py-4 pl-12 pr-4 text-base shadow-sm transition-colors focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-200"
           />
         </div>
+
+        {/*
+          The same control and the same stored value as the homepage, so a
+          family that picked "5-7" there does not have to pick it again here.
+        */}
+        <ServingsPicker value={band} onChange={setBand} />
+        <PantryLink owned={owned} />
 
         {/* ── Category tabs ── */}
         <div className="scrollbar-hide -mx-4 mb-3 flex gap-2 overflow-x-auto px-4 pb-1">
@@ -351,15 +379,15 @@ export default function UlamPage() {
                       so showing it here too printed the same number twice in
                       two different styles.
                     */}
-                    {isOpen ? null : row.cost === null ? (
+                    {isOpen ? null : row.effective === null ? (
                       <span className="shrink-0 text-xs font-medium text-gray-500">
                         walang presyo
                       </span>
                     ) : (
                       <span
-                        className={`shrink-0 text-sm font-bold tabular-nums ${costColor(row.cost)}`}
+                        className={`shrink-0 text-sm font-bold tabular-nums ${costColor(row.effective)}`}
                       >
-                        ₱{row.cost}
+                        ₱{scaleCost(row.effective, band.multiplier)}
                       </span>
                     )}
                     <span
@@ -380,6 +408,8 @@ export default function UlamPage() {
                     key={`${row.recipe.id}-card`}
                     index={0}
                     unpriced={row.cost === null}
+                    band={band}
+                    owned={owned}
                     meal={{
                       name: row.recipe.name,
                       estimated_cost: row.cost ?? 0,
