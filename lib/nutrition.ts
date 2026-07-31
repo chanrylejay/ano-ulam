@@ -116,8 +116,24 @@ function lookupNutrition(name: string, daKey: string | null): NutritionPer100g |
 // UNIT CONVERTER — qty + unit → grams
 // ═══════════════════════════════════════════════════════════
 
-function toGrams(qty: number, unit: "kg" | "pcs", name: string): number {
+/**
+ * A tali is a bundle, and its weight depends entirely on what is in it.
+ *
+ * Measured against the quantities these ingredients carried before they moved
+ * to the tali unit on 29 Jul 2026: kangkong was 0.175 kg per tali, malunggay
+ * 0.04 kg, okra 0.1 kg. Those numbers are kept here so the nutrition panel does
+ * not silently change when the PRICE unit changed.
+ */
+const TALI_GRAMS: Record<string, number> = {
+  Kangkong: 175,
+  Malunggay: 40,
+  Okra: 100,
+};
+const TALI_DEFAULT_GRAMS = 150;
+
+function toGrams(qty: number, unit: "kg" | "pcs" | "tali", name: string): number {
   if (unit === "kg") return qty * 1000;
+  if (unit === "tali") return qty * (TALI_GRAMS[name] ?? TALI_DEFAULT_GRAMS);
   if (name === "Itlog" || name === "Chicken Egg (White Medium)") return qty * EGG_MEDIUM_GRAMS;
   if (name === "Mais") return qty * MAIS_GRAMS;
   return qty * 50; // safe default for unknown pcs items

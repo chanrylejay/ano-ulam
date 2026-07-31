@@ -2,8 +2,13 @@
 
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { RECIPES } from "@/lib/recipes";
+import { RECIPES, pantryRole } from "@/lib/recipes";
 import { calculateRecipeNutrition } from "@/lib/nutrition";
+import { BASE_BAND, scaleAmount, scaleCost, type ServingBand } from "@/lib/servings";
+import { ownedDiscount } from "@/lib/pantry";
+
+/** Module-level so the default prop is referentially stable across renders. */
+const NOTHING_OWNED: ReadonlySet<string> = new Set<string>();
 
 interface Ingredient {
   name: string;
@@ -37,19 +42,29 @@ interface MealCardProps {
    * so the homepage is unaffected.
    */
   unpriced?: boolean;
+  /**
+   * How many people this card is costed for. Defaults to the base band, so any
+   * caller that has not adopted the picker renders exactly as it did before.
+   */
+  band?: ServingBand;
+  /**
+   * Ingredient names the person already has at home. Their cost comes off the
+   * total and their rows are struck through. Defaults to nothing owned, so any
+   * caller that has not adopted the pantry renders exactly as it did before.
+   */
+  owned?: ReadonlySet<string>;
 }
 
-function formatPeso(amount?: number): string {
+function formatPeso(amount: number | undefined, multiplier: number): string {
   if (amount === undefined || amount === null || Number.isNaN(amount)) return "";
-  return `₱${Math.round(amount)}`;
+  return `₱${scaleCost(amount, multiplier)}`;
 }
 
-function formatCost(meal: Meal): string {
-  if (meal.estimated_cost !== undefined && meal.estimated_cost !== null) {
-    const cost = String(meal.estimated_cost).replace(/[₱,]/g, "");
-    return `₱${cost}`;
-  }
-  return "₱?";
+/** The cached row can carry the cost as a number OR as a "₱123" string. */
+function parseCost(meal: Meal): number | null {
+  if (meal.estimated_cost === undefined || meal.estimated_cost === null) return null;
+  const cost = Number(String(meal.estimated_cost).replace(/[₱,]/g, ""));
+  return Number.isFinite(cost) ? cost : null;
 }
 
 function getCostBadgeColor(cost: number): string {
@@ -73,25 +88,54 @@ function sortIngredients(ingredients: Ingredient[] = []): Ingredient[] {
   });
 }
 
-export function MealCard({ meal, index, unpriced = false }: MealCardProps) {
+export function MealCard({
+  meal,
+  index,
+  unpriced = false,
+  band = BASE_BAND,
+  owned = NOTHING_OWNED,
+}: MealCardProps) {
   const [showIngredients, setShowIngredients] = useState(false);
   const [showSteps, setShowSteps] = useState(false);
   const [showNutrition, setShowNutrition] = useState(false);
 
   // Client-side recipe lookup by name
   const recipe = RECIPES.find((r) => r.name === meal.name);
+  const recipeForPantry = recipe;
   const nutrition = recipe ? calculateRecipeNutrition(recipe) : null;
 
   const sortedIngredients = sortIngredients(meal.ingredients);
+
+  /**
+   * The name of the first row that is a pantry good, or null when the dish has
+   * none. The "common ingredients" divider renders in front of it.
+   */
+  const firstCommonName = (() => {
+    if (!recipeForPantry) return null;
+    const pantryNames = new Set(recipeForPantry.pantryItems.map((p) => p.name));
+    const hit = sortIngredients(meal.ingredients).find((ing) => pantryNames.has(ing.name));
+    return hit ? hit.name : null;
+  })();
   const visibleIngredients = sortedIngredients.filter((ing) => {
     if (ing.optional && (!ing.cost || ing.cost === 0)) return false;
     return true;
   });
 
+  // ── The fridge, applied to this dish ──────────────────────────────
+  const baseCost = parseCost(meal);
+  const discount = ownedDiscount(meal.ingredients, owned);
+  // Floored at zero. Owning everything means the dish costs you nothing to shop
+  // for today, never a negative amount.
+  const effectiveBase = baseCost === null ? null : Math.max(0, baseCost - discount);
+  const saved = baseCost === null ? 0 : Math.min(discount, baseCost);
+  const ownedInThisDish = meal.ingredients.filter((ing) => owned.has(ing.name)).length;
+  const costLabel =
+    effectiveBase === null ? "₱?" : `₱${scaleCost(effectiveBase, band.multiplier)}`;
+
   return (
     <li>
       <article
-        aria-label={`${meal.name}, ${unpriced ? "walang presyo ngayon" : `estimated cost ${formatCost(meal)}`}, serves ${meal.servings || "1-3 katao"}`}
+        aria-label={`${meal.name}, ${unpriced ? "walang presyo ngayon" : `estimated cost ${costLabel}`}, serves ${band.label}`}
         style={{ animationDelay: `${index * 80}ms` }}
         className="animate-card-enter"
       >
@@ -131,10 +175,27 @@ export function MealCard({ meal, index, unpriced = false }: MealCardProps) {
                   Walang presyo
                 </span>
               ) : (
+                /*
+                  Three things deliberately do not move together here.
+
+                  The NUMBER scales with the servings band and drops with the
+                  fridge. The COLOUR is read from the base per-1-3-katao cost
+                  AFTER the fridge but BEFORE the servings scale, because "mura"
+                  is a property of the dish and of what you already own, not of
+                  how many mouths are being fed. Colouring the scaled total
+                  would turn every card red at the bigger bands and destroy the
+                  signal completely.
+
+                  ₱0 is allowed here, and only here. This project's canon bans a
+                  rendered ₱0 because a MISSING price once read as free and
+                  ranked a dish cheapest. This ₱0 has the opposite cause: you own
+                  every ingredient, so the dish really does cost you nothing to
+                  shop for today. Different fact, honest number.
+                */
                 <span
-                  className={`${getCostBadgeColor(meal.estimated_cost)} text-white text-sm font-bold px-3 py-1.5 rounded-full shrink-0 whitespace-nowrap`}
+                  className={`${getCostBadgeColor(effectiveBase ?? Number.NaN)} text-white text-sm font-bold px-3 py-1.5 rounded-full shrink-0 whitespace-nowrap`}
                 >
-                  {formatCost(meal)}
+                  {costLabel}
                 </span>
               )}
             </div>
@@ -149,10 +210,34 @@ export function MealCard({ meal, index, unpriced = false }: MealCardProps) {
             <div className="mb-3 space-y-0">
               {visibleIngredients.map((ing, j) => {
                 const isOptional = !!ing.optional;
+                const isOwned = owned.has(ing.name);
                 const trend = getTrendArrow(ing.trend);
+
+                /*
+                  "common ingredients*" divider, Chan's layout of 30 Jul 2026:
+                  *"i think we should have pantry items section before the
+                  optional items, pantry sections, pantry section still should
+                  have price"*.
+
+                  It marks where the dish's own ingredients end and the cabinet
+                  staples begin, and it goes in FRONT of the first pantry row so
+                  the optionals that follow sit under it too.
+
+                  Membership comes from the recipe's own pantryItems rather than
+                  a flag on the row, because the homepage renders CACHED cron
+                  output whose rows carry no such flag. Reading the recipe works
+                  for both the live page and the cached one.
+                */
+                const startsCommon = firstCommonName !== null && ing.name === firstCommonName;
+
                 return (
+                  <div key={`wrap-${ing.name}-${j}`}>
+                    {startsCommon && (
+                      <p className="mt-2 mb-1 text-[10px] font-semibold uppercase tracking-wider text-gray-400">
+                        Common ingredients
+                      </p>
+                    )}
                   <div
-                    key={`${ing.name}-${j}`}
                     className="flex items-center gap-2 py-1.5 border-b border-gray-50 last:border-0"
                   >
                     <span
@@ -163,15 +248,27 @@ export function MealCard({ meal, index, unpriced = false }: MealCardProps) {
                     </span>
                     <div className="flex flex-1 items-baseline gap-2 min-w-0 overflow-hidden">
                       <span
-                        className={`font-semibold text-sm leading-snug shrink-0 ${isOptional ? "text-gray-400" : "text-gray-900"}`}
+                        className={`font-semibold text-sm leading-snug shrink-0 ${
+                          isOwned
+                            ? "text-gray-400 line-through decoration-gray-300"
+                            : isOptional
+                              ? "text-gray-400"
+                              : "text-gray-900"
+                        }`}
                       >
                         {ing.name}
                       </span>
                       {ing.amount && (
                         <span
-                          className={`text-xs leading-snug shrink-0 ${isOptional ? "text-gray-300" : "text-gray-400"}`}
+                          className={`text-xs leading-snug shrink-0 ${
+                            isOwned
+                              ? "text-gray-300 line-through decoration-gray-200"
+                              : isOptional
+                                ? "text-gray-300"
+                                : "text-gray-400"
+                          }`}
                         >
-                          {ing.amount}
+                          {scaleAmount(ing.amount, band.multiplier)}
                         </span>
                       )}
                       {isOptional && (
@@ -180,18 +277,66 @@ export function MealCard({ meal, index, unpriced = false }: MealCardProps) {
                         </span>
                       )}
                     </div>
-                    <span
-                      className={`text-sm font-bold shrink-0 tabular-nums ${isOptional ? "text-rose-400" : "text-emerald-700"}`}
-                    >
-                      {formatPeso(ing.cost)}
-                    </span>
+                    {isOwned ? (
+                      /*
+                        Two shades, because one would be a lie.
+
+                        An owned REQUIRED ingredient really did come off the
+                        total, so it gets the emerald that means "you saved
+                        this". An owned OPTIONAL one never counted toward the
+                        total in the first place, so it stays grey. It is still
+                        struck through, because the person genuinely owns it,
+                        but a green badge claiming a saving it never made is
+                        exactly how a total stops adding up in front of someone.
+                        Caught in the browser: ticking Bawang struck two rows in
+                        Tortang Talong and moved the price by ₱0, which looked
+                        broken while being perfectly correct.
+                      */
+                      <span
+                        className={`shrink-0 whitespace-nowrap text-xs font-semibold ${
+                          isOptional ? "text-gray-400" : "text-emerald-700"
+                        }`}
+                      >
+                        meron ka na
+                      </span>
+                    ) : (
+                      <span
+                        className={`text-sm font-bold shrink-0 tabular-nums ${isOptional ? "text-gray-300" : "text-emerald-700"}`}
+                      >
+                        {/*
+                          An OPTIONAL row shows no price at all. Chan, 30 Jul
+                          2026: *"optional items should have no price and not
+                          counted on total"*.
+
+                          It never counted toward the total, and printing a peso
+                          figure next to something the total ignores invites the
+                          reader to add it up themselves and get a number the
+                          card does not agree with. A dash says "bring it if you
+                          want" without pretending to be part of the bill.
+                        */}
+                        {isOptional ? "—" : formatPeso(ing.cost, band.multiplier)}
+                      </span>
+                    )}
+                  </div>
                   </div>
                 );
               })}
             </div>
 
             {/* ── Servings ── */}
-            <p className="text-xs text-gray-500 mb-3">🍽️ {meal.servings || "1-3 katao"}</p>
+            <p className="text-xs text-gray-500 mb-3">🍽️ {band.label}</p>
+
+            {/*
+              What the fridge did to THIS dish. Without this line the total
+              silently disagrees with the rows above it, and a number that does
+              not add up in front of you reads as a bug even when it is right.
+            */}
+            {!unpriced && saved > 0 && (
+              <p className="-mt-1.5 mb-3 text-xs font-medium text-emerald-700">
+                🧺 Meron ka na ng {ownedInThisDish} sangkap · nakatipid ka ng ₱
+                {scaleCost(saved, band.multiplier)}
+              </p>
+            )}
 
             {/* ── Bakit? ── */}
             {meal.reason && (
@@ -206,61 +351,19 @@ export function MealCard({ meal, index, unpriced = false }: MealCardProps) {
             {/* ── Accordions (only render if recipe found in RECIPES) ── */}
             {recipe && (
               <div className="border-t border-gray-100 mt-1">
-                {/* Accordion 1 — Buong Sangkap */}
-                <button
-                  onClick={() => setShowIngredients(!showIngredients)}
-                  className="w-full flex items-center justify-between py-3 text-sm font-semibold text-gray-700 hover:text-gray-900 transition-colors"
-                  aria-expanded={showIngredients}
-                >
-                  <span>🧾 Buong Sangkap</span>
-                  <span
-                    className={`text-gray-400 transition-transform duration-200 ${showIngredients ? "rotate-180" : ""}`}
-                  >
-                    ▾
-                  </span>
-                </button>
+                {/*
+                  The "Buong Sangkap" accordion and its pantry list are GONE,
+                  removed 30 Jul 2026 at Chan's request: *"we will remove the
+                  buong sangkap section dropdown, and the pantry items, since
+                  were gonna introduce to user ticking of items on their pantry
+                  and to display accurate prices"*.
 
-                {showIngredients && (
-                  <div className="pb-3 space-y-1">
-                    {/* DA-tracked ingredients — amounts only, no price column */}
-                    {recipe.ingredients.map((ing, i) => (
-                      <div key={i} className="flex items-center justify-between py-1 text-sm">
-                        <span className={ing.optional ? "text-gray-400" : "text-gray-800"}>
-                          {ing.name}
-                          {ing.optional && (
-                            <span className="ml-1.5 text-[10px] text-rose-400 font-medium">
-                              ✦ optional
-                            </span>
-                          )}
-                        </span>
-                        <span className="text-gray-400 text-xs ml-2 shrink-0">{ing.amount}</span>
-                      </div>
-                    ))}
-
-                    {/* Pantry Items */}
-                    {recipe.pantryItems.length > 0 && (
-                      <>
-                        <div className="pt-2 pb-1">
-                          <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">
-                            Pantry items
-                          </span>
-                          <span className="ml-1.5 text-[9px] text-gray-300">
-                            — hindi kasama sa DA price monitoring
-                          </span>
-                        </div>
-                        {recipe.pantryItems.map((item, i) => (
-                          <div key={i} className="flex items-center justify-between py-1 text-sm">
-                            <span className="text-gray-400">{item.name}</span>
-                            <span className="text-gray-300 text-xs ml-2 shrink-0">
-                              {item.amount}
-                            </span>
-                          </div>
-                        ))}
-                      </>
-                    )}
-                  </div>
-                )}
-
+                  It stopped earning its space once the priced list above became
+                  the whole shopping list. Oil, pepper, asin and the sauces are
+                  real lines there now, ticking them lives on /pantry, and a
+                  second copy of the same goods under a "free" heading was the
+                  duplicate this file kept having to work around.
+                */}
                 {/* Accordion 2 — Paano Magluto? */}
                 <button
                   onClick={() => setShowSteps(!showSteps)}
@@ -308,7 +411,14 @@ export function MealCard({ meal, index, unpriced = false }: MealCardProps) {
                       {/* Header */}
                       <div className="bg-gray-900 text-white px-3 py-2">
                         <p className="font-black text-base">Nutrition Facts</p>
-                        <p className="text-gray-300 text-xs">Per serving • Recipe serves 1-3</p>
+                        {/*
+                          Per-serving macros do NOT move with the band. More
+                          people means more food AND more servings, so the ratio
+                          holds; only the number of servings changes.
+                        */}
+                        <p className="text-gray-300 text-xs">
+                          Per serving • Recipe serves {band.people}
+                        </p>
                       </div>
 
                       {/* Calories row */}
