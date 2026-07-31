@@ -9,7 +9,7 @@ export interface RecipeIngredient {
   name: string;
   daKey: string | null;
   qty: number;
-  unit: "kg" | "pcs";
+  unit: "kg" | "pcs" | "tali";
   amount: string;
   optional: boolean;
   fallbackPrice?: number;
@@ -46,7 +46,7 @@ export interface CostResult {
   }[];
 }
 
-type Unit = "kg" | "pcs";
+type Unit = "kg" | "pcs" | "tali";
 
 function ing(
   name: string,
@@ -91,9 +91,9 @@ export const RECIPES: Recipe[] = [
     "Adobong Manok",
     ings(
       ["Chicken", "Chicken Leg Quarter", 0.625, "kg", "1/2 kg"],
-      ["Bawang", "Garlic Native/Local", 0.06, "kg", "1 ulo"],
-      ["Sibuyas", "Red Onion Local", 0.15, "kg", "1-2 pcs"],
-      ["Patatas", "White Potato Local", 0.3, "kg", "1-2 pcs", true],
+      ["Bawang", "Garlic", 0.06, "kg", "1 ulo"],
+      ["Sibuyas", "Red Onion", 0.15, "kg", "1-2 pcs"],
+      ["Patatas", "White Potato", 0.3, "kg", "1-2 pcs", true],
       ["Itlog", "Chicken Egg (White Medium)", 2, "pcs", "2 pcs", true],
     ),
     [
@@ -123,13 +123,14 @@ export const RECIPES: Recipe[] = [
     ings(
       ["Pork", "Pork Picnic Shoulder (Kasim)", 0.5, "kg", "1/2 kg"],
       ["Kamatis", "Tomato", 0.2, "kg", "2 pcs"],
-      ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
-      ["Gabi", null, 0.25, "kg", "1 pc", false, 50],
-      ["Kangkong", null, 0.175, "kg", "1 tali", false, 100],
+      ["Sibuyas", "Red Onion", 0.1, "kg", "1 pc"],
+      ["Gabi", null, 0.25, "kg", "1 pc", false, 140],
+      ["Kangkong", null, 1, "tali", "1 tali", false, 20],
       ["Sitaw", "Pole Sitao", 0.125, "kg", "5-8 pcs", true],
       ["Talong", "Eggplant", 0.2, "kg", "1 pc", true],
-      ["Okra", null, 0.1, "kg", "4-6 pcs", true, 90],
-      ["Siling haba", "Chilli (Green) Local", 0.02, "kg", "1-2 pcs", true],
+      ["Okra", null, 1, "tali", "1 tali", true, 15],
+      ["Siling haba", "Chilli (Green)", 0.02, "kg", "1-2 pcs", true],
+      ["Sinigang mix", null, 1, "pcs", "1 pack", false, 8.45],
     ),
     [
       "Pakuluan ang karne ng baboy sa tubig kasama ang kamatis at sibuyas.",
@@ -140,7 +141,7 @@ export const RECIPES: Recipe[] = [
       "Timplahan ng patis at sili para sa dagdag na anghang.",
       "Hanguin kapag luto na ang lahat ng gulay.",
     ],
-    [p("Sinigang mix", "1 pack"), p("Tubig", "1 liter"), p("Patis", "2 tbsp"), p("Asin", "1 tsp")],
+    [ p("Tubig", "1 liter"), p("Patis", "2 tbsp"), p("Asin", "1 tsp")],
   ),
 
   recipe(
@@ -151,8 +152,10 @@ export const RECIPES: Recipe[] = [
       ["Talong", "Eggplant", 0.2, "kg", "1 pc"],
       ["Sitaw", "Pole Sitao", 0.125, "kg", "5-8 pcs"],
       ["Pechay", "Native Pechay", 0.2, "kg", "1 tali"],
-      ["Bawang", "Garlic Native/Local", 0.035, "kg", "4 cloves"],
-      ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
+      ["Bawang", "Garlic", 0.035, "kg", "4 cloves"],
+      ["Sibuyas", "Red Onion", 0.1, "kg", "1 pc"],
+      ["Bagoong alamang", null, 0.5, "pcs", "1/2 pack", false, 25],
+      ["Peanut butter", null, 1, "pcs", "1 jar", false, 55.75],
     ),
     [
       "Pakuluan ang buntot at pata ng baka hanggang sa matanggal ang tigas.",
@@ -164,12 +167,10 @@ export const RECIPES: Recipe[] = [
       "Ihain kasama ang ginisang bagoong alamang.",
     ],
     [
-      p("Peanut butter", "1/2 cup"),
       p("Atsuete powder", "1 tbsp"),
       p("Tubig", "4 cups"),
       p("Mantika", "2 tbsp"),
       p("Asin", "1 tsp"),
-      p("Bagoong alamang", "1/2 cup"),
       p("Puso ng saging", "1 pc"),
     ],
   ),
@@ -180,10 +181,10 @@ export const RECIPES: Recipe[] = [
     ings(
       ["Chicken", "Chicken Leg Quarter", 0.5, "kg", "1/2 kg"],
       ["Sayote", "Chayote", 0.4, "kg", "1 pc"],
-      ["Luya", "Ginger Local", 0.04, "kg", "1 piraso"],
-      ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
-      ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
-      ["Malunggay", null, 0.04, "kg", "1 tali", true, 250],
+      ["Luya", "Ginger", 0.04, "kg", "1 piraso"],
+      ["Bawang", "Garlic", 0.04, "kg", "1 ulo"],
+      ["Sibuyas", "Red Onion", 0.1, "kg", "1 pc"],
+      ["Malunggay", null, 1, "tali", "1 tali", true, 20],
     ),
     [
       "Igisa ang luya, bawang, at sibuyas sa kaunting mantika.",
@@ -208,7 +209,7 @@ export const RECIPES: Recipe[] = [
     "Lechon Kawali",
     ings(
       ["Liempo", "Pork Belly (Liempo)", 0.5, "kg", "1/2 kg"],
-      ["Bawang", "Garlic Native/Local", 0.035, "kg", "4-6 cloves"],
+      ["Bawang", "Garlic", 0.035, "kg", "4-6 cloves"],
     ),
     [
       "Pakuluan ang liempo sa tubig na may asin, paminta, at bawang.",
@@ -234,9 +235,9 @@ export const RECIPES: Recipe[] = [
     "Lumpiang Shanghai",
     ings(
       ["Ground Pork", "Pork Picnic Shoulder (Kasim)", 0.5, "kg", "1/2 kg"],
-      ["Carrots", "Carrots Local", 0.1, "kg", "1 pc"],
-      ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
-      ["Bawang", "Garlic Native/Local", 0.035, "kg", "4 cloves"],
+      ["Carrots", "Carrots", 0.1, "kg", "1 pc"],
+      ["Sibuyas", "Red Onion", 0.1, "kg", "1 pc"],
+      ["Bawang", "Garlic", 0.035, "kg", "4 cloves"],
       ["Itlog", "Chicken Egg (White Medium)", 1, "pcs", "1 pc", true],
     ),
     [
@@ -263,8 +264,8 @@ export const RECIPES: Recipe[] = [
     "Pork Sisig",
     ings(
       ["Liempo", "Pork Belly (Liempo)", 0.5, "kg", "1/2 kg"],
-      ["Sibuyas", "Red Onion Local", 0.15, "kg", "1-2 pcs"],
-      ["Siling green", "Chilli (Green) Local", 0.02, "kg", "2-4 pcs"],
+      ["Sibuyas", "Red Onion", 0.15, "kg", "1-2 pcs"],
+      ["Siling green", "Chilli (Green)", 0.02, "kg", "2-4 pcs"],
       ["Kalamansi", "Calamansi", 0.04, "kg", "3-5 pcs"],
       ["Itlog", "Chicken Egg (White Medium)", 1, "pcs", "1 pc", true],
     ),
@@ -293,12 +294,12 @@ export const RECIPES: Recipe[] = [
     "Nilagang Baboy",
     ings(
       ["Pork", "Pork Picnic Shoulder (Kasim)", 0.5, "kg", "1/2 kg"],
-      ["Repolyo", "Cabbage (Scorpio)", 0.25, "kg", "1/4 head"],
-      ["Patatas", "White Potato Local", 0.3, "kg", "1-2 pcs"],
-      ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
-      ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
+      ["Repolyo", "Cabbage", 0.25, "kg", "1/4 head"],
+      ["Patatas", "White Potato", 0.3, "kg", "1-2 pcs"],
+      ["Sibuyas", "Red Onion", 0.1, "kg", "1 pc"],
+      ["Bawang", "Garlic", 0.04, "kg", "1 ulo"],
       ["Pechay", "Native Pechay", 0.2, "kg", "1 tali", true],
-      ["Mais", null, 1, "pcs", "1 pc", true, 18],
+      ["Mais", null, 1, "pcs", "1 pc", true, 25],
     ),
     [
       "Pakuluan ang karne ng baboy sa tubig kasama ang sibuyas at paminta.",
@@ -317,11 +318,12 @@ export const RECIPES: Recipe[] = [
     "Chicken Afritada",
     ings(
       ["Chicken", "Chicken Leg Quarter", 0.5, "kg", "1/2 kg"],
-      ["Patatas", "White Potato Local", 0.3, "kg", "1-2 pcs"],
-      ["Carrots", "Carrots Local", 0.1, "kg", "1 pc"],
-      ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
-      ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
-      ["Bell pepper", "Bell Pepper (Red) Local", 0.125, "kg", "1 pc", true],
+      ["Patatas", "White Potato", 0.3, "kg", "1-2 pcs"],
+      ["Carrots", "Carrots", 0.1, "kg", "1 pc"],
+      ["Sibuyas", "Red Onion", 0.1, "kg", "1 pc"],
+      ["Bawang", "Garlic", 0.04, "kg", "1 ulo"],
+      ["Bell pepper", "Bell Pepper (Red)", 0.125, "kg", "1 pc", true],
+      ["Tomato sauce", null, 1, "pcs", "1 pack", false, 13.6],
     ),
     [
       "Iprito muna ang patatas at carrots hanggang sa maging brown.",
@@ -333,7 +335,6 @@ export const RECIPES: Recipe[] = [
       "Timplahan ng asin, paminta, at patis bago hanguin.",
     ],
     [
-      p("Tomato sauce", "1 cup"),
       p("Tubig", "1 cup"),
       p("Laurel", "2 pcs"),
       p("Patis", "1 tbsp"),
@@ -348,12 +349,14 @@ export const RECIPES: Recipe[] = [
     "Pork Menudo",
     ings(
       ["Pork", "Pork Picnic Shoulder (Kasim)", 0.5, "kg", "1/2 kg"],
-      ["Patatas", "White Potato Local", 0.3, "kg", "1-2 pcs"],
-      ["Carrots", "Carrots Local", 0.1, "kg", "1 pc"],
-      ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
-      ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
-      ["Atay ng baboy", null, 0.25, "kg", "1/4 kg", true, 225],
-      ["Bell pepper", "Bell Pepper (Red) Local", 0.125, "kg", "1 pc", true],
+      ["Patatas", "White Potato", 0.3, "kg", "1-2 pcs"],
+      ["Carrots", "Carrots", 0.1, "kg", "1 pc"],
+      ["Sibuyas", "Red Onion", 0.1, "kg", "1 pc"],
+      ["Bawang", "Garlic", 0.04, "kg", "1 ulo"],
+      ["Atay ng baboy", null, 0.25, "kg", "1/4 kg", true, 280],
+      ["Bell pepper", "Bell Pepper (Red)", 0.125, "kg", "1 pc", true],
+      ["Tomato sauce", null, 1, "pcs", "1 pack", false, 13.6],
+      ["Hotdog", null, 2, "pcs", "2 pcs", true, 10],
     ),
     [
       "I-marinate ang baboy sa toyo at calamansi ng ilang minuto.",
@@ -365,11 +368,9 @@ export const RECIPES: Recipe[] = [
       "Timplahan ng asin at paminta bago patayin ang apoy.",
     ],
     [
-      p("Tomato sauce", "1 cup"),
       p("Laurel", "2 pcs"),
       p("Toyo", "2 tbsp"),
       p("Kalamansi", "3 pcs"),
-      p("Hotdog", "2 pcs"),
       p("Tubig", "1 cup"),
       p("Mantika", "2 tbsp"),
       p("Asin", "1/2 tsp"),
@@ -383,12 +384,13 @@ export const RECIPES: Recipe[] = [
     "Ginataang Kalabasa",
     ings(
       ["Kalabasa", "Squash", 0.5, "kg", "1/2 kg"],
-      ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
-      ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
-      ["Luya", "Ginger Local", 0.04, "kg", "1 piraso"],
+      ["Bawang", "Garlic", 0.04, "kg", "1 ulo"],
+      ["Sibuyas", "Red Onion", 0.1, "kg", "1 pc"],
+      ["Luya", "Ginger", 0.04, "kg", "1 piraso"],
       ["Sitaw", "Pole Sitao", 0.125, "kg", "5-8 pcs", true],
       ["Pork", "Pork Picnic Shoulder (Kasim)", 0.25, "kg", "1/4 kg", true],
-      ["Siling haba", "Chilli (Green) Local", 0.02, "kg", "1-2 pcs", true],
+      ["Siling haba", "Chilli (Green)", 0.02, "kg", "1-2 pcs", true],
+      ["Gata", null, 1, "pcs", "1 pack", false, 35.75],
     ),
     [
       "Igisa ang bawang, sibuyas, at luya sa kaunting mantika.",
@@ -400,7 +402,6 @@ export const RECIPES: Recipe[] = [
       "Timplahan ng bagoong o asin at pakuluan hanggang sa lumapot.",
     ],
     [
-      p("Gata", "2 cups"),
       p("Patis", "1 tbsp"),
       p("Mantika", "1 tbsp"),
       p("Tubig", "1/2 cup"),
@@ -414,8 +415,8 @@ export const RECIPES: Recipe[] = [
     ings(
       ["Talong", "Eggplant", 0.4, "kg", "2-3 pcs"],
       ["Itlog", "Chicken Egg (White Medium)", 3, "pcs", "3 pcs"],
-      ["Sibuyas", "Red Onion Local", 0.065, "kg", "1 pc", true],
-      ["Bawang", "Garlic Native/Local", 0.015, "kg", "2-3 cloves", true],
+      ["Sibuyas", "Red Onion", 0.065, "kg", "1 pc", true],
+      ["Bawang", "Garlic", 0.015, "kg", "2-3 cloves", true],
       ["Ground Pork", "Pork Picnic Shoulder (Kasim)", 0.25, "kg", "1/4 kg", true],
     ),
     [
@@ -438,11 +439,12 @@ export const RECIPES: Recipe[] = [
       ["Sitaw", "Pole Sitao", 0.125, "kg", "5-8 pcs"],
       ["Talong", "Eggplant", 0.275, "kg", "1-2 pcs"],
       ["Kamatis", "Tomato", 0.2, "kg", "2 pcs"],
-      ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
-      ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
-      ["Okra", null, 0.1, "kg", "4-6 pcs", true, 90],
+      ["Sibuyas", "Red Onion", 0.1, "kg", "1 pc"],
+      ["Bawang", "Garlic", 0.04, "kg", "1 ulo"],
+      ["Okra", null, 1, "tali", "1 tali", true, 15],
       ["Ampalaya", "Ampalaya", 0.2, "kg", "1 pc", true],
       ["Pork", "Pork Picnic Shoulder (Kasim)", 0.25, "kg", "1/4 kg", true],
+      ["Bagoong alamang", null, 0.5, "pcs", "1/2 pack", false, 25],
     ),
     [
       "Igisa ang bawang, sibuyas, at kamatis sa mainit na mantika.",
@@ -454,7 +456,6 @@ export const RECIPES: Recipe[] = [
       "Takpan ang kawali at hayaang maluto ang gulay nang bahagya bago hanguin.",
     ],
     [
-      p("Bagoong alamang", "3 tbsp"),
       p("Tubig", "1 cup"),
       p("Mantika", "1 tbsp"),
       p("Asin", "1/2 tsp"),
@@ -467,11 +468,12 @@ export const RECIPES: Recipe[] = [
     "Pork Giniling",
     ings(
       ["Ground Pork", "Pork Picnic Shoulder (Kasim)", 0.5, "kg", "1/2 kg"],
-      ["Patatas", "White Potato Local", 0.175, "kg", "1 pc"],
-      ["Carrots", "Carrots Local", 0.1, "kg", "1 pc"],
-      ["Bell pepper", "Bell Pepper (Red) Local", 0.125, "kg", "1 pc"],
-      ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
-      ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
+      ["Patatas", "White Potato", 0.175, "kg", "1 pc"],
+      ["Carrots", "Carrots", 0.1, "kg", "1 pc"],
+      ["Bell pepper", "Bell Pepper (Red)", 0.125, "kg", "1 pc"],
+      ["Sibuyas", "Red Onion", 0.1, "kg", "1 pc"],
+      ["Bawang", "Garlic", 0.04, "kg", "1 ulo"],
+      ["Tomato sauce", null, 1, "pcs", "1 pack", false, 13.6],
     ),
     [
       "Igisa ang bawang at sibuyas sa sapat na mantika.",
@@ -483,7 +485,6 @@ export const RECIPES: Recipe[] = [
       "Timplahan ng asin at paminta bago patayin ang apoy.",
     ],
     [
-      p("Tomato sauce", "1 cup"),
       p("Toyo", "2 tbsp"),
       p("Tubig", "1/2 cup"),
       p("Mantika", "2 tbsp"),
@@ -501,8 +502,8 @@ export const RECIPES: Recipe[] = [
       ["Sayote", "Chayote", 0.5, "kg", "2 pcs"],
       ["Pork", "Pork Picnic Shoulder (Kasim)", 0.25, "kg", "1/4 kg"],
       ["Kamatis", "Tomato", 0.1, "kg", "1 pc"],
-      ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
-      ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
+      ["Sibuyas", "Red Onion", 0.1, "kg", "1 pc"],
+      ["Bawang", "Garlic", 0.04, "kg", "1 ulo"],
     ),
     [
       "Igisa ang bawang at sibuyas sa mainit na mantika.",
@@ -539,11 +540,11 @@ export const RECIPES: Recipe[] = [
     "ginisang-repolyo-at-manok",
     "Ginisang Repolyo at Manok",
     ings(
-      ["Repolyo", "Cabbage (Scorpio)", 0.5, "kg", "1/2 head"],
+      ["Repolyo", "Cabbage", 0.5, "kg", "1/2 head"],
       ["Chicken Breast", "Chicken Breast", 0.625, "kg", "1/2 kg"],
-      ["Carrots", "Carrots Local", 0.1, "kg", "1 pc"],
-      ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
-      ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
+      ["Carrots", "Carrots", 0.1, "kg", "1 pc"],
+      ["Sibuyas", "Red Onion", 0.1, "kg", "1 pc"],
+      ["Bawang", "Garlic", 0.04, "kg", "1 ulo"],
     ),
     [
       "Igisa ang bawang at sibuyas sa katamtamang apoy.",
@@ -562,10 +563,13 @@ export const RECIPES: Recipe[] = [
     "Sopas",
     ings(
       ["Chicken Breast", "Chicken Breast", 0.25, "kg", "1/4 kg"],
-      ["Repolyo", "Cabbage (Scorpio)", 0.25, "kg", "1/4 head"],
-      ["Carrots", "Carrots Local", 0.1, "kg", "1 pc"],
-      ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
-      ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
+      ["Repolyo", "Cabbage", 0.25, "kg", "1/4 head"],
+      ["Carrots", "Carrots", 0.1, "kg", "1 pc"],
+      ["Sibuyas", "Red Onion", 0.1, "kg", "1 pc"],
+      ["Bawang", "Garlic", 0.04, "kg", "1 ulo"],
+      ["Hotdog", null, 2, "pcs", "2 pcs", true, 10],
+      ["Elbow macaroni", null, 1, "pcs", "1 pack", false, 26.1],
+      ["Evaporated milk", null, 1, "pcs", "1 can", false, 20.25],
     ),
     [
       "Igisa ang bawang, sibuyas, at hinimay na manok sa mantikilya.",
@@ -577,14 +581,11 @@ export const RECIPES: Recipe[] = [
       "Timplahan ng asin at paminta bago hanguin sa kalan.",
     ],
     [
-      p("Elbow macaroni", "2 cups"),
-      p("Evaporated milk", "1 cup"),
       p("Tubig", "6 cups"),
       p("Margarine", "1 tbsp"),
       p("Patis", "1 tbsp"),
       p("Paminta", "1/2 tsp"),
       p("Kintsay", "1 stalk"),
-      p("Hotdog", "2 pcs"),
     ],
   ),
 
@@ -595,8 +596,8 @@ export const RECIPES: Recipe[] = [
       ["Ampalaya", "Ampalaya", 0.4, "kg", "1-2 pcs"],
       ["Itlog", "Chicken Egg (White Medium)", 3, "pcs", "3 pcs"],
       ["Kamatis", "Tomato", 0.14, "kg", "1-2 pcs"],
-      ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
-      ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
+      ["Sibuyas", "Red Onion", 0.1, "kg", "1 pc"],
+      ["Bawang", "Garlic", 0.04, "kg", "1 ulo"],
       ["Ground Pork", "Pork Picnic Shoulder (Kasim)", 0.25, "kg", "1/4 kg", true],
     ),
     [
@@ -616,11 +617,14 @@ export const RECIPES: Recipe[] = [
     "Chicken Caldereta",
     ings(
       ["Chicken", "Chicken Leg Quarter", 0.625, "kg", "1/2 kg"],
-      ["Patatas", "White Potato Local", 0.3, "kg", "1-2 pcs"],
-      ["Carrots", "Carrots Local", 0.1, "kg", "1 pc"],
-      ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
-      ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
-      ["Bell pepper", "Bell Pepper (Red) Local", 0.125, "kg", "1 pc", true],
+      ["Patatas", "White Potato", 0.3, "kg", "1-2 pcs"],
+      ["Carrots", "Carrots", 0.1, "kg", "1 pc"],
+      ["Sibuyas", "Red Onion", 0.1, "kg", "1 pc"],
+      ["Bawang", "Garlic", 0.04, "kg", "1 ulo"],
+      ["Bell pepper", "Bell Pepper (Red)", 0.125, "kg", "1 pc", true],
+      ["Tomato sauce", null, 1, "pcs", "1 pack", false, 13.6],
+      ["Liver spread", null, 1, "pcs", "1 can", false, 24.35],
+      ["Grated cheese", null, 1, "pcs", "1 pack", true, 17.6],
     ),
     [
       "Iprito ang patatas at carrots sa mainit na mantika bago itabi.",
@@ -632,10 +636,7 @@ export const RECIPES: Recipe[] = [
       "Timplahan ng keso, asin, at paminta bago patayin ang apoy.",
     ],
     [
-      p("Tomato sauce", "1 cup"),
-      p("Liver spread", "1 can"),
       p("Siling labuyo", "2 pcs"),
-      p("Grated cheese", "1/2 cup"),
       p("Tubig", "1 cup"),
       p("Mantika", "2 tbsp"),
       p("Patis", "1 tbsp"),
@@ -648,12 +649,12 @@ export const RECIPES: Recipe[] = [
     "Beef Nilaga",
     ings(
       ["Beef", "Beef Brisket", 0.5, "kg", "1/2 kg"],
-      ["Repolyo", "Cabbage (Scorpio)", 0.25, "kg", "1/4 head"],
-      ["Patatas", "White Potato Local", 0.3, "kg", "1-2 pcs"],
-      ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
-      ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
+      ["Repolyo", "Cabbage", 0.25, "kg", "1/4 head"],
+      ["Patatas", "White Potato", 0.3, "kg", "1-2 pcs"],
+      ["Sibuyas", "Red Onion", 0.1, "kg", "1 pc"],
+      ["Bawang", "Garlic", 0.04, "kg", "1 ulo"],
       ["Pechay", "Native Pechay", 0.2, "kg", "1 tali", true],
-      ["Mais", null, 1, "pcs", "1 pc", true, 18],
+      ["Mais", null, 1, "pcs", "1 pc", true, 25],
     ),
     [
       "Pakuluan ang karne ng baka sa tubig kasama ang sibuyas at pamintang buo.",
@@ -674,10 +675,11 @@ export const RECIPES: Recipe[] = [
       ["Kalabasa", "Squash", 0.5, "kg", "1/2 kg"],
       ["Sitaw", "Pole Sitao", 0.125, "kg", "5-8 pcs"],
       ["Pork", "Pork Picnic Shoulder (Kasim)", 0.25, "kg", "1/4 kg"],
-      ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
-      ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
-      ["Luya", "Ginger Local", 0.04, "kg", "1 piraso", true],
-      ["Siling haba", "Chilli (Green) Local", 0.02, "kg", "1-2 pcs", true],
+      ["Bawang", "Garlic", 0.04, "kg", "1 ulo"],
+      ["Sibuyas", "Red Onion", 0.1, "kg", "1 pc"],
+      ["Luya", "Ginger", 0.04, "kg", "1 piraso", true],
+      ["Siling haba", "Chilli (Green)", 0.02, "kg", "1-2 pcs", true],
+      ["Gata", null, 1, "pcs", "1 pack", false, 35.75],
     ),
     [
       "Igisa ang bawang at sibuyas sa kaunting mantika.",
@@ -689,7 +691,6 @@ export const RECIPES: Recipe[] = [
       "Timplahan ng asin o bagoong at hayaang lumapot ang gata.",
     ],
     [
-      p("Gata", "2 cups"),
       p("Patis", "1 tbsp"),
       p("Mantika", "1 tbsp"),
       p("Tubig", "1/2 cup"),
@@ -704,8 +705,8 @@ export const RECIPES: Recipe[] = [
       ["Pechay", "Native Pechay", 0.325, "kg", "1-2 tali"],
       ["Pork", "Pork Picnic Shoulder (Kasim)", 0.25, "kg", "1/4 kg"],
       ["Kamatis", "Tomato", 0.1, "kg", "1 pc"],
-      ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
-      ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
+      ["Sibuyas", "Red Onion", 0.1, "kg", "1 pc"],
+      ["Bawang", "Garlic", 0.04, "kg", "1 ulo"],
     ),
     [
       "Igisa ang bawang at sibuyas sa mainit na mantika.",
@@ -726,9 +727,9 @@ export const RECIPES: Recipe[] = [
       ["Chicken", "Chicken Leg Quarter", 0.5, "kg", "1/2 kg"],
       ["Sayote", "Chayote", 0.5, "kg", "2 pcs"],
       ["Kamatis", "Tomato", 0.1, "kg", "1 pc"],
-      ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
-      ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
-      ["Luya", "Ginger Local", 0.04, "kg", "1 piraso", true],
+      ["Sibuyas", "Red Onion", 0.1, "kg", "1 pc"],
+      ["Bawang", "Garlic", 0.04, "kg", "1 ulo"],
+      ["Luya", "Ginger", 0.04, "kg", "1 piraso", true],
     ),
     [
       "Igisa ang bawang at sibuyas sa mainit na mantika.",
@@ -749,8 +750,8 @@ export const RECIPES: Recipe[] = [
       ["Pork", "Pork Picnic Shoulder (Kasim)", 0.5, "kg", "1/2 kg"],
       ["Sayote", "Chayote", 0.5, "kg", "2 pcs"],
       ["Kamatis", "Tomato", 0.1, "kg", "1 pc"],
-      ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
-      ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
+      ["Sibuyas", "Red Onion", 0.1, "kg", "1 pc"],
+      ["Bawang", "Garlic", 0.04, "kg", "1 ulo"],
     ),
     [
       "Igisa ang bawang at sibuyas sa mainit na mantika.",
@@ -795,10 +796,10 @@ export const RECIPES: Recipe[] = [
     "Beef Broccoli",
     ings(
       ["Beef", "Beef Brisket", 0.5, "kg", "1/2 kg"],
-      ["Broccoli", "Broccoli Local", 0.4, "kg", "1 head"],
-      ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
-      ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
-      ["Carrots", "Carrots Local", 0.1, "kg", "1 pc", true],
+      ["Broccoli", "Broccoli", 0.4, "kg", "1 head"],
+      ["Sibuyas", "Red Onion", 0.1, "kg", "1 pc"],
+      ["Bawang", "Garlic", 0.04, "kg", "1 ulo"],
+      ["Carrots", "Carrots", 0.1, "kg", "1 pc", true],
     ),
     [
       "I-marinate ang hiniwang baka sa toyo, cornstarch, at kaunting asukal.",
@@ -825,10 +826,10 @@ export const RECIPES: Recipe[] = [
     "ginisang-upo",
     "Ginisang Upo",
     ings(
-      ["Upo", null, 0.7, "kg", "1 pc", false, 50],
+      ["Upo", null, 1, "pcs", "1 pc", false, 80],
       ["Kamatis", "Tomato", 0.1, "kg", "1 pc"],
-      ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
-      ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
+      ["Sibuyas", "Red Onion", 0.1, "kg", "1 pc"],
+      ["Bawang", "Garlic", 0.04, "kg", "1 ulo"],
       ["Pork", "Pork Picnic Shoulder (Kasim)", 0.25, "kg", "1/4 kg", true],
     ),
     [
@@ -849,10 +850,11 @@ export const RECIPES: Recipe[] = [
     ings(
       ["Tilapia", "Tilapia", 0.625, "kg", "2-3 pcs"],
       ["Pechay", "Native Pechay", 0.2, "kg", "1 tali"],
-      ["Luya", "Ginger Local", 0.04, "kg", "1 piraso"],
-      ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
-      ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
-      ["Siling haba", "Chilli (Green) Local", 0.02, "kg", "1-2 pcs", true],
+      ["Luya", "Ginger", 0.04, "kg", "1 piraso"],
+      ["Bawang", "Garlic", 0.04, "kg", "1 ulo"],
+      ["Sibuyas", "Red Onion", 0.1, "kg", "1 pc"],
+      ["Siling haba", "Chilli (Green)", 0.02, "kg", "1-2 pcs", true],
+      ["Gata", null, 1, "pcs", "1 pack", false, 35.75],
     ),
     [
       "Iprito nang bahagya ang tilapia para hindi madurog sa gata.",
@@ -864,7 +866,6 @@ export const RECIPES: Recipe[] = [
       "Timplahan ng asin o patis at hayaang lumapot ang sarsa bago hanguin.",
     ],
     [
-      p("Gata", "2 cups"),
       p("Suka", "2 tbsp"),
       p("Tubig", "1/2 cup"),
       p("Asin", "1 tsp"),
@@ -878,7 +879,7 @@ export const RECIPES: Recipe[] = [
     ings(
       ["Bangus", "Bangus", 0.75, "kg", "3/4 kg"],
       ["Kalamansi", "Calamansi", 0.04, "kg", "3-5 pcs", true],
-      ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo", true],
+      ["Bawang", "Garlic", 0.04, "kg", "1 ulo", true],
     ),
     [
       "Linisin ang bangus at hiwain sa gitna para maging butterfly cut.",
@@ -898,8 +899,8 @@ export const RECIPES: Recipe[] = [
     ings(
       ["Tilapia", "Tilapia", 0.625, "kg", "2-3 pcs"],
       ["Kamatis", "Tomato", 0.225, "kg", "2-3 pcs"],
-      ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
-      ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
+      ["Sibuyas", "Red Onion", 0.1, "kg", "1 pc"],
+      ["Bawang", "Garlic", 0.04, "kg", "1 ulo"],
       ["Itlog", "Chicken Egg (White Medium)", 2, "pcs", "1-2 pcs"],
     ),
     [
@@ -926,7 +927,7 @@ export const RECIPES: Recipe[] = [
     ings(
       ["Galunggong", "Galunggong", 0.625, "kg", "1/2 kg"],
       ["Kalamansi", "Calamansi", 0.025, "kg", "2-3 pcs", true],
-      ["Bawang", "Garlic Native/Local", 0.025, "kg", "3-4 cloves", true],
+      ["Bawang", "Garlic", 0.025, "kg", "3-4 cloves", true],
     ),
     [
       "Linisin ang galunggong at tanggalin ang hasang pati bituka nito.",
@@ -946,8 +947,8 @@ export const RECIPES: Recipe[] = [
     ings(
       ["Galunggong", "Galunggong", 0.5, "kg", "1/2 kg"],
       ["Kamatis", "Tomato", 0.225, "kg", "2-3 pcs"],
-      ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
-      ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
+      ["Sibuyas", "Red Onion", 0.1, "kg", "1 pc"],
+      ["Bawang", "Garlic", 0.04, "kg", "1 ulo"],
       ["Itlog", "Chicken Egg (White Medium)", 2, "pcs", "1-2 pcs"],
     ),
     [
@@ -974,7 +975,7 @@ export const RECIPES: Recipe[] = [
     ings(
       ["Tamban", "Sardines (Tamban)", 0.5, "kg", "1/2 kg"],
       ["Kalamansi", "Calamansi", 0.025, "kg", "2-3 pcs", true],
-      ["Bawang", "Garlic Native/Local", 0.025, "kg", "3-4 cloves", true],
+      ["Bawang", "Garlic", 0.025, "kg", "3-4 cloves", true],
     ),
     [
       "Linisin ang isdang tamban at tanggalin ang kaliskis nito.",
@@ -994,10 +995,10 @@ export const RECIPES: Recipe[] = [
     ings(
       ["Ground Pork", "Pork Picnic Shoulder (Kasim)", 0.25, "kg", "1/4 kg"],
       ["Itlog", "Chicken Egg (White Medium)", 3, "pcs", "3 pcs"],
-      ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
-      ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
-      ["Patatas", "White Potato Local", 0.175, "kg", "1 pc", true],
-      ["Carrots", "Carrots Local", 0.1, "kg", "1 pc", true],
+      ["Sibuyas", "Red Onion", 0.1, "kg", "1 pc"],
+      ["Bawang", "Garlic", 0.04, "kg", "1 ulo"],
+      ["Patatas", "White Potato", 0.175, "kg", "1 pc", true],
+      ["Carrots", "Carrots", 0.1, "kg", "1 pc", true],
     ),
     [
       "Igisa ang bawang, sibuyas, at giniling na baboy sa kawali.",
@@ -1017,7 +1018,7 @@ export const RECIPES: Recipe[] = [
     ings(
       ["Pork Chop", "Pork Chop", 0.5, "kg", "1/2 kg"],
       ["Kalamansi", "Calamansi", 0.04, "kg", "3-5 pcs", true],
-      ["Bawang", "Garlic Native/Local", 0.035, "kg", "4-6 cloves", true],
+      ["Bawang", "Garlic", 0.035, "kg", "4-6 cloves", true],
       ["Itlog", "Chicken Egg (White Medium)", 1, "pcs", "1 pc", true],
     ),
     [
@@ -1043,7 +1044,7 @@ export const RECIPES: Recipe[] = [
     "Fried Liempo",
     ings(
       ["Liempo", "Pork Belly (Liempo)", 0.5, "kg", "1/2 kg"],
-      ["Bawang", "Garlic Native/Local", 0.035, "kg", "4-6 cloves", true],
+      ["Bawang", "Garlic", 0.035, "kg", "4-6 cloves", true],
       ["Kalamansi", "Calamansi", 0.025, "kg", "2-3 pcs", true],
     ),
     [
@@ -1087,9 +1088,9 @@ export const RECIPES: Recipe[] = [
     "Adobong Baboy",
     ings(
       ["Pork", "Pork Picnic Shoulder (Kasim)", 0.5, "kg", "1/2 kg"],
-      ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
-      ["Sibuyas", "Red Onion Local", 0.15, "kg", "1-2 pcs"],
-      ["Patatas", "White Potato Local", 0.3, "kg", "1-2 pcs", true],
+      ["Bawang", "Garlic", 0.04, "kg", "1 ulo"],
+      ["Sibuyas", "Red Onion", 0.15, "kg", "1-2 pcs"],
+      ["Patatas", "White Potato", 0.3, "kg", "1-2 pcs", true],
       ["Itlog", "Chicken Egg (White Medium)", 2, "pcs", "2 pcs", true],
     ),
     [
@@ -1118,12 +1119,13 @@ export const RECIPES: Recipe[] = [
     "Pork Mechado",
     ings(
       ["Pork", "Pork Picnic Shoulder (Kasim)", 0.5, "kg", "1/2 kg"],
-      ["Patatas", "White Potato Local", 0.3, "kg", "1-2 pcs"],
-      ["Carrots", "Carrots Local", 0.1, "kg", "1 pc"],
+      ["Patatas", "White Potato", 0.3, "kg", "1-2 pcs"],
+      ["Carrots", "Carrots", 0.1, "kg", "1 pc"],
       ["Kamatis", "Tomato", 0.14, "kg", "1-2 pcs"],
-      ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
-      ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
-      ["Bell pepper", "Bell Pepper (Red) Local", 0.125, "kg", "1 pc", true],
+      ["Sibuyas", "Red Onion", 0.1, "kg", "1 pc"],
+      ["Bawang", "Garlic", 0.04, "kg", "1 ulo"],
+      ["Bell pepper", "Bell Pepper (Red)", 0.125, "kg", "1 pc", true],
+      ["Tomato sauce", null, 1, "pcs", "1 pack", false, 13.6],
     ),
     [
       "Igisa ang bawang at sibuyas sa mainit na mantika.",
@@ -1135,7 +1137,6 @@ export const RECIPES: Recipe[] = [
       "Hanguin kapag lumapot na ang sarsa at malambot na ang mga gulay.",
     ],
     [
-      p("Tomato sauce", "1 cup"),
       p("Toyo", "2 tbsp"),
       p("Tubig", "1 cup"),
       p("Laurel", "2 pcs"),
@@ -1150,12 +1151,13 @@ export const RECIPES: Recipe[] = [
     "Beef Mechado",
     ings(
       ["Beef", "Beef Brisket", 0.5, "kg", "1/2 kg"],
-      ["Patatas", "White Potato Local", 0.3, "kg", "1-2 pcs"],
-      ["Carrots", "Carrots Local", 0.1, "kg", "1 pc"],
-      ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
-      ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
-      ["Bell pepper", "Bell Pepper (Red) Local", 0.125, "kg", "1 pc", true],
+      ["Patatas", "White Potato", 0.3, "kg", "1-2 pcs"],
+      ["Carrots", "Carrots", 0.1, "kg", "1 pc"],
+      ["Sibuyas", "Red Onion", 0.1, "kg", "1 pc"],
+      ["Bawang", "Garlic", 0.04, "kg", "1 ulo"],
+      ["Bell pepper", "Bell Pepper (Red)", 0.125, "kg", "1 pc", true],
       ["Kamatis", "Tomato", 0.14, "kg", "1-2 pcs", true],
+      ["Tomato sauce", null, 1, "pcs", "1 pack", false, 13.6],
     ),
     [
       "Igisa ang bawang at sibuyas sa kaunting mantika.",
@@ -1167,7 +1169,6 @@ export const RECIPES: Recipe[] = [
       "Hanguin kapag lumapot na ang sarsa ng mechado.",
     ],
     [
-      p("Tomato sauce", "1 cup"),
       p("Toyo", "2 tbsp"),
       p("Tubig", "2 cups"),
       p("Laurel", "2 pcs"),
@@ -1182,10 +1183,13 @@ export const RECIPES: Recipe[] = [
     "Pork Caldereta",
     ings(
       ["Pork", "Pork Picnic Shoulder (Kasim)", 0.5, "kg", "1/2 kg"],
-      ["Patatas", "White Potato Local", 0.3, "kg", "1-2 pcs"],
-      ["Carrots", "Carrots Local", 0.1, "kg", "1 pc"],
-      ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
-      ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
+      ["Patatas", "White Potato", 0.3, "kg", "1-2 pcs"],
+      ["Carrots", "Carrots", 0.1, "kg", "1 pc"],
+      ["Sibuyas", "Red Onion", 0.1, "kg", "1 pc"],
+      ["Bawang", "Garlic", 0.04, "kg", "1 ulo"],
+      ["Tomato sauce", null, 1, "pcs", "1 pack", false, 13.6],
+      ["Liver spread", null, 1, "pcs", "1 can", false, 24.35],
+      ["Grated cheese", null, 1, "pcs", "1 pack", true, 17.6],
     ),
     [
       "Iprito muna ang patatas at carrots sa mainit na mantika saka itabi.",
@@ -1197,11 +1201,8 @@ export const RECIPES: Recipe[] = [
       "Pakuluan ng isa pang minuto bago hanguin at ihain.",
     ],
     [
-      p("Tomato sauce", "1 cup"),
-      p("Liver spread", "1 can"),
       p("Bell pepper", "1 pc"),
       p("Siling labuyo", "2 pcs"),
-      p("Grated cheese", "1/2 cup"),
       p("Tubig", "1 cup"),
       p("Mantika", "2 tbsp"),
       p("Patis", "1 tbsp"),
@@ -1214,11 +1215,14 @@ export const RECIPES: Recipe[] = [
     "Beef Caldereta",
     ings(
       ["Beef", "Beef Brisket", 0.5, "kg", "1/2 kg"],
-      ["Patatas", "White Potato Local", 0.3, "kg", "1-2 pcs"],
-      ["Carrots", "Carrots Local", 0.1, "kg", "1 pc"],
-      ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
-      ["Bawang", "Garlic Native/Local", 0.04, "kg", "1 ulo"],
-      ["Bell pepper", "Bell Pepper (Red) Local", 0.125, "kg", "1 pc", true],
+      ["Patatas", "White Potato", 0.3, "kg", "1-2 pcs"],
+      ["Carrots", "Carrots", 0.1, "kg", "1 pc"],
+      ["Sibuyas", "Red Onion", 0.1, "kg", "1 pc"],
+      ["Bawang", "Garlic", 0.04, "kg", "1 ulo"],
+      ["Bell pepper", "Bell Pepper (Red)", 0.125, "kg", "1 pc", true],
+      ["Tomato sauce", null, 1, "pcs", "1 pack", false, 13.6],
+      ["Liver spread", null, 1, "pcs", "1 can", false, 24.35],
+      ["Grated cheese", null, 1, "pcs", "1 pack", true, 17.6],
     ),
     [
       "Pakuluan ang baka sa tubig hanggang sa matanggal ang tigas nito.",
@@ -1230,10 +1234,7 @@ export const RECIPES: Recipe[] = [
       "Timplahan ng gadgaring keso bago patayin ang apoy.",
     ],
     [
-      p("Tomato sauce", "1 cup"),
-      p("Liver spread", "1 can"),
       p("Siling labuyo", "2 pcs"),
-      p("Grated cheese", "1/2 cup"),
       p("Tubig", "2 cups"),
       p("Mantika", "2 tbsp"),
       p("Patis", "1 tbsp"),
@@ -1275,7 +1276,7 @@ export const RECIPES: Recipe[] = [
     ings(
       ["Liempo", "Pork Belly (Liempo)", 0.5, "kg", "1/2 kg"],
       ["Kalamansi", "Calamansi", 0.04, "kg", "3-5 pcs", true],
-      ["Bawang", "Garlic Native/Local", 0.035, "kg", "4-6 cloves", true],
+      ["Bawang", "Garlic", 0.035, "kg", "4-6 cloves", true],
     ),
     [
       "I-marinate ang liempo sa toyo, calamansi, bawang, at kaunting asukal ng tatlong oras.",
@@ -1300,10 +1301,10 @@ export const RECIPES: Recipe[] = [
     ings(
       ["Bangus", "Bangus", 0.75, "kg", "3/4 kg"],
       ["Kamatis", "Tomato", 0.2, "kg", "2 pcs"],
-      ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
-      ["Luya", "Ginger Local", 0.04, "kg", "1 piraso", true],
+      ["Sibuyas", "Red Onion", 0.1, "kg", "1 pc"],
+      ["Luya", "Ginger", 0.04, "kg", "1 piraso", true],
       ["Kalamansi", "Calamansi", 0.04, "kg", "3-5 pcs", true],
-      ["Siling haba", "Chilli (Green) Local", 0.02, "kg", "1-2 pcs", true],
+      ["Siling haba", "Chilli (Green)", 0.02, "kg", "1-2 pcs", true],
     ),
     [
       "Linisin ang bangus at hiwain sa likod para sa paglalagyan ng palaman.",
@@ -1323,12 +1324,13 @@ export const RECIPES: Recipe[] = [
     ings(
       ["Bangus", "Bangus", 0.625, "kg", "1/2 kg"],
       ["Kamatis", "Tomato", 0.225, "kg", "2-3 pcs"],
-      ["Sibuyas", "Red Onion Local", 0.1, "kg", "1 pc"],
-      ["Kangkong", null, 0.175, "kg", "1 tali", false, 100],
-      ["Gabi", null, 0.25, "kg", "1 pc", false, 50],
+      ["Sibuyas", "Red Onion", 0.1, "kg", "1 pc"],
+      ["Kangkong", null, 1, "tali", "1 tali", false, 20],
+      ["Gabi", null, 0.25, "kg", "1 pc", false, 140],
       ["Talong", "Eggplant", 0.2, "kg", "1 pc", true],
-      ["Okra", null, 0.1, "kg", "4-6 pcs", true, 90],
-      ["Siling haba", "Chilli (Green) Local", 0.02, "kg", "1-2 pcs", true],
+      ["Okra", null, 1, "tali", "1 tali", true, 15],
+      ["Siling haba", "Chilli (Green)", 0.02, "kg", "1-2 pcs", true],
+      ["Sinigang mix", null, 1, "pcs", "1 pack", false, 8.45],
     ),
     [
       "Pakuluan ang tubig kasama ang kamatis, sibuyas, at luya.",
@@ -1339,7 +1341,7 @@ export const RECIPES: Recipe[] = [
       "Timplahan ng patis para makuha ang tamang alat at asim.",
       "Patayin ang apoy pagkatapos ng isang minuto para hindi ma-overcook ang gulay.",
     ],
-    [p("Sinigang mix", "1 pack"), p("Tubig", "1 liter"), p("Patis", "2 tbsp"), p("Asin", "1 tsp")],
+    [ p("Tubig", "1 liter"), p("Patis", "2 tbsp"), p("Asin", "1 tsp")],
   ),
 ];
 
@@ -1350,9 +1352,9 @@ export const RECIPES: Recipe[] = [
 // Palengke-realistic rates for items bought by piece, not by kilo.
 // DA per-kg wholesale rates inflate small quantities unrealistically.
 const PALENGKE_RATE_OVERRIDES: Record<string, number> = {
-  "Garlic Native/Local": 175, // 1 ulo ≈ ₱7 (DA ₱383/kg × 0.04 = ₱15 — too high)
-  "Red Onion Local": 80, // 1 pc ≈ ₱8 (DA ₱102/kg × 0.10 = ₱10 — slightly high)
-  "Ginger Local": 125, // 1 piraso ≈ ₱5 (DA ₱180/kg × 0.04 = ₱7 — slightly high)
+  "Garlic": 175, // 1 ulo ≈ ₱7 (DA ₱383/kg × 0.04 = ₱15 — too high)
+  "Red Onion": 80, // 1 pc ≈ ₱8 (DA ₱102/kg × 0.10 = ₱10 — slightly high)
+  "Ginger": 125, // 1 piraso ≈ ₱5 (DA ₱180/kg × 0.04 = ₱7 — slightly high)
 };
 
 // ═══════════════════════════════════════════════════════════
@@ -1469,40 +1471,32 @@ function getMainIngredientKey(recipe: Recipe): string {
   return key;
 }
 
-function isMainProteinIngredient(recipe: Recipe, ing: RecipeIngredient): boolean {
-  if (ing.optional) return false;
-  const protein = getProteinType(recipe);
-  const key = (ing.daKey || ing.name).toLowerCase();
+// isMainProteinIngredient() lived here until 30 Jul 2026. Its only caller was
+// the 3/4 kg rule below, so retiring that rule left it dead, and dead code that
+// looks load-bearing is worse than no code. getMainIngredientKey above is still
+// live: the selection engine uses it to stop two dishes with the same main
+// ingredient landing on one day.
 
-  if (protein === "chicken") return key.includes("chicken");
-  if (protein === "fish") {
-    return (
-      key.includes("bangus") ||
-      key.includes("tilapia") ||
-      key.includes("galunggong") ||
-      key.includes("tamban") ||
-      key.includes("sardines")
-    );
-  }
-  return false;
-}
-
-function normalizeIngredientForCost(recipe: Recipe, ing: RecipeIngredient): RecipeIngredient {
-  const excludedSmallProteinRecipes = new Set([
-    "sopas",
-    "ginisang-repolyo-at-manok",
-    "ginisang-sayote-at-manok",
-  ]);
-
-  if (
-    !excludedSmallProteinRecipes.has(recipe.id) &&
-    isMainProteinIngredient(recipe, ing) &&
-    ing.unit === "kg" &&
-    ing.qty < 0.75
-  ) {
-    return { ...ing, qty: 0.75, amount: "3/4 kg" };
-  }
-
+/**
+ * RETIRED 30 Jul 2026. It now returns the ingredient untouched.
+ *
+ * It used to round a small main protein UP to 3/4 kg, on the theory that a
+ * family portion is 3/4 kg. Chan killed it: *"3/4 kg rule, make it 1/2 for all
+ * of them i think 1/2 is enough for 1-3 person"*.
+ *
+ * He is the one who wrote "1/2 kg" in the recipes, every card says 1-3 katao, and
+ * the rule was quietly overriding his amount AND relabelling it as "3/4 kg" on
+ * the card. The app was overruling its own author and then hiding that it had.
+ *
+ * Measured before removing it: 13 of the 47 dishes were affected and the book
+ * carried P380 of protein nobody asked for, about P29 a dish. Fried Tamban was
+ * P102 and is P74 now.
+ *
+ * The function stays as a seam rather than being deleted at every call site, so
+ * the reason is recorded where the behaviour used to live. Anything wanting to
+ * adjust a quantity at costing time belongs here.
+ */
+function normalizeIngredientForCost(_recipe: Recipe, ing: RecipeIngredient): RecipeIngredient {
   return ing;
 }
 
@@ -1572,6 +1566,204 @@ function getIngredientTrend(
   return "stable";
 }
 
+/**
+ * Pantry goods that DO cost money, at a flat tingi price for one dish.
+ *
+ * Chan, Jul 30 2026, reviewing Chicken Steak with Gravy: *"some of this item
+ * should be optional and not free -- Harina, knorr chicken cubes, mantika,
+ * paminta, this should not be free"*, with the prices: *"for all the dishes that
+ * have mantika or oil we should put it like 10 pesos base price, for paminta 2
+ * pesos is the base price for 1 dish tingi, harina/flour/cornstarch we can have
+ * a base price of 10 pesos on palengke"*.
+ *
+ * This PARTLY REVERSES the Jul 29 split model, which made every tingi seasoning
+ * free. Oil and pepper are no longer free: oil is in 38 of 47 dishes and pepper
+ * in 44, so calling them free understated almost every dish on the site. The P10
+ * is the repackaged mantika he described, and P2 is a tingi of pepper, so both
+ * are whole units in the whole-packs sense, not a fraction of anything.
+ *
+ * A FLAT price per dish, never price x amount. A dish deep-frying in 1 cup of
+ * oil and one sauteing in 2 tbsp both pay P10, because both send you to the
+ * sari-sari store for the same P10 sachet.
+ *
+ * What is absent stays free, and every absence is Chan's own call:
+ *   asin           "asin is optional its not needed"
+ *   garlic powder  "optional we already have garlic"
+ *   tubig, laurel  never bought for a single dish
+ *
+ * ── Jul 30 2026, second pass: the sauces get priced too ─────
+ * Asked whether toyo, patis, suka and asukal should follow, Chan: *"yes do it"*.
+ * Every price below is a real ShopSuki row, not a guess.
+ *
+ * Toyo, patis and suka use the 100ml BUDGET PACK, not the cheaper 60ml, because
+ * that is the size Chan already ruled on: *"shop suki is 100ml budget pack which
+ * is enough for 1 dish. so i think we should follow it"*. A 60ml Datu Puti at
+ * P5.00 exists but does not cover the 1/2 cup an adobo asks for.
+ *
+ * ASUKAL is the one price not from ShopSuki. Its cheapest catalogue row is a
+ * 1/2 kg bag at P35, absurd for the 1 tsp a dish uses, and Chan is right that
+ * *"asukal is just sugar - we already have this on dti bantay presyo"* — the DA
+ * sheet does carry Sugar (Brown) at P72.32/kg. But a per-tablespoon figure from
+ * that (P0.87) is not a thing you can buy either. Chan, 30 Jul 2026: *"put it as
+ * a base price of 5 pesos there is a tingi of this also"*. P5 is the tingi bag,
+ * which is the unit that actually changes hands.
+ *
+ * MARGARINE AND MANTIKILYA are both priced, and both at P10. Chan first: *"some
+ * this need margarine or mantikilya or butter, margarine is a cheaper side of
+ * butter in philippines"*, then on seeing the P10.60 ShopSuki figure: *"10 pesos
+ * base price on palengke - we should put it for this -- 10 pesos is enough for 1
+ * dish"*. He said that about mantikilya; margarine follows it because margarine
+ * is the CHEAPER of the two and leaving it at P10.60 would price the cheap
+ * option above the dear one. Say so if that is wrong.
+ *
+ * ── Four roles, not two (Chan, 30 Jul 2026) ─────────────────
+ * A pantry good is no longer just priced-or-free. Reviewing this same dish he
+ * asked for all four:
+ *
+ *   charged   a real line with a price, and tickable on /pantry
+ *   optional  shown, greyed, NEVER counted: *"garlic powder is not free this
+ *             should be optional and not counted on total price"*
+ *   hidden    not shown at all: *"tubig -- dont display this"*
+ *   free      shown under the free heading, the remainder (laurel)
+ *
+ * ASIN MOVED FROM FREE TO CHARGED at P5: *"asin should be here - 5 pesos base
+ * price not optional or free so they can tick this pantry items"*. That reverses
+ * his Jul 30 morning ruling that asin was optional, and the reason is the pantry
+ * page — he wants it tickable, and only a charged good can be.
+ *
+ * MANTIKA IS CONDITIONAL, the one rule that depends on the rest of the dish:
+ * *"sometimes if you have mantikilya/butter or margarine -- mantika is optional
+ * make this mantika optional"*. A dish already buying a butter-family fat does
+ * not also buy oil, so mantika drops to `optional` there. See pantryRole().
+ */
+const PANTRY_PRICES: Record<string, number> = {
+  // Oil and fat
+  Mantika: 10,
+  "Atsuete oil": 10,
+  Margarine: 10,
+  Mantikilya: 10,
+  // Seasoning
+  Asin: 5,
+  Paminta: 2,
+  "Pamintang buo": 2,
+  Toyo: 7.2,
+  Patis: 10.6,
+  Suka: 6.3,
+  Asukal: 5,
+  "Asukal na pula": 5,
+  "Chicken broth cube": 6.8,
+  "Knorr chicken cube": 6.8,
+  // Coating
+  Harina: 10,
+  Flour: 10,
+  Cornstarch: 10,
+
+  // ── The 19 that used to sit in the "free" list ────────────
+  // Chan, 30 Jul 2026: *"this items is probably not optional goods or items
+  // instead its essential for the dish and should be counted on total, most of
+  // this are on shopsuki"*. He was right, and it was worse than free: removing
+  // the pantry section from the card would have hidden a whole bottle of Mang
+  // Tomas and 30 lumpia wrappers, so a cook could not have shopped for the dish.
+  //
+  // Groceries priced from ShopSuki, cheapest pack that actually covers the
+  // amount the recipe asks for.
+  "Mang Tomas sauce": 6.45,
+  "Lumpia wrapper": 54.65,
+  "Sweet chili sauce": 31.5,
+  Mayonnaise: 33.95,
+  "Oyster sauce": 6.05,
+  Breadcrumbs: 13.65,
+  "Banana ketchup": 10.1,
+  "Green peas": 13.4,
+  Raisins: 20.65,
+  "Atsuete powder": 16.7,
+  Laurel: 10.75,
+  Tanglad: 10.05,
+  "Puso ng saging": 17.5,
+
+  // Fresh goods, priced to MATCH what the app already charges for the same good
+  // where it is a real ingredient. Bawang is P7 for one ulo on 39 other cards, so
+  // it is P7 here too — a good must not cost two different amounts on one site.
+  Bawang: 7,
+  Kalamansi: 3,
+  Luya: 5,
+  "Bell pepper": 27,
+  "Siling labuyo": 2,
+  Kintsay: 6,
+};
+
+/** Shown and greyed, never counted. Chan on garlic powder: "we already have garlic". */
+const PANTRY_OPTIONAL = new Set(["Garlic powder", "Garlic Powder"]);
+
+/** Never displayed. Chan: "tubig -- dont display this". */
+const PANTRY_HIDDEN = new Set(["Tubig", "Hugas bigas"]);
+
+/**
+ * A dish buying one of these does not also buy oil, so its mantika drops to
+ * optional. Chan: "sometimes if you have mantikilya/butter or margarine --
+ * mantika is optional".
+ */
+const BUTTER_FAMILY = new Set(["Mantikilya", "Margarine", "Butter"]);
+
+export type PantryRole = "charged" | "optional" | "hidden" | "free";
+
+/**
+ * What a pantry good does on ONE dish. Four outcomes, all of them Chan's calls —
+ * see the PANTRY_PRICES header for the quotes.
+ *
+ * Takes the whole recipe, not just a name, because the mantika rule genuinely
+ * depends on what else the dish buys.
+ */
+export function pantryRole(recipe: Recipe, name: string): PantryRole {
+  if (PANTRY_HIDDEN.has(name)) return "hidden";
+  if (PANTRY_OPTIONAL.has(name)) return "optional";
+  if (name === "Mantika" && recipe.pantryItems.some((p) => BUTTER_FAMILY.has(p.name))) {
+    return "optional";
+  }
+  return PANTRY_PRICES[name] !== undefined ? "charged" : "free";
+}
+
+/**
+ * The ShopSuki row each price above came from, so a number can be re-checked
+ * without re-running the whole catalogue pull.
+ */
+export const PANTRY_SOURCES: Record<string, string> = {
+  Mantika: "P10 repackaged sari-sari sachet (Chan; the DA's 350ml bottle is P39.21)",
+  Margarine: "Star Margarine Classic Twin Pack 30g",
+  Mantikilya: "Star Margarine Classic Twin Pack 30g (cheapest of the butter family)",
+  Toyo: "Datu Puti Soy Sauce 100ml",
+  Patis: "Silver Swan Patis Seasoning 100ml",
+  Suka: "Silver Swan Sukang Puti Budget Pack 100ml",
+  Asukal: "P5 tingi (Chan: there is a tingi of this too). The DA sells Sugar (Brown) at P72.32/kg, which works out to P0.87 a tbsp, but nobody buys a tablespoon.",
+  "Chicken broth cube": "Knorr Broth Cubes Chicken Single 10g",
+  Asin: "P5 tingi (Chan: \"asin should be here - 5 pesos base price not optional or free so they can tick this pantry items\")",
+  Paminta: "P2 tingi (Chan)",
+  Flour: "P10 palengke tingi (Chan)",
+};
+
+/**
+ * What the pantry adds to one dish. Zero when every pantry good is free.
+ *
+ * Summed in CENTAVOS. The prices are decimals (toyo 7.20, patis 10.60, suka
+ * 6.30) and adding them as floats produced P29.799999999999997 on the mechado,
+ * which would have reached a card.
+ */
+export function pantryCost(recipe: Recipe): number {
+  let centavos = 0;
+  for (const item of recipe.pantryItems) {
+    // Only a CHARGED good counts. An optional one is shown and never billed,
+    // which is the whole difference between garlic powder and asin.
+    if (pantryRole(recipe, item.name) !== "charged") continue;
+    centavos += Math.round((PANTRY_PRICES[item.name] ?? 0) * 100);
+  }
+  return centavos / 100;
+}
+
+/** The tingi price of one pantry good, or undefined when it is free. */
+export function pantryItemPrice(name: string): number | undefined {
+  return PANTRY_PRICES[name];
+}
+
 export function calculateRecipeCost(recipe: Recipe, priceMap: PriceMap): number {
   if (!hasRequiredPrices(recipe, priceMap)) return Number.POSITIVE_INFINITY;
 
@@ -1579,6 +1771,9 @@ export function calculateRecipeCost(recipe: Recipe, priceMap: PriceMap): number 
   for (const ing of recipe.ingredients) {
     if (!ing.optional) total += getIngredientCost(recipe, ing, priceMap);
   }
+
+  // Oil, pepper and flour are bought, not conjured. See PANTRY_PRICES.
+  total += pantryCost(recipe);
 
   return Math.round(total);
 }
@@ -1604,6 +1799,38 @@ export function calculateRecipeCostDetailed(
       optional: ing.optional,
     };
   });
+
+  // A priced pantry good becomes a real line on the card. Showing it under a
+  // "not in DA price monitoring" heading while it adds P10 to the total would be
+  // the same display-versus-data split that once made the homepage and /ulam
+  // disagree, so it is listed where the money is.
+  for (const item of recipe.pantryItems) {
+    const role = pantryRole(recipe, item.name);
+    if (role === "hidden" || role === "free") continue;
+
+    // An optional pantry good gets a line so the cook knows to bring it, and a
+    // cost of zero so it can never move the total.
+    if (role === "optional") {
+      ingredientCosts.push({
+        name: item.name,
+        amount: item.amount,
+        cost: 0,
+        trend: "stable",
+        optional: true,
+      });
+      continue;
+    }
+
+    const price = pantryItemPrice(item.name) ?? 0;
+    totalCost += price;
+    ingredientCosts.push({
+      name: item.name,
+      amount: item.amount,
+      cost: price,
+      trend: "stable",
+      optional: false,
+    });
+  }
 
   return {
     recipe,
@@ -1847,15 +2074,32 @@ export function selectDailyMeals(
   const proteinCount: Record<string, number> = {};
   let pritoCount = 0;
 
-  const canTake = (result: CostResult, enforceProtein: boolean): boolean => {
+  /**
+   * `pritoLimit` is lower for the mura slots than the day's real cap, and that
+   * gap is the whole point.
+   *
+   * Fried dishes are cheap, so they crowd the cheap pool. With one shared cap
+   * the five mura slots spent the entire prito budget before the rotation slots
+   * ran, and a fried dish too dear to be "mura" could then never be taken at
+   * all — not on any day, ever. Three recipes went permanently unshown that
+   * way (29 Jul 2026), which is the exact failure the V2.4 selection exists to
+   * prevent, reappearing through a side door.
+   *
+   * Holding one prito slot back for rotation fixes it without raising the cap:
+   * a day still never serves more than opts.pritoCap fried dishes.
+   */
+  const canTake = (result: CostResult, enforceProtein: boolean, pritoLimit: number): boolean => {
     if (used[result.recipe.id]) return false;
-    if (getCookingMethod(result.recipe) === "prito" && pritoCount >= opts.pritoCap) return false;
+    if (getCookingMethod(result.recipe) === "prito" && pritoCount >= pritoLimit) return false;
     if (enforceProtein) {
       const protein = getProteinType(result.recipe);
       if ((proteinCount[protein] || 0) >= getProteinLimit(protein)) return false;
     }
     return true;
   };
+
+  /** The cheap slots may not use the last fried slot; rotation needs it. */
+  const MURA_PRITO_LIMIT = Math.max(1, opts.pritoCap - 1);
 
   const take = (result: CostResult, slot: MealSlot) => {
     picked.push({ result, slot });
@@ -1871,15 +2115,15 @@ export function selectDailyMeals(
 
   for (const result of rested) {
     if (picked.length >= opts.coreSlots) break;
-    if (canTake(result, true)) take(result, "mura");
+    if (canTake(result, true, MURA_PRITO_LIMIT)) take(result, "mura");
   }
   for (const result of corePool) {
     if (picked.length >= opts.coreSlots) break;
-    if (canTake(result, true)) take(result, "mura");
+    if (canTake(result, true, MURA_PRITO_LIMIT)) take(result, "mura");
   }
   for (const result of corePool) {
     if (picked.length >= opts.coreSlots) break;
-    if (canTake(result, false)) take(result, "mura");
+    if (canTake(result, false, MURA_PRITO_LIMIT)) take(result, "mura");
   }
 
   // ── IBA NAMAN: longest-waiting across the whole book, price ignored ──
@@ -1887,11 +2131,24 @@ export function selectDailyMeals(
 
   for (const result of rotation) {
     if (picked.length >= opts.count) break;
-    if (canTake(result, true)) take(result, "iba");
+    /*
+      A dish that has NEVER been shown gets one exemption from the protein cap.
+
+      Without it a whole category can lock a dish out forever. The veggie cap is
+      1 a day and the cheap pool is full of veggie dishes, so a veggie mura pick
+      spent that cap every single day and Ginataang Sitaw at Kalabasa — the
+      dearest of the five — was never once surfaced in a 28-day simulation
+      (29 Jul 2026).
+
+      The exemption is self-limiting: it only fires while a dish has never been
+      shown, so it cannot become a way for one category to take over a day.
+    */
+    const neverShown = waited(result) === NEVER_SHOWN;
+    if (canTake(result, !neverShown, opts.pritoCap)) take(result, "iba");
   }
   for (const result of rotation) {
     if (picked.length >= opts.count) break;
-    if (canTake(result, false)) take(result, "iba");
+    if (canTake(result, false, opts.pritoCap)) take(result, "iba");
   }
   // Last resort: fill the page even if that means breaking the prito cap.
   for (const result of costed) {
