@@ -146,3 +146,8 @@ dist
 # Output of npm run check:ingredients (a report, regenerate it any time)
 ingredient-coverage.json
 ingredient-sweep.log
+
+# Local working data: audit JSONs, DTI parse output, relay notes, recipe
+# drafts. Untracked was never protection; this is. The repo is PUBLIC and
+# a public commit cannot be recalled.
+data/
